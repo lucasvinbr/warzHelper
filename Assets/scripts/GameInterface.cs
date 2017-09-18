@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +7,10 @@ public class GameInterface : MonoBehaviour {
     public static GameInterface instance;
 
     public EditFactionPanel editFactionPanel;
+
+	public TextInputPanel texInputPanel;
+
+	public ColorInputPanel colorInputPanel;
 
     void Awake()
     {

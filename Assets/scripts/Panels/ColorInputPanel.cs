@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +10,7 @@ public class ColorInputPanel : InputPanel {
 
     public Image colorImg;
 
-    public Color theColor;
+    public Color theColor = Color.white;
 
     public void SetPanelInfo(string infoLabelContent, Color initialColor, string actionButtonText, UnityEvent onActionButtonPress)
     {
