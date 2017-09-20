@@ -12,6 +12,23 @@ using UnityEngine;
 /// </summary>
 public class PersistenceHandler
 {
+
+    public static string gamesDirectory
+    {
+        get
+        {
+            return Application.streamingAssetsPath + "/savedGames/";
+        }
+    }
+
+    public static string templatesDirectory
+    {
+        get
+        {
+            return Application.streamingAssetsPath + "/savedTemplates/";
+        }
+    }
+
     /// <summary>
     /// does a LoadFromFile on each file found in the directory;
     /// returns the successfully loaded data
@@ -100,8 +117,6 @@ public class PersistenceHandler
 
                 filePath = Application.streamingAssetsPath + "/" + subDirectory + "/" + fileName + ".xml";
             }
-            
-
             
 
             StreamWriter writer = new StreamWriter(filePath);

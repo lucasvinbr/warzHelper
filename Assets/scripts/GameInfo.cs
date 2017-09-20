@@ -2,16 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameInfo {
-
-    public string gameName;
-
-    public bool isATemplate = false;
+public class GameInfo : TemplateInfo {
 
     public int lastTurnPriority;
 
-    public List<Faction> factions;
-
-    public List<Zone> zones;
-
+    public int elapsedTurns = 0;
 }
