@@ -12,6 +12,10 @@ public class GameInterface : MonoBehaviour {
 
 	public ColorInputPanel colorInputPanel;
 
+    public SaveListPanel saveListPanel;
+
+    public Color positiveUIColor, negativeUIColor;
+
     void Awake()
     {
         instance = this;
@@ -35,5 +39,10 @@ public class GameInterface : MonoBehaviour {
     public void EditFaction(Faction targetFaction)
     {
         editFactionPanel.Open(targetFaction);
+    }
+
+    public void OpenLoadGameMenu(bool templateMode = false)
+    {
+        saveListPanel.OpenUp(!templateMode);
     }
 }

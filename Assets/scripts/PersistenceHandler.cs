@@ -29,6 +29,17 @@ public class PersistenceHandler
         }
     }
 
+    public static bool IsAValidFilename(string theName)
+    {
+        if (string.IsNullOrEmpty(theName)) return false;
+
+        if (theName.Contains("?") || theName.Contains(":") || theName.Contains("/") || theName.Contains("\\") ||
+            theName.Contains("\"") || theName.Contains("<") || theName.Contains(">") || theName.Contains(".") ||
+            theName.Contains("*") || theName.Contains("|")) return false;
+
+        return true;
+    }
+
     /// <summary>
     /// does a LoadFromFile on each file found in the directory;
     /// returns the successfully loaded data
@@ -100,24 +111,11 @@ public class PersistenceHandler
         }
     }
 
-    public static void SaveToFile<T>(T dataToSave, string fileName, bool notifyMsg = true, string subDirectory = null)
+    public static void SaveToFile<T>(T dataToSave, string filePath, bool notifyMsg = true)
     {
         try
         {
             XmlSerializer serializer = new XmlSerializer(typeof(T));
-
-            string filePath = Application.streamingAssetsPath + fileName + ".xml";
-
-            if (subDirectory != null)
-            {
-                if (!Directory.Exists(Application.streamingAssetsPath + "/" + subDirectory + "/"))
-                {
-                    Directory.CreateDirectory(Application.streamingAssetsPath + "/" + subDirectory + "/");
-                }
-
-                filePath = Application.streamingAssetsPath + "/" + subDirectory + "/" + fileName + ".xml";
-            }
-            
 
             StreamWriter writer = new StreamWriter(filePath);
             serializer.Serialize(writer, dataToSave);

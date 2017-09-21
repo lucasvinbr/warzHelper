@@ -8,7 +8,7 @@ public class TextInputPanel : InputPanel {
 
     public InputField theInputField;
 
-    public void SetPanelInfo(string infoLabelContent, string inputPanelPlaceholderText, string inputPanelInitialText, string actionButtonText, UnityEvent onActionButtonPress)
+    public void SetPanelInfo(string infoLabelContent, string inputPanelPlaceholderText, string inputPanelInitialText, string actionButtonText, UnityAction onActionButtonPress)
     {
         SetPanelInfo(infoLabelContent, actionButtonText, onActionButtonPress);
         (theInputField.placeholder as Text).text = inputPanelPlaceholderText;

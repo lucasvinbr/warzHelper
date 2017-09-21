@@ -13,4 +13,9 @@ public class TemplateInfo {
     public List<Faction> factions;
 
     public List<Zone> zones;
+
+    public TemplateInfo(string name)
+    {
+        this.gameName = name;
+    }
 }

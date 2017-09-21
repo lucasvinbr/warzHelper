@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SaveListPanel : ListContainerPanel<TemplateInfo> {
+
+    public Text promptText;
 
     public bool inGameMode = false;
 
@@ -12,8 +15,9 @@ public class SaveListPanel : ListContainerPanel<TemplateInfo> {
     /// sets this panel as active and shows either saved templates or saved games
     /// </summary>
     /// <param name="showGames"></param>
-    public void OpenUp(bool showGames)
+    public void OpenUp(bool showGames, string promptText)
     {
+        this.promptText.text = promptText;
         inGameMode = showGames;
         gameObject.SetActive(true);
     }

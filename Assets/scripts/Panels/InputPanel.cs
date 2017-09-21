@@ -17,14 +17,14 @@ public class InputPanel : MonoBehaviour {
 
     public virtual void Close()
     {
-        gameObject.SetActive(true);
+        gameObject.SetActive(false);
     }
 
-    public void SetPanelInfo(string infoLabelContent, string actionButtonText, UnityEvent onActionButtonPress)
+    public void SetPanelInfo(string infoLabelContent, string actionButtonText, UnityAction onActionButtonPress)
     {
         infoLabelText.text = infoLabelContent;
         this.actionButtonText.text = actionButtonText;
         actionButton.onClick.RemoveAllListeners();
-        actionButton.onClick.AddListener(() => onActionButtonPress.Invoke());
+        actionButton.onClick.AddListener(onActionButtonPress);
     }
 }

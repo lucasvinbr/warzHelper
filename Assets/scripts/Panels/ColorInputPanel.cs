@@ -12,7 +12,7 @@ public class ColorInputPanel : InputPanel {
 
     public Color theColor = Color.white;
 
-    public void SetPanelInfo(string infoLabelContent, Color initialColor, string actionButtonText, UnityEvent onActionButtonPress)
+    public void SetPanelInfo(string infoLabelContent, Color initialColor, string actionButtonText, UnityAction onActionButtonPress)
     {
         SetPanelInfo(infoLabelContent, actionButtonText, onActionButtonPress);
         SetTheColor(initialColor);
