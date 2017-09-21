@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SaveListPanel : ListContainerPanel<GameInfo> {
+public class SaveListPanel : ListContainerPanel<TemplateInfo> {
 
     public bool inGameMode = false;
 
@@ -35,6 +35,11 @@ public class SaveListPanel : ListContainerPanel<GameInfo> {
         else
         {
             savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.templatesDirectory);
+        }
+
+        for(int i = 0; i < savesList.Count; i++)
+        {
+            AddEntry(savesList[i]);
         }
     }
 }
