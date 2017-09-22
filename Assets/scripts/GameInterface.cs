@@ -14,7 +14,7 @@ public class GameInterface : MonoBehaviour {
 
     public SaveListPanel saveListPanel;
 
-    public Color positiveUIColor, negativeUIColor;
+    public Color positiveUIColor, negativeUIColor, selectedUIElementColor, deselectedUIElementColor;
 
     void Awake()
     {
@@ -43,6 +43,6 @@ public class GameInterface : MonoBehaviour {
 
     public void OpenLoadGameMenu(bool templateMode = false)
     {
-        saveListPanel.OpenUp(!templateMode);
+        saveListPanel.OpenUp(!templateMode, "Select one of the saved entries");
     }
 }

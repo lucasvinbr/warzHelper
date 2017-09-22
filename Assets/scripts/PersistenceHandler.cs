@@ -131,5 +131,17 @@ public class PersistenceHandler
         }
 
     }
+
+    public static void DeleteFile(string filePath)
+    {
+        try
+        {
+            File.Delete(filePath);
+            Debug.LogWarning("deleted file at " + filePath);
+        }catch(Exception e)
+        {
+            Debug.LogError("an error occurred while trying to delete data! error: " + e.ToString());
+        }
+    }
 }
 
