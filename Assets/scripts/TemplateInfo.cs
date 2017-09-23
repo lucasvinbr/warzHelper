@@ -17,5 +17,13 @@ public class TemplateInfo {
     public TemplateInfo(string name)
     {
         this.gameName = name;
+        factions = new List<Faction>();
+        zones = new List<Zone>();
+    }
+
+    //empty constructor to enable xml serialization
+    public TemplateInfo()
+    {
+
     }
 }

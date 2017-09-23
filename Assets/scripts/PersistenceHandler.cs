@@ -80,10 +80,22 @@ public class PersistenceHandler
 
             if (File.Exists(fileName))
             {
-                FileStream readStream = new FileStream(fileName, FileMode.Open);
-                T loadedData = (T)serializer.Deserialize(readStream);
-                readStream.Close();
-                return loadedData;
+                using (FileStream readStream = new FileStream(fileName, FileMode.Open))
+                {
+                    try
+                    {
+                        T loadedData = (T)serializer.Deserialize(readStream);
+                        readStream.Close();
+                        return loadedData;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("an error occurred when trying to read file " + fileName + " as a xml! error: " + e.ToString());
+                        readStream.Close();
+                        return default(T);
+                    }
+
+                }
             }
             else return default(T);
         }
@@ -117,12 +129,14 @@ public class PersistenceHandler
         {
             XmlSerializer serializer = new XmlSerializer(typeof(T));
 
-            StreamWriter writer = new StreamWriter(filePath);
-            serializer.Serialize(writer, dataToSave);
-            writer.Close();
-            if (notifyMsg)
+            using (StreamWriter writer = new StreamWriter(filePath))
             {
-                Debug.LogError("saved at: " + filePath);
+                serializer.Serialize(writer, dataToSave);
+                writer.Close();
+                if (notifyMsg)
+                {
+                    Debug.LogError("saved at: " + filePath);
+                }
             }
         }
         catch (Exception e)

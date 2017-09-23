@@ -11,6 +11,11 @@ public class SavePanelListEntry : ListPanelEntry<TemplateInfo> {
 
     public Image backgroundImg;
 
+    void Start()
+    {
+        backgroundImg.color = GameInterface.instance.deselectedUIElementColor;
+    }
+
     public override void SetContent(TemplateInfo theContent)
     {
         base.SetContent(theContent);

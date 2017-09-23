@@ -48,7 +48,7 @@ public class GameController : MonoBehaviour {
             }
 
             //even if there actually is data, we pretend there isn't in case we plan to overwrite
-            if (existingData != null)
+            if (existingData == null)
             {
                 if (isTemplate)
                 {

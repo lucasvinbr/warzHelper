@@ -10,6 +10,12 @@ public class GameInfo : TemplateInfo {
 
     public GameInfo(string name) : base(name)
     {
-        this.gameName = name;
+       
+    }
+
+    //empty constructor to enable xml serialization
+    public GameInfo()
+    {
+
     }
 }
