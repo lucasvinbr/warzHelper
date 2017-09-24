@@ -6,7 +6,7 @@ public class Zone {
 
     public string name;
 
-    public Faction ownerFaction;
+    public string ownerFaction;
 
     public int bonusTroopsGeneratedPerTurn = 0;
 

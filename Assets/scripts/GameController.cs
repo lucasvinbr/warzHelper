@@ -11,12 +11,14 @@ public class GameController : MonoBehaviour {
 
     void Awake()
     {
-        instance = this;
-    }
+        if (instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-    void OnDestroy()
-    {
-        instance = null;
+        instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     public void StartNewGame(bool isTemplate)

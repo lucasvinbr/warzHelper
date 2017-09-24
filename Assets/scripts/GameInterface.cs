@@ -21,11 +21,6 @@ public class GameInterface : MonoBehaviour {
         instance = this;
     }
 
-    void OnDestroy()
-    {
-        instance = null;
-    }
-
 	public void ShowObject(GameObject obj)
     {
         obj.SetActive(true);
