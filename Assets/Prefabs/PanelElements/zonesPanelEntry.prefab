@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 114099923970825720}
   - component: {fileID: 114341802909013136}
   - component: {fileID: 114157073453212854}
-  - component: {fileID: 114846971210039876}
+  - component: {fileID: 114753489153876882}
   m_Layer: 5
   m_Name: zonesPanelEntry
   m_TagString: Untagged
@@ -122,7 +122,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114846971210039876}
+      - m_Target: {fileID: 0}
         m_MethodName: OpenEditFactionPanel
         m_Mode: 1
         m_Arguments:
@@ -236,6 +236,21 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &114753489153876882
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1367325926709148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dfd55a7d20ab314eb378cef26a6de34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nameTxt: {fileID: 114969548982806962}
+  ownerTxt: {fileID: 114838324241342776}
+  garrisonTxt: {fileID: 114247659789002886}
+  backgroundImg: {fileID: 114187325391636092}
 --- !u!114 &114838324241342776
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -269,20 +284,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: owner faction
---- !u!114 &114846971210039876
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1367325926709148}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d105ee524915eb48b09e756aa5e3e67, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nameTxt: {fileID: 114969548982806962}
-  turnPriorityTxt: {fileID: 114838324241342776}
-  backgroundImg: {fileID: 114187325391636092}
 --- !u!114 &114969548982806962
 MonoBehaviour:
   m_ObjectHideFlags: 1

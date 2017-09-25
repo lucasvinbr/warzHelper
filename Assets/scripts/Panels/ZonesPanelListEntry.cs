@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class ZonesPanelListEntry : ListPanelEntry<Zone> {
 
     public Text nameTxt, ownerTxt, garrisonTxt;
+
+	public Image backgroundImg;
 
     public override void SetContent(Zone theContent)
     {
