@@ -14,7 +14,16 @@ public class GameInterface : MonoBehaviour {
 
     public SaveListPanel saveListPanel;
 
+    public ModeUI startOptionsPanel, templateOptionsPanel, gameOptionsPanel;
+
     public Color positiveUIColor, negativeUIColor, selectedUIElementColor, deselectedUIElementColor;
+
+    public enum InterfaceMode
+    {
+        start,
+        template,
+        game
+    }
 
     void Awake()
     {
@@ -39,5 +48,34 @@ public class GameInterface : MonoBehaviour {
     public void OpenLoadGameMenu(bool templateMode = false)
     {
         saveListPanel.OpenUp(!templateMode, "Select one of the saved entries");
+    }
+
+    /// <summary>
+    /// hides the other modes' UI and shows the desired mode's one
+    /// </summary>
+    /// <param name="desiredMode"></param>
+    public void SwitchInterface(InterfaceMode desiredMode)
+    {
+        switch (desiredMode)
+        {
+            case InterfaceMode.start:
+                templateOptionsPanel.gameObject.SetActive(false);
+                gameOptionsPanel.gameObject.SetActive(false);
+                startOptionsPanel.gameObject.SetActive(true);
+                startOptionsPanel.ShowInitialUI();
+                break;
+            case InterfaceMode.game:
+                templateOptionsPanel.gameObject.SetActive(false);
+                gameOptionsPanel.gameObject.SetActive(true);
+                startOptionsPanel.gameObject.SetActive(false);
+                gameOptionsPanel.ShowInitialUI();
+                break;
+            case InterfaceMode.template:
+                templateOptionsPanel.gameObject.SetActive(true);
+                gameOptionsPanel.gameObject.SetActive(false);
+                startOptionsPanel.gameObject.SetActive(false);
+                templateOptionsPanel.ShowInitialUI();
+                break;
+        }
     }
 }

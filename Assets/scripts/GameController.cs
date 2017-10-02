@@ -11,14 +11,7 @@ public class GameController : MonoBehaviour {
 
     void Awake()
     {
-        if (instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
         instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     public void StartNewGame(bool isTemplate)
@@ -66,6 +59,8 @@ public class GameController : MonoBehaviour {
                 }
 
                 GameInterface.instance.texInputPanel.Close();
+
+
             }
 
 
@@ -83,6 +78,11 @@ public class GameController : MonoBehaviour {
         PersistenceHandler.SaveToFile(curGameData, curGameData.gameName, true);
     }
 
+
+    public void GoToTemplate(TemplateInfo templateData)
+    {
+        GameInterface.instance.SwitchInterface(GameInterface.InterfaceMode.template);
+    }
 
     void OnGameStart()
     {

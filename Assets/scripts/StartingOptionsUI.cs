@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StartingOptions : MonoBehaviour {
+public class StartingOptionsUI : ModeUI {
 
     public GameObject initialOptions, templateOptions, gameOptions;
 	
 
-    public void ShowInitialOptions()
+    public override void ShowInitialUI()
     {
         initialOptions.SetActive(true);
         templateOptions.SetActive(false);
