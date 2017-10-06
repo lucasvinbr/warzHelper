@@ -27,6 +27,12 @@ public class ZonePlacer : MonoBehaviour {
         zoneBlueprint.gameObject.SetActive(false);
     }
 
+    public void StartNewZonePlacement()
+    {
+        this.enabled = true;
+        actionOnSpotSelect += OnNewZoneConfirmPlacement;
+    }
+
     void Update()
     {
         if(Physics.Raycast( cam.ScreenPointToRay(Input.mousePosition), out hit, 100, 1 << 0))
@@ -34,7 +40,7 @@ public class ZonePlacer : MonoBehaviour {
             zoneBlueprint.position = hit.point;
         }
 
-        if (Input.GetButtonDown("Confirm"))
+        if (Input.GetButtonDown("Select"))
         {
             if(actionOnSpotSelect != null)
             {
@@ -43,5 +49,10 @@ public class ZonePlacer : MonoBehaviour {
                 actionOnSpotSelect = null;
             }
         }
+    }
+
+    void OnNewZoneConfirmPlacement()
+    {
+        World.instance.CreateNewZoneAtPoint(zoneBlueprint.position);
     }
 }

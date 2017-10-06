@@ -15,8 +15,8 @@ public class ZoneSpot : MonoBehaviour {
         if (!myLabel)
         {
             myLabel = FollowerTextCanvasRecycler.GetAFollower();
-            myLabel.SetText(data.name);
             myLabel.FollowThis = labelPoint;
+            RefreshDataDisplay();
         }
     }
 
@@ -25,6 +25,14 @@ public class ZoneSpot : MonoBehaviour {
         if (myLabel)
         {
             FollowerTextCanvasRecycler.instance.PoolObj(myLabel);
+        }
+    }
+
+    public void RefreshDataDisplay()
+    {
+        if(data != null)
+        {
+            myLabel.SetText(data.name);
         }
     }
 

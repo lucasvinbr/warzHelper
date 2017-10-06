@@ -8,6 +8,8 @@ public class GameInterface : MonoBehaviour {
 
     public EditFactionPanel editFactionPanel;
 
+    public EditZonePanel editZonePanel;
+
 	public TextInputPanel texInputPanel;
 
 	public ColorInputPanel colorInputPanel;
@@ -43,6 +45,11 @@ public class GameInterface : MonoBehaviour {
     public void EditFaction(Faction targetFaction)
     {
         editFactionPanel.Open(targetFaction);
+    }
+
+    public void EditZone(Zone targetZone)
+    {
+        editZonePanel.Open(targetZone);
     }
 
     public void OpenLoadGameMenu(bool templateMode = false)

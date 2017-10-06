@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EditFactionPanel : MonoBehaviour {
-
-    public Faction factionBeingEdited;
+public class EditFactionPanel : EditDataPanel<Faction> {
 
     public InputField facNameField, turnPriorityField;
 
@@ -13,19 +11,19 @@ public class EditFactionPanel : MonoBehaviour {
 
 
 
-    public void Open(Faction editedFaction)
+    public override void Open(Faction editedFaction)
     {
         //set data
-        factionBeingEdited = editedFaction;
-        facNameField.text = factionBeingEdited.name;
-        turnPriorityField.text = factionBeingEdited.turnPriority.ToString();
-        factionColorImg.color = factionBeingEdited.color;
+        base.Open(editedFaction);
+        facNameField.text = dataBeingEdited.name;
+        turnPriorityField.text = dataBeingEdited.turnPriority.ToString();
+        factionColorImg.color = dataBeingEdited.color;
     }
 
     public void CheckIfNameIsAlreadyInUse()
     {
         Faction sameNameFaction = GameController.GetFactionByName(facNameField.text);
-        if (sameNameFaction != null && sameNameFaction.name != factionBeingEdited.name)
+        if (sameNameFaction != null && sameNameFaction.name != dataBeingEdited.name)
         {
             //TODO modal warning: name already in use, adding "copy" to name
             facNameField.text += " copy";
@@ -34,8 +32,8 @@ public class EditFactionPanel : MonoBehaviour {
 
     public void CloseAndSaveChanges()
     {
-        factionBeingEdited.name = facNameField.text;
-        factionBeingEdited.color = factionColorImg.color;
-        factionBeingEdited.turnPriority = int.Parse(turnPriorityField.text);
+        dataBeingEdited.name = facNameField.text;
+        dataBeingEdited.color = factionColorImg.color;
+        dataBeingEdited.turnPriority = int.Parse(turnPriorityField.text);
     }
 }
