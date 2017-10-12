@@ -1,16 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameModeUI : MonoBehaviour {
+public class GameModeUI : ModeUI
+{
+    public override void ShowInitialUI()
+    {
+        //hide all menus and show the world
+    }
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    
 }

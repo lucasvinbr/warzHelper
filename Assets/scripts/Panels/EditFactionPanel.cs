@@ -23,10 +23,12 @@ public class EditFactionPanel : EditDataPanel<Faction> {
     public void CheckIfNameIsAlreadyInUse()
     {
         Faction sameNameFaction = GameController.GetFactionByName(facNameField.text);
-        if (sameNameFaction != null && sameNameFaction.name != dataBeingEdited.name)
+        while (sameNameFaction != null && sameNameFaction.name != dataBeingEdited.name)
         {
             //TODO modal warning: name already in use, adding "copy" to name
+            ModalPanel.Instance().OkBox("Name already in use", "A suffix will be added to this faction's name.");
             facNameField.text += " copy";
+            sameNameFaction = GameController.GetFactionByName(facNameField.text);
         }
     }
 

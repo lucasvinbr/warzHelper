@@ -103,4 +103,18 @@ public class GameController : MonoBehaviour {
 
         return null;
     }
+
+    public static Zone GetZoneByName(string zoneName)
+    {
+        List<Zone> zoneList = instance.curGameData.zones;
+        for (int i = 0; i < zoneList.Count; i++)
+        {
+            if (zoneList[i].name == zoneName)
+            {
+                return zoneList[i];
+            }
+        }
+
+        return null;
+    }
 }

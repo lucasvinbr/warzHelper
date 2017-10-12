@@ -13,5 +13,17 @@ public class Zone {
 
     public int troopsGarrisoned = 0;
 
+    public int incomeGeneratedPerTurn = 0;
+
     public Vector2 coords;
+
+    public Zone(string name)
+    {
+        this.name = name;
+        while(GameController.GetZoneByName(name) != null)
+        {
+            this.name = name + " copy";
+        }
+        
+    }
 }

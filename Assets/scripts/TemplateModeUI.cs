@@ -2,15 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TemplateModeUI : MonoBehaviour {
+public class TemplateModeUI : ModeUI {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public override void ShowInitialUI()
+    {
+        //hide all menus and show the world
+    }
 }
