@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,6 +35,15 @@ public class World : MonoBehaviour {
             GameInterface.instance.EditZone(newZone);
         }
     }
+
+	public ZoneSpot GetZoneSpotByZoneName(string zoneName) {
+		Transform theZoneTransform = zonesContainer.Find(zoneName);
+		if (theZoneTransform) {
+			return theZoneTransform.GetComponent<ZoneSpot>();
+		}
+
+		return null;
+	}
 
     public void PlaceZone(Zone targetZone)
     {

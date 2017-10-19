@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -88,6 +88,10 @@ public class GameController : MonoBehaviour {
     {
 
     }
+
+	public static void RemoveZone(Zone targetZone) {
+		instance.curGameData.zones.Remove(targetZone);
+	}
 
 
     public static Faction GetFactionByName(string factionName)
