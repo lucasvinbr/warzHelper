@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,6 +16,10 @@ public class Zone {
     public int incomeGeneratedPerTurn = 0;
 
     public Vector2 coords;
+
+	public Zone() {
+
+	}
 
     public Zone(string name)
     {
