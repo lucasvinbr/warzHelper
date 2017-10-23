@@ -20,7 +20,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
         //add dropdown options for each faction (and the 'no faction' option)
         int initiallyPickedOption = 0;
         ownerFactionDropdown.options.Add(new Dropdown.OptionData("none"));
-        List<Faction> factions = GameController.instance.curGameData.factions;
+        List<Faction> factions = GameController.instance.curData.factions;
         for (int i = 0; i < factions.Count; i++)
         {
             ownerFactionDropdown.options.Add(new Dropdown.OptionData(factions[i].name));

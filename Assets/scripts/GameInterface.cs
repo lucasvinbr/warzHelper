@@ -54,8 +54,12 @@ public class GameInterface : MonoBehaviour {
 
     public void OpenLoadGameMenu(bool templateMode = false)
     {
-        saveListPanel.OpenUp(!templateMode, "Select one of the saved entries");
+        saveListPanel.OpenUp(!templateMode, "Select one of the saved entries", UIStartLoadGame);
     }
+
+	public void UIStartLoadGame() {
+		GameController.instance.LoadData(saveListPanel.PickedEntry.gameNameTxt.text, !saveListPanel.inGameMode);
+	}
 
     /// <summary>
     /// hides the other modes' UI and shows the desired mode's one

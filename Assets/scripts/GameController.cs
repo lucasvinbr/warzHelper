@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class GameController : MonoBehaviour {
 
-    public TemplateInfo curGameData;
+    public TemplateInfo curData;
 
     public static GameController instance;
 
@@ -47,14 +47,14 @@ public class GameController : MonoBehaviour {
             {
                 if (isTemplate)
                 {
-                    curGameData = new TemplateInfo(gameName);
-                    PersistenceHandler.SaveToFile(curGameData, PersistenceHandler.templatesDirectory + gameName + ".xml");
+                    curData = new TemplateInfo(gameName);
+                    PersistenceHandler.SaveToFile(curData, PersistenceHandler.templatesDirectory + gameName + ".xml");
                     Debug.Log("saved new template");
                 }
                 else
                 {
-                    curGameData = new GameInfo(gameName);
-                    PersistenceHandler.SaveToFile(curGameData, PersistenceHandler.gamesDirectory + gameName + ".xml");
+                    curData = new GameInfo(gameName);
+                    PersistenceHandler.SaveToFile(curData, PersistenceHandler.gamesDirectory + gameName + ".xml");
                     Debug.Log("saved new game");
                 }
 
@@ -68,14 +68,18 @@ public class GameController : MonoBehaviour {
         GameInterface.instance.texInputPanel.Open();
     }
 
-	public void LoadGame(string gameName)
+	public void LoadData(string gameName, bool isTemplate = false)
     {
-        curGameData = PersistenceHandler.LoadFromFile<GameInfo>(gameName);
+        curData = PersistenceHandler.LoadFromFile<TemplateInfo>(gameName);
+		if(curData != null) {
+			Debug.Log("loaded game: " + curData.gameName);
+			GameInterface.instance.SwitchInterface(isTemplate ? GameInterface.InterfaceMode.template : GameInterface.InterfaceMode.game);
+		}
     }
 
     public void SaveGame()
     {
-        PersistenceHandler.SaveToFile(curGameData, curGameData.gameName, true);
+        PersistenceHandler.SaveToFile(curData, curData.gameName, true);
     }
 
 
@@ -90,13 +94,13 @@ public class GameController : MonoBehaviour {
     }
 
 	public static void RemoveZone(Zone targetZone) {
-		instance.curGameData.zones.Remove(targetZone);
+		instance.curData.zones.Remove(targetZone);
 	}
 
 
     public static Faction GetFactionByName(string factionName)
     {
-        List<Faction> factionList = instance.curGameData.factions;
+        List<Faction> factionList = instance.curData.factions;
         for (int i = 0; i < factionList.Count; i++)
         {
             if(factionList[i].name == factionName)
@@ -110,7 +114,7 @@ public class GameController : MonoBehaviour {
 
     public static Zone GetZoneByName(string zoneName)
     {
-        List<Zone> zoneList = instance.curGameData.zones;
+        List<Zone> zoneList = instance.curData.zones;
         for (int i = 0; i < zoneList.Count; i++)
         {
             if (zoneList[i].name == zoneName)
