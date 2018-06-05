@@ -14,8 +14,5 @@ public class GameInfo : TemplateInfo {
     }
 
     //empty constructor to enable xml serialization
-    public GameInfo()
-    {
-
-    }
+    public GameInfo() {}
 }

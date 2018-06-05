@@ -10,9 +10,17 @@ public class TemplateInfo {
 
     public bool isATemplate = false;
 
+	public Rules rules;
+
+	public Board boardInfo;
+
     public List<Faction> factions;
 
     public List<Zone> zones;
+
+	public List<Troop> troopTypes;
+
+	public List<Commander> deployedCommanders;
 
     public TemplateInfo(string name)
     {
@@ -22,8 +30,5 @@ public class TemplateInfo {
     }
 
     //empty constructor to enable xml serialization
-    public TemplateInfo()
-    {
-
-    }
+    public TemplateInfo() {}
 }
