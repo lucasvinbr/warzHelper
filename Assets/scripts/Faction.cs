@@ -10,6 +10,11 @@ public class Faction
     public string name;
 
 	/// <summary>
+	/// any extra text info the player might want to provide to the faction
+	/// </summary>
+	public string extraInfo;
+
+	/// <summary>
 	/// is this faction controlled by a player? 
 	/// This affects options like automatically giving control to the AI to other factions and auto-resolving their battles
 	/// </summary>
@@ -54,6 +59,16 @@ public class Faction
 	public int extraMaxCommanders = 0;
 
 	/// <summary>
+	/// when a new commander is created, it will automatically receive, and spend, this many points on recruitment
+	/// </summary>
+	public int newCommanderRecruitmentPoints;
+
+	/// <summary>
+	/// when a new commander is created, it will automatically receive, and spend, this many points on training
+	/// </summary>
+	public int newCommanderTrainingPoints;
+
+	/// <summary>
 	/// if set to a number that's greater than or equal to 0,
 	/// this will restrict the auto training that occurs in full garrisons:
 	/// troops won't upgrade past this specified index of the TroopTree list
@@ -65,10 +80,5 @@ public class Faction
 	/// the troops used by this faction, starting by the base troop and ending with the top-tier one... or not, if you want troops to get worse with time
 	/// </summary>
 	public List<string> troopTree;
-
-	/// <summary>
-	/// when a new commander is created, it will have these troops
-	/// </summary>
-	public List<TroopNumberPair> newCommanderTroops;
 
 }

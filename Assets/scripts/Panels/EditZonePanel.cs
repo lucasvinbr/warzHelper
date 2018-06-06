@@ -12,9 +12,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
     void OnEnable()
     {
         nameInput.text = dataBeingEdited.name;
-        numGarrisonInput.text = dataBeingEdited.troopsGarrisoned.ToString();
-        numTroopGenInput.text = dataBeingEdited.bonusTroopsGeneratedPerTurn.ToString();
-        numIncomeInput.text = dataBeingEdited.incomeGeneratedPerTurn.ToString();
+		//fill data entries with the data already defined for this zone
 
         ownerFactionDropdown.ClearOptions();
         //add dropdown options for each faction (and the 'no faction' option)
@@ -66,9 +64,6 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		ZoneSpot thisZoneSpot = World.instance.GetZoneSpotByZoneName(dataBeingEdited.name);
         dataBeingEdited.name = nameInput.text;
 		dataBeingEdited.ownerFaction = ownerFactionDropdown.captionText.text;
-		dataBeingEdited.troopsGarrisoned = int.Parse(numGarrisonInput.text);
-		dataBeingEdited.bonusTroopsGeneratedPerTurn = int.Parse(numTroopGenInput.text);
-		dataBeingEdited.incomeGeneratedPerTurn = int.Parse(numIncomeInput.text);
 		dataBeingEdited.coords = new Vector2(thisZoneSpot.transform.localPosition.x, thisZoneSpot.transform.localPosition.z);
 		thisZoneSpot.RefreshDataDisplay();
 	}

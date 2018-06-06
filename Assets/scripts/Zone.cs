@@ -9,6 +9,11 @@ public class Zone {
     public string name;
 
 	/// <summary>
+	/// any text the player might want to add about the zone
+	/// </summary>
+	public string extraInfo;
+
+	/// <summary>
 	/// name of the faction that currently owns this zone
 	/// </summary>
     public string ownerFaction;
