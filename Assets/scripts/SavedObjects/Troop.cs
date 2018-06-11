@@ -22,6 +22,9 @@ public class Troop {
 	public int pointCost = 2;
 }
 
+/// <summary>
+/// represents the population of a specific troop type in a commander's army or a zone's garrison
+/// </summary>
 public struct TroopNumberPair {
 	public string troopName;
 	public int troopAmount;

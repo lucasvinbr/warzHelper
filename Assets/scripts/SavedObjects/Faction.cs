@@ -32,7 +32,8 @@ public class Faction
 	public string iconPath;
 
 	/// <summary>
-	/// the smaller this value is, the bigger the chances this faction's turn will come before the others'
+	/// the smaller this value is, the bigger the chances this faction's turn will come before the others'.
+	/// The order between factions with the same priority is defined when the game starts
 	/// </summary>
     public int turnPriority = 0;
 
