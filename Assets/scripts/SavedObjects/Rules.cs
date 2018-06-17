@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class Rules {
 	/// <summary>
-	/// each commander can only make this many actions each turn
-	/// </summary>
-    public int maxCommanderMovesPerTurn = 1;
-	/// <summary>
 	/// the maximum multiplier applied to the sum of all troops' autoResolvePower during autocalc battles
 	/// it might help a losing faction win some battles, but may make troop training lose relevance if too high
 	/// </summary>

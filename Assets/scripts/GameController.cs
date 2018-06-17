@@ -125,4 +125,15 @@ public class GameController : MonoBehaviour {
 
         return null;
     }
+
+	public static TroopType GetTroopTypeByName(string troopTypeName) {
+		List<TroopType> trpList = instance.curData.troopTypes;
+		for (int i = 0; i < trpList.Count; i++) {
+			if (trpList[i].name == troopTypeName) {
+				return trpList[i];
+			}
+		}
+
+		return null;
+	}
 }

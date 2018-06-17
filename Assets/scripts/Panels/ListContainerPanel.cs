@@ -12,13 +12,15 @@ public class ListContainerPanel<T> : MonoBehaviour {
 
     public GameObject entryPrefab, listIsEmptyObject;
 
-    public virtual void AddEntry(T entryData)
+    public virtual GameObject AddEntry(T entryData)
     {
         GameObject newEntry = Instantiate(entryPrefab);
         newEntry.transform.SetParent(listContainer, false);
         newEntry.GetComponent<ListPanelEntry<T>>().SetContent(entryData);
 
-        listIsEmptyObject.SetActive(false);
+        if(listIsEmptyObject) listIsEmptyObject.SetActive(false);
+
+		return newEntry;
     }
 
     protected virtual void ClearList()
@@ -28,7 +30,7 @@ public class ListContainerPanel<T> : MonoBehaviour {
             Destroy(listContainer.GetChild(i).gameObject);
         }
 
-        listIsEmptyObject.SetActive(true);
+		if (listIsEmptyObject) listIsEmptyObject.SetActive(true);
     }
 
     

@@ -18,7 +18,7 @@ public class TemplateInfo {
 
     public List<Zone> zones;
 
-	public List<Troop> troopTypes;
+	public List<TroopType> troopTypes;
 
 	public List<Commander> deployedCommanders;
 

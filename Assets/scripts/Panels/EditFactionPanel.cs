@@ -25,7 +25,6 @@ public class EditFactionPanel : EditDataPanel<Faction> {
         Faction sameNameFaction = GameController.GetFactionByName(facNameField.text);
         while (sameNameFaction != null && sameNameFaction.name != dataBeingEdited.name)
         {
-            //TODO modal warning: name already in use, adding "copy" to name
             ModalPanel.Instance().OkBox("Name already in use", "A suffix will be added to this faction's name.");
             facNameField.text += " copy";
             sameNameFaction = GameController.GetFactionByName(facNameField.text);

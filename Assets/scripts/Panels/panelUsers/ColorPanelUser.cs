@@ -13,7 +13,7 @@ public class ColorPanelUser : PanelUser<ColorInputPanel> {
 	}
 
 	public void OpenEditColorMenu() {
-		thePanel.SetPanelInfo("Set Faction Color", colorImg.color, "Confirm", () => {
+		thePanel.SetPanelInfo("Set Color", colorImg.color, "Confirm", () => {
 			colorImg.color = thePanel.colorImg.color;
 		});
 		thePanel.Open();

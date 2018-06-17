@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public class Troop {
+public class TroopType {
 	/// <summary>
 	/// the troop's unique name.
 	/// </summary>
@@ -20,6 +20,14 @@ public class Troop {
 	/// the point cost in order to recruit, or upgrade to, this unit
 	/// </summary>
 	public int pointCost = 2;
+
+	public TroopType(string name) {
+		this.name = name;
+		while (GameController.GetTroopTypeByName(name) != null) {
+			this.name = name + " copy";
+		}
+
+	}
 }
 
 /// <summary>
@@ -29,4 +37,6 @@ public struct TroopNumberPair {
 	public string troopName;
 	public int troopAmount;
 }
+
+
 
