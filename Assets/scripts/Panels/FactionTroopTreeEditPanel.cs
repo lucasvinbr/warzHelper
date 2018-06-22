@@ -11,11 +11,17 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 
 	public FactionTroopListEntry selectedEntry;
 
-	public Button editEntryBtn, delEntryBtn;
+	public Color selectedEntryColor, unselectedEntryColor;
+
+	public Button editEntryBtn, delEntryBtn, addEntryBtn;
 
 
 	public void SelectTierEntry(FactionTroopListEntry theEntry) {
+		if (selectedEntry) {
+			selectedEntry.selectEntryBtn.image.color = unselectedEntryColor;
+		}
 		selectedEntry = theEntry;
+		selectedEntry.selectEntryBtn.image.color = selectedEntryColor;
 		editEntryBtn.interactable = true;
 		delEntryBtn.interactable = CheckIfCanDeleteMoreEntries();
 	}
@@ -32,11 +38,18 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		selectedEntry.OpenEditTroopPanel();
 	}
 
-	public void DeleteSelectedTierEntry() {
+	public void StartDeleteTierProcedure() {
+		StartCoroutine(DeleteSelectedTierEntry());
+	}
+
+	public IEnumerator DeleteSelectedTierEntry() {
 		if (selectedEntry) {
 			Destroy(selectedEntry.gameObject);
+			yield return null;
 			UpdateTreeTierValues();
 			RefreshMaxGarrLvlText();
+			editEntryBtn.interactable = false;
+			delEntryBtn.interactable = false;
 		}
 	}
 
@@ -77,7 +90,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 
 	public void IncrementMaxGarrTroopLvl() {
 		int delimiterPos = maxGarrTroopLvlDelimiter.GetSiblingIndex();
-		if(delimiterPos < listContainer.childCount - 1) {
+		if(delimiterPos < listContainer.childCount - 2) { //can't go below the "add tier" btn
 			maxGarrTroopLvlDelimiter.SetSiblingIndex(delimiterPos + 1);
 			RefreshMaxGarrLvlText();
 		}
@@ -138,10 +151,17 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		}
 
 		if(newTierData == null) {
-			newTierData = GameController.instance.curData.troopTypes[0];
+			if (GameController.GuardGameDataExist()) {
+				newTierData = GameController.instance.curData.troopTypes[0];
+			}
+			
 		}
 
 		AddEntry(newTierData);
+
+		UpdateTreeTierValues();
+
+		addEntryBtn.transform.SetAsLastSibling();
 	}
 
 	public override GameObject AddEntry(TroopType entryData) {

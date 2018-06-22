@@ -301,6 +301,7 @@ MonoBehaviour:
   tierTxt: {fileID: 114798210212662864}
   costTxt: {fileID: 114257360018547428}
   troopTypeDropdown: {fileID: 114468690802705044}
+  selectEntryBtn: {fileID: 114731854618871064}
 --- !u!114 &114080877408541160
 MonoBehaviour:
   m_ObjectHideFlags: 1

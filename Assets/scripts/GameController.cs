@@ -127,13 +127,30 @@ public class GameController : MonoBehaviour {
     }
 
 	public static TroopType GetTroopTypeByName(string troopTypeName) {
-		List<TroopType> trpList = instance.curData.troopTypes;
-		for (int i = 0; i < trpList.Count; i++) {
-			if (trpList[i].name == troopTypeName) {
-				return trpList[i];
+		if (GuardGameDataExist()) {
+			List<TroopType> trpList = instance.curData.troopTypes;
+			for (int i = 0; i < trpList.Count; i++) {
+				if (trpList[i].name == troopTypeName) {
+					return trpList[i];
+				}
 			}
 		}
+		
 
 		return null;
+	}
+
+	/// <summary>
+	/// returns true if curData exists; shows a modal warning and returns false otherwise
+	/// </summary>
+	/// <returns></returns>
+	public static bool GuardGameDataExist() {
+		if(instance.curData != null) {
+			return true;
+		}
+		else {
+			ModalPanel.Instance().OkBox("No Game Data Found", "Unexpected: there is no current game data to save to/load from. Actions won't work properly. Please load or start a new game.");
+			return false;
+		}
 	}
 }

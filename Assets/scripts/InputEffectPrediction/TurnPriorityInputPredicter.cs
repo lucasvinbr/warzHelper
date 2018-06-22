@@ -8,7 +8,7 @@ public class TurnPriorityInputPredicter : InputEffectPredicter {
 		if (predictedEffectText) {
 			int tpValue = int.Parse(inputText);
 
-			if (GameController.instance.curData != null) {
+			if (GameController.GuardGameDataExist()) {
 				List<Faction> createdFacs = GameController.instance.curData.factions;
 				int ourMinPos = 1, ourMaxPosDelta = 0;
 				for(int i = 0; i < createdFacs.Count; i++) {

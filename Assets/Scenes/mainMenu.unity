@@ -2986,7 +2986,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000061035156, y: -0.000061035156}
+  m_AnchoredPosition: {x: 0, y: -0.000061035156}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &173356054
@@ -3007,8 +3007,11 @@ MonoBehaviour:
   maxGarrTroopLvlText: {fileID: 1899612377}
   maxGarrTroopLvlDelimiter: {fileID: 1471113716}
   selectedEntry: {fileID: 0}
+  selectedEntryColor: {r: 0.7169812, g: 0.7169812, b: 0.7169812, a: 1}
+  unselectedEntryColor: {r: 0.5735294, g: 0.5735294, b: 0.5735294, a: 0.54901963}
   editEntryBtn: {fileID: 246760035}
   delEntryBtn: {fileID: 1419554810}
+  addEntryBtn: {fileID: 1667414606}
 --- !u!114 &173356055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3718,7 +3721,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 246760036}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 173356054}
+        m_MethodName: EditTierEntry
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &246760036
@@ -5060,7 +5074,7 @@ GameObject:
   - component: {fileID: 325108908}
   - component: {fileID: 325108907}
   m_Layer: 5
-  m_Name: numberIncreaseBtn
+  m_Name: numberDecreaseBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5123,7 +5137,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 325108908}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 173356054}
+        m_MethodName: DecrementMaxGarrTroopLvl
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &325108908
@@ -22976,7 +23001,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1419554811}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 173356054}
+        m_MethodName: StartDeleteTierProcedure
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1419554811
@@ -26354,7 +26390,7 @@ GameObject:
   - component: {fileID: 1655209387}
   - component: {fileID: 1655209386}
   m_Layer: 5
-  m_Name: numberDecreaseBtn
+  m_Name: numberIncreaseBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26417,7 +26453,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1655209387}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 173356054}
+        m_MethodName: IncrementMaxGarrTroopLvl
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1655209387
@@ -26673,7 +26720,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1667414607}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 173356054}
+        m_MethodName: AddTroopTier
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1667414607
@@ -26688,7 +26746,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.62352943}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.4392157}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -32791,6 +32849,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2115011250}
   - component: {fileID: 2115011251}
+  - component: {fileID: 2115011252}
   m_Layer: 5
   m_Name: troopTreeEntriesContainer
   m_TagString: Untagged
@@ -32814,10 +32873,10 @@ RectTransform:
   m_Father: {fileID: 1182055381}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 358.27997}
-  m_SizeDelta: {x: 0, y: 239.76}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -0.000054861914}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2115011251
 MonoBehaviour:
@@ -32841,6 +32900,19 @@ MonoBehaviour:
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 0
+--- !u!114 &2115011252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2115011249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1741964061, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &2116057690
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,9 +21,11 @@ public class FactionTroopListEntry : ListPanelEntry<TroopType> {
 	public static bool troopDDownsAreStale = true;
 
 	public override void SetContent(TroopType targetTroop) {
-		myContent = targetTroop;
-		tierTxt.text = targetTroop.name;
-		costTxt.text = targetTroop.pointCost.ToString();
+		if (targetTroop != null) {
+			myContent = targetTroop;
+			tierTxt.text = targetTroop.name;
+			costTxt.text = targetTroop.pointCost.ToString();
+		}
 	}
 
 	public void RefreshInfoLabels() {
@@ -49,7 +51,7 @@ public class FactionTroopListEntry : ListPanelEntry<TroopType> {
 	/// </summary>
 	public static void ReBakeTroopTypeDDowns() {
 		troopDDownOptions.Clear();
-		if (GameController.instance.curData != null) {
+		if (GameController.GuardGameDataExist()) {
 			List<TroopType> tTypes = GameController.instance.curData.troopTypes;
 			for (int i = 0; i < tTypes.Count; i++) {
 				troopDDownOptions.Add(new Dropdown.OptionData(tTypes[i].name));

@@ -33,7 +33,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 
     public void DeleteZone()
     {
-		ModalPanel.Instance().YesNoBox("Confirm Zone Deletion", "You are about to delete this zone. Are you sure?", OnZoneWillBeDeleted, null);
+		ModalPanel.Instance().YesNoBox("Confirm Zone Deletion", "You are about to delete this zone. Are you sure?", OnConfirmDelete, null);
     }
 
     public void EditZoneLocation()
@@ -42,21 +42,17 @@ public class EditZonePanel : EditDataPanel<Zone> {
         //menu opens again once a spot is defined
     }
 
-    public void OnCloseBtnClick()
-    {
-		//if this panel has been opened because this is a new zone we're adding,
-		//closing this panel saves this zone immediately.
-		//if this zone already exists and we're editing it,
-		//a modal asking if we want to keep/discard changes should show up
+
+	public override void OnCloseBtnClicked() {
 		Zone existingData = GameController.GetZoneByName(dataBeingEdited.name);
-        if (existingData != null) {
+		if (existingData != null) {
 			ModalPanel.Instance().YesNoBox("Unsaved changes", "Save changes made to this zone?", SaveZoneEdits, CloseWithoutSaving);
 		}
-    }
+	}
 
 	public void CloseWithoutSaving() {
 		gameObject.SetActive(false);
-		//TODO reset the zone's position: get it back from the data
+		OnWindowIsClosing();
 	}
 
 	public void SaveZoneEdits() {
@@ -66,13 +62,21 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		dataBeingEdited.ownerFaction = ownerFactionDropdown.captionText.text;
 		dataBeingEdited.coords = new Vector2(thisZoneSpot.transform.localPosition.x, thisZoneSpot.transform.localPosition.z);
 		thisZoneSpot.RefreshDataDisplay();
+		OnWindowIsClosing();
 	}
 
-	public void OnZoneWillBeDeleted() {
+	public override void OnDeleteBtnClicked() {
+		base.OnDeleteBtnClicked();
+	}
+
+	public override void OnConfirmDelete() {
 		//hide this panel!
 		gameObject.SetActive(false);
 		//delete this zone's entry in the game data... if there is one
 		GameController.RemoveZone(dataBeingEdited);
 		World.instance.GetZoneSpotByZoneName(dataBeingEdited.name).DeleteThisSpot();
+		dataBeingEdited = null;
+		OnWindowIsClosing();
 	}
+
 }

@@ -7,7 +7,7 @@ public class MaxCmdersInputPredicter : InputEffectPredicter {
 
 	public override void WriteProjection(string inputText) {
 		if (predictedEffectText) {
-			if (GameController.instance.curData != null) {
+			if (GameController.GuardGameDataExist()) {
 				predictedEffectText.text = Mathf.Max(int.Parse(inputText) + 
 					GameController.instance.curData.rules.baseMaxCommandersPerFaction, 0).ToString(CultureInfo.InvariantCulture);
 			}

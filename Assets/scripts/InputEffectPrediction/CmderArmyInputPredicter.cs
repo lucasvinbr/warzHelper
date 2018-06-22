@@ -7,7 +7,7 @@ public class CmderArmyInputPredicter : InputEffectPredicter {
 
 	public override void WriteProjection(string inputText) {
 		if (predictedEffectText) {
-			if (GameController.instance.curData != null) {
+			if (GameController.GuardGameDataExist()) {
 				predictedEffectText.text = Mathf.RoundToInt
 					(float.Parse(inputText, CultureInfo.InvariantCulture) * 
 					GameController.instance.curData.rules.baseMaxUnitsUnderOneCommander).ToString(CultureInfo.InvariantCulture);
