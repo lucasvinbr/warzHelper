@@ -73,9 +73,9 @@ public class Faction
 	/// if set to a number that's greater than or equal to 0,
 	/// this will restrict the auto training that occurs in full garrisons:
 	/// troops won't upgrade past this specified index of the TroopTree list
-	/// (an invalid value disables this feature)
+	/// (an invalid value will clamp to the closest valid one)
 	/// </summary>
-	public int maxGarrisonedTroopTier = -1;
+	public int maxGarrisonedTroopTier = 0;
 
 	/// <summary>
 	/// the troops used by this faction, starting by the base troop and ending with the top-tier one... or not, if you want troops to get worse with time

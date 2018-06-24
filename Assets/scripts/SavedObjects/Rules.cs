@@ -34,6 +34,9 @@ public class Rules {
 	/// </summary>
 	public int baseMaxCommandersPerFaction = 5;
 
+
+	public const string NO_FACTION_NAME = "No Faction";
+
 	//empty constructor to enable xml serialization
 	public Rules() {}
 }

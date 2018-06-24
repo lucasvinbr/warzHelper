@@ -96,6 +96,13 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		}
 	}
 
+	public void SetMaxGarrTroopLvl(int tier) {
+		if (tier < 0) tier = 0;
+		else if (tier > listContainer.childCount - 2) tier = listContainer.childCount - 2;
+		maxGarrTroopLvlDelimiter.SetSiblingIndex(tier);
+		RefreshMaxGarrLvlText();
+	}
+
 	public void DecrementMaxGarrTroopLvl() {
 		int delimiterPos = maxGarrTroopLvlDelimiter.GetSiblingIndex();
 		if (delimiterPos >= 1) {
@@ -117,6 +124,18 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		return returnedTree;
 	}
 
+	public void ImportTroopTreeData(List<string> tree, int maxGarrLvl) {
+		for(int i = 0; i < tree.Count; i++) {
+			AddEntry(GameController.GetTroopTypeByName(tree[i]));
+		}
+
+		SetMaxGarrTroopLvl(maxGarrLvl);
+
+		UpdateTreeTierValues();
+
+		addEntryBtn.transform.SetAsLastSibling();
+	}
+
 	protected override void ClearList() {
 		for (int i = 0; i < listContainer.childCount - 1; i++) {
 			Transform entry = listContainer.GetChild(i);
@@ -128,7 +147,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 	}
 
 	protected override void OnEnable() {
-		base.OnEnable();
+		//do nothing; the faction panel takes care of clearing and refilling the tree
 	}
 
 	/// <summary>

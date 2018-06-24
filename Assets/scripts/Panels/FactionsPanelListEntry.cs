@@ -19,7 +19,7 @@ public class FactionsPanelListEntry : ListPanelEntry<Faction> {
 
     public void OpenEditFactionPanel()
     {
-		GameInterface.instance.EditFaction(myContent);
+		GameInterface.instance.EditFaction(myContent, false);
     }
 
 }

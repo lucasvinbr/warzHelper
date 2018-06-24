@@ -95,10 +95,26 @@ public class GameController : MonoBehaviour {
 
 	public static void RemoveZone(Zone targetZone) {
 		instance.curData.zones.Remove(targetZone);
+		//TODO all zones should check their links
+	}
+
+	public static void RemoveFaction(Faction targetFaction) {
+		instance.curData.factions.Remove(targetFaction);
+		//TODO set all zones controlled by this faction as neutral
+	}
+
+	public static void RemoveTroopType(TroopType targetTroop) {
+		instance.curData.troopTypes.Remove(targetTroop);
+		//TODO remove all references to this type
+	}
+
+	public static int GetUnusedID() {
+		instance.curData.lastIDGiven++;
+		return instance.curData.lastIDGiven;
 	}
 
 
-    public static Faction GetFactionByName(string factionName)
+	public static Faction GetFactionByName(string factionName)
     {
         List<Faction> factionList = instance.curData.factions;
         for (int i = 0; i < factionList.Count; i++)

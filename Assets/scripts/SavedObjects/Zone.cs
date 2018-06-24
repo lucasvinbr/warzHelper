@@ -48,6 +48,13 @@ public class Zone {
 	public float multMaxUnitsInGarrison = 1;
 
 	/// <summary>
+	/// the amount of points given to this zone at the beginning of the game.
+	/// these points are used both for recruiting and upgrading (first recruiting then upgrading)
+	/// and are not affected by the zone's multipliers
+	/// </summary>
+	public int pointsGivenAtGameStart = 0;
+
+	/// <summary>
 	/// the zone's position in the world. Does not take the board into account
 	/// </summary>
 	public Vector2 coords;
@@ -63,6 +70,6 @@ public class Zone {
         {
             this.name = name + " copy";
         }
-        
-    }
+		GameController.instance.curData.zones.Add(this);
+	}
 }

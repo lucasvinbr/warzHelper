@@ -26,13 +26,13 @@ public class World : MonoBehaviour {
 
     public void CreateNewZoneAtPoint(Vector3 point, bool autoOpenEditMenu = true)
     {
-        Zone newZone = new Zone("New Zone");
+        Zone newZone = new Zone("New Zone");		
         GameObject newSpot = Instantiate(zonePrefab, point, Quaternion.identity);
         newSpot.transform.parent = zonesContainer;
         newSpot.GetComponent<ZoneSpot>().data = newZone;
         if (autoOpenEditMenu)
         {
-            GameInterface.instance.EditZone(newZone);
+            GameInterface.instance.EditZone(newZone, true);
         }
     }
 

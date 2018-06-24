@@ -13,12 +13,12 @@ public class ModalPanel : MonoBehaviour
         public string title, question;
         public UnityAction yesEvent, noEvent, cancelEvent, okEvent;
         public bool iconActive;
-        public modalMessageType messageType;
+        public ModalMessageType messageType;
 
         
 
         public QueuedModalInfo(Sprite iconPic, string title, string question, UnityAction yesEvent, UnityAction noEvent, UnityAction cancelEvent,
-            UnityAction okEvent, bool iconActive, modalMessageType messageType)
+            UnityAction okEvent, bool iconActive, ModalMessageType messageType)
         {
             this.iconPic = iconPic;
             this.title = title;
@@ -44,7 +44,7 @@ public class ModalPanel : MonoBehaviour
 
     private List<QueuedModalInfo> queuedModals = new List<QueuedModalInfo>();
 
-    public enum modalMessageType
+    public enum ModalMessageType
     {
         YesNo,
         YesNoCancel,
@@ -64,7 +64,7 @@ public class ModalPanel : MonoBehaviour
         return MainModalPanel;
     }
 
-    public void MessageBox(Sprite IconPic, string Title, string Question, UnityAction YesEvent, UnityAction NoEvent, UnityAction CancelEvent, UnityAction OkEvent, bool IconActive, modalMessageType MessageType)
+    public void MessageBox(Sprite IconPic, string Title, string Question, UnityAction YesEvent, UnityAction NoEvent, UnityAction CancelEvent, UnityAction OkEvent, bool IconActive, ModalMessageType MessageType)
     {
         //if the panel is already open, we queue a new opening with the desired info.
         //the new panel will open as soon as the current one is closed
@@ -81,7 +81,7 @@ public class ModalPanel : MonoBehaviour
 
         switch (MessageType)
         {
-            case modalMessageType.YesNoCancel:
+            case ModalMessageType.YesNoCancel:
                 //Button1 is on the far left; Button2 is in the center and Button3 is on the right
                 //Each can be activated and labeled individually
                 if(YesEvent != null) Button1.onClick.AddListener(YesEvent);
@@ -100,7 +100,7 @@ public class ModalPanel : MonoBehaviour
                 Button2.gameObject.SetActive(true);
                 Button3.gameObject.SetActive(true);
                 break;
-            case modalMessageType.YesNo:
+            case ModalMessageType.YesNo:
                 if(YesEvent != null) Button1.onClick.AddListener(YesEvent);
                 Button1.onClick.AddListener(ClosePanel);
                 Button1.GetComponentInChildren<Text>().text = "Yes";
@@ -113,7 +113,7 @@ public class ModalPanel : MonoBehaviour
                 Button2.gameObject.SetActive(false);
                 Button3.gameObject.SetActive(true);
                 break;
-            case modalMessageType.Ok:
+            case ModalMessageType.Ok:
                 if(OkEvent != null) Button2.onClick.AddListener(OkEvent);
                 Button2.onClick.AddListener(ClosePanel);
                 Button2.GetComponentInChildren<Text>().text = "OK";
@@ -128,12 +128,12 @@ public class ModalPanel : MonoBehaviour
         this.Question.text = Question;     //Fill in the Question/statement part of the Messsage Box
         if (IconActive)                    //If the Icon is active (true)...
         {
-            this.IconImage.gameObject.SetActive(true);  //Turn on the icon,
-            this.IconImage.sprite = IconPic;            //and assign the picture.
+            IconImage.gameObject.SetActive(true);  //Turn on the icon,
+            IconImage.sprite = IconPic;            //and assign the picture.
         }
         else
         {
-            //this.IconImage.gameObject.SetActive(false); //Turn off the icon.
+            IconImage.gameObject.SetActive(false); //Turn off the icon.
         }
     }
 
@@ -151,18 +151,29 @@ public class ModalPanel : MonoBehaviour
     /// <param name="noEvent"></param>
     public void YesNoBox(string windowTitle, string windowText, UnityAction yesEvent, UnityAction noEvent)
     {
-        MessageBox(null, windowTitle, windowText, yesEvent, noEvent, null, null, false, modalMessageType.YesNo);
+        MessageBox(null, windowTitle, windowText, yesEvent, noEvent, null, null, false, ModalMessageType.YesNo);
     }
 
-    /// <summary>
-    /// window used only to notify about something
-    /// </summary>
-    /// <param name="windowTitle"></param>
-    /// <param name="windowText"></param>
-    public void OkBox(string windowTitle, string windowText)
+	/// <summary>
+	/// basic yes/no/cancel window with yes/no/cancel actions
+	/// </summary>
+	/// <param name="windowTitle"></param>
+	/// <param name="windowText"></param>
+	/// <param name="yesEvent"></param>
+	/// <param name="noEvent"></param>
+	public void YesNoCancelBox(string windowTitle, string windowText, UnityAction yesEvent, UnityAction noEvent, UnityAction cancelEvent) {
+		MessageBox(null, windowTitle, windowText, yesEvent, noEvent, cancelEvent, null, false, ModalMessageType.YesNoCancel);
+	}
+
+	/// <summary>
+	/// window used only to notify about something
+	/// </summary>
+	/// <param name="windowTitle"></param>
+	/// <param name="windowText"></param>
+	public void OkBox(string windowTitle, string windowText)
     {
         MessageBox(null, windowTitle, windowText, null,
-            null, null, null, false, modalMessageType.Ok);
+            null, null, null, false, ModalMessageType.Ok);
     }
 
     void ClosePanel()

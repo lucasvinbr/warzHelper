@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameInterface : MonoBehaviour {
 
@@ -20,7 +21,24 @@ public class GameInterface : MonoBehaviour {
 
     public Color positiveUIColor, negativeUIColor, selectedUIElementColor, deselectedUIElementColor;
 
-    public enum InterfaceMode
+
+	public static List<Dropdown.OptionData> factionDDownOptions = new List<Dropdown.OptionData>();
+	public static List<Dropdown.OptionData> troopDDownOptions = new List<Dropdown.OptionData>();
+
+
+	/// <summary>
+	/// a variable that should always be set to true whenever a troop type is edited.
+	/// this makes sure the troop type dropdown options are refreshed
+	/// </summary>
+	public static bool troopDDownsAreStale = true;
+
+	/// <summary>
+	/// a variable that should always be set to true whenever faction is edited.
+	/// this makes sure that "pick a faction" dropdowns' options are refreshed
+	/// </summary>
+	public static bool factionDDownsAreStale = true;
+
+	public enum InterfaceMode
     {
         start,
         template,
@@ -42,14 +60,14 @@ public class GameInterface : MonoBehaviour {
         obj.SetActive(false);
     }
 
-    public void EditFaction(Faction targetFaction)
+    public void EditFaction(Faction targetFaction, bool isNewEntry)
     {
-        editFactionPanel.Open(targetFaction);
+        editFactionPanel.Open(targetFaction, isNewEntry);
     }
 
-    public void EditZone(Zone targetZone)
+    public void EditZone(Zone targetZone, bool isNewEntry)
     {
-        editZonePanel.Open(targetZone);
+        editZonePanel.Open(targetZone, isNewEntry);
     }
 
     public void OpenLoadGameMenu(bool templateMode = false)
@@ -89,4 +107,82 @@ public class GameInterface : MonoBehaviour {
                 break;
         }
     }
+
+
+
+
+	/// <summary>
+	/// rebuilds troop dropdown data in order to make sure it's in sync with the available troop types
+	/// </summary>
+	public static void ReBakeFactionDDowns() {
+		factionDDownOptions.Clear();
+		if (GameController.GuardGameDataExist()) {
+			factionDDownOptions.Add(new Dropdown.OptionData(Rules.NO_FACTION_NAME));
+			List<Faction> factions = GameController.instance.curData.factions;
+			for (int i = 0; i < factions.Count; i++) {
+				factionDDownOptions.Add(new Dropdown.OptionData(factions[i].name));
+			}
+		}
+		else {
+			factionDDownOptions.Add(new Dropdown.OptionData("?"));
+		}
+
+		factionDDownsAreStale = false;
+	}
+
+	/// <summary>
+	/// returns the dropdown index for the faction with the name specified, or -1 if it isn't found
+	/// </summary>
+	/// <param name="factionName"></param>
+	/// <returns></returns>
+	public static int GetDDownIndexForFaction(string factionName) {
+		if (string.IsNullOrEmpty(factionName)) {
+			factionName = Rules.NO_FACTION_NAME;
+		}
+		if (factionDDownsAreStale) {
+			ReBakeFactionDDowns();
+		}
+		for (int i = 0; i < factionDDownOptions.Count; i++) {
+			if (factionDDownOptions[i].text == factionName) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/// <summary>
+	/// rebuilds troop dropdown data in order to make sure it's in sync with the available troop types
+	/// </summary>
+	public static void ReBakeTroopTypeDDowns() {
+		troopDDownOptions.Clear();
+		if (GameController.GuardGameDataExist()) {
+			List<TroopType> tTypes = GameController.instance.curData.troopTypes;
+			for (int i = 0; i < tTypes.Count; i++) {
+				troopDDownOptions.Add(new Dropdown.OptionData(tTypes[i].name));
+			}
+		}
+		else {
+			troopDDownOptions.Add(new Dropdown.OptionData("?"));
+		}
+
+		troopDDownsAreStale = false;
+	}
+
+	/// <summary>
+	/// returns the dropdown index for the troop type with the name specified, or -1 if it isn't found
+	/// </summary>
+	/// <param name="troopTypeName"></param>
+	/// <returns></returns>
+	public static int GetDDownIndexForTType(string troopTypeName) {
+		if (troopDDownsAreStale) {
+			ReBakeTroopTypeDDowns();
+		}
+		for (int i = 0; i < troopDDownOptions.Count; i++) {
+			if (troopDDownOptions[i].text == troopTypeName) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 }

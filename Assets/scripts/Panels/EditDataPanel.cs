@@ -16,11 +16,52 @@ public abstract class EditDataPanel<T> : MonoBehaviour{
 
 	public OnDoneEditing onDoneEditing;
 
-    public virtual void Open(T editedData)
+	public Button closeBtn, deleteBtn;
+
+	/// <summary>
+	/// true if this panel was opened because we're creating a new object, not editing an existing one
+	/// </summary>
+	public bool creatingNewEntry = false;
+
+	/// <summary>
+	/// sets the menu's GO to active, sets dataBeingEdited to the target object and sets the close/delete buttons' texts to something relative to whether this is a new entry or not
+	/// </summary>
+	/// <param name="editedData"></param>
+	/// <param name="isNewEntry"></param>
+    public virtual void Open(T editedData, bool isNewEntry)
     {
+		gameObject.SetActive(true);
         //set data
         dataBeingEdited = editedData;
+		creatingNewEntry = isNewEntry;
+		ContextualizeFinishBtns();
     }
+
+	public virtual void ContextualizeFinishBtns() {
+		if (closeBtn) {
+			Text closeBtnText = closeBtn.GetComponentInChildren<Text>();
+			if (closeBtnText) {
+				if (creatingNewEntry) {
+					closeBtnText.text = "Confirm Creation";
+				}
+				else {
+					closeBtnText.text = "Close";
+				}
+			}
+		}
+
+		if (deleteBtn) {
+			Text delBtnText = deleteBtn.GetComponentInChildren<Text>();
+			if (delBtnText) {
+				if (creatingNewEntry) {
+					delBtnText.text = "Cancel Creation";
+				}
+				else {
+					delBtnText.text = "Delete";
+				}
+			}
+		}		
+	}
 
 	/// <summary>
 	/// ask if the user is sure about deleting what's being edited
@@ -45,6 +86,14 @@ public abstract class EditDataPanel<T> : MonoBehaviour{
 	/// </summary>
 	public virtual void OnCloseBtnClicked() {
 		Debug.Log("SAVE CHANGES?");
+	}
+
+	/// <summary>
+	/// returns false if any data entry contains invalid info (name is empty, for example); true otherwise
+	/// </summary>
+	/// <returns></returns>
+	public virtual bool DataIsValid() {
+		return true;
 	}
 
 	/// <summary>

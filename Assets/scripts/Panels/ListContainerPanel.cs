@@ -34,6 +34,9 @@ public class ListContainerPanel<T> : MonoBehaviour {
     }
 
     
+	/// <summary>
+	/// calls ClearList
+	/// </summary>
     protected virtual void OnEnable()
     {
         ClearList();
