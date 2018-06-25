@@ -18,17 +18,23 @@ public class World : MonoBehaviour {
         instance = this;
     }
 
-    public void ToggleWorldDisplay(bool active)
+    public static void ToggleWorldDisplay(bool active)
     {
-        ground.gameObject.SetActive(active);
-        zonesContainer.gameObject.SetActive(active);
+        instance.ground.gameObject.SetActive(active);
+		instance.zonesContainer.gameObject.SetActive(active);
     }
 
-    public void CreateNewZoneAtPoint(Vector3 point, bool autoOpenEditMenu = true)
+	public static void CleanZonesContainer() {
+		for(int i = 0; i < instance.zonesContainer.childCount; i++) {
+			Destroy(instance.zonesContainer.GetChild(i).gameObject);
+		}
+	}
+
+    public static void CreateNewZoneAtPoint(Vector3 point, bool autoOpenEditMenu = true)
     {
         Zone newZone = new Zone("New Zone");		
-        GameObject newSpot = Instantiate(zonePrefab, point, Quaternion.identity);
-        newSpot.transform.parent = zonesContainer;
+        GameObject newSpot = Instantiate(instance.zonePrefab, point, Quaternion.identity);
+        newSpot.transform.parent = instance.zonesContainer;
         newSpot.GetComponent<ZoneSpot>().data = newZone;
         if (autoOpenEditMenu)
         {
@@ -36,8 +42,8 @@ public class World : MonoBehaviour {
         }
     }
 
-	public ZoneSpot GetZoneSpotByZoneName(string zoneName) {
-		Transform theZoneTransform = zonesContainer.Find(zoneName);
+	public static ZoneSpot GetZoneSpotByZoneName(string zoneName) {
+		Transform theZoneTransform = instance.zonesContainer.Find(zoneName);
 		if (theZoneTransform) {
 			return theZoneTransform.GetComponent<ZoneSpot>();
 		}
@@ -45,8 +51,21 @@ public class World : MonoBehaviour {
 		return null;
 	}
 
-    public void PlaceZone(Zone targetZone)
-    {
+	public static void SetupAllZonesFromData() {
+		List<Zone> zones = GameController.instance.curData.zones;
+		for(int i = 0; i < zones.Count; i++) {
+			PlaceZone(zones[i]);
+		}
+	}
 
-    }
+	public static void LinkAllZonesFromData() {
+		Debug.Log("TODO Zone linking");
+	}
+
+    public static void PlaceZone(Zone targetZone)
+    {
+		GameObject newSpot = Instantiate(instance.zonePrefab, targetZone.coords, Quaternion.identity);
+		newSpot.transform.parent = instance.zonesContainer;
+		newSpot.GetComponent<ZoneSpot>().data = targetZone;
+	}
 }

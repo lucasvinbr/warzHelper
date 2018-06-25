@@ -6,6 +6,9 @@ public class TemplateModeUI : ModeUI {
 
     public override void ShowInitialUI()
     {
-        //hide all menus and show the world
+		World.CleanZonesContainer();
+		World.ToggleWorldDisplay(true);
+		World.SetupAllZonesFromData();
+		World.LinkAllZonesFromData();
     }
 }

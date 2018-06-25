@@ -7,7 +7,8 @@ using UnityEngine.UI;
 
 /// <summary>
 /// script for the arrows in a numeric input field. expects to be placed in the parent of the buttons,
-/// which should be a child of the target input field
+/// which should be a child of the target input field.
+/// can also add events to ensure validation of the provided input
 /// </summary>
 public class NumericInputFieldBtns : MonoBehaviour {
 	
@@ -17,7 +18,7 @@ public class NumericInputFieldBtns : MonoBehaviour {
 
 	public bool addEventToBtnsOnStart = true;
 
-	public float minValue = 0, stepSize = 0.1f;
+	public float minValue = 0, maxValue = 99, stepSize = 0.1f;
 
 	private void Reset() {
 		
@@ -49,6 +50,9 @@ public class NumericInputFieldBtns : MonoBehaviour {
 			if (downBtn) {
 				downBtn.onClick.AddListener(DecrementTheField);
 			}
+			if (targetField) {
+				targetField.onEndEdit.AddListener(ClampFieldValue);
+			}
 		}
 		
 	}
@@ -57,12 +61,12 @@ public class NumericInputFieldBtns : MonoBehaviour {
 		if (targetField) {
 			if (targetField.contentType == InputField.ContentType.IntegerNumber) {
 				int curValue = int.Parse(targetField.text);
-				curValue += (int) stepSize;
+				curValue = (int)Mathf.Min(curValue + stepSize, maxValue);
 				targetField.text = curValue.ToString();
 			}
 			else {
 				float curFValue = float.Parse(targetField.text, CultureInfo.InvariantCulture);
-				curFValue += stepSize;
+				curFValue = Mathf.Min(curFValue + stepSize, maxValue);
 				targetField.text = curFValue.ToString(CultureInfo.InvariantCulture);
 			}
 		}
@@ -78,6 +82,21 @@ public class NumericInputFieldBtns : MonoBehaviour {
 			else {
 				float curFValue = float.Parse(targetField.text, CultureInfo.InvariantCulture);
 				curFValue = Mathf.Max(curFValue - stepSize, minValue);
+				targetField.text = curFValue.ToString(CultureInfo.InvariantCulture);
+			}
+		}
+	}
+
+	public void ClampFieldValue(string fieldText) {
+		if (targetField) {
+			if (targetField.contentType == InputField.ContentType.IntegerNumber) {
+				int curValue = int.Parse(fieldText);
+				curValue = (int)Mathf.Clamp(curValue, minValue, maxValue);
+				targetField.text = curValue.ToString();
+			}
+			else {
+				float curFValue = float.Parse(fieldText, CultureInfo.InvariantCulture);
+				curFValue = Mathf.Clamp(curFValue, minValue, maxValue);
 				targetField.text = curFValue.ToString(CultureInfo.InvariantCulture);
 			}
 		}

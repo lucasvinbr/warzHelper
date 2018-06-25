@@ -169,4 +169,42 @@ public class GameController : MonoBehaviour {
 			return false;
 		}
 	}
+
+	/// <summary>
+	/// returns the product of the baseZonePointAward, the owner faction's multPointAward for zones
+	/// and the zoneMult (multTrainingPoints or multRecruitPoints, for example)
+	/// </summary>
+	/// <param name="ownerFaction"></param>
+	/// <param name="zoneMult"></param>
+	/// <returns></returns>
+	public static int GetResultingPointsForZone(string ownerFaction, float zoneMult) {
+		Faction ownerFac = GetFactionByName(ownerFaction);
+		
+		if(ownerFac != null) {
+			return Mathf.RoundToInt(instance.curData.rules.baseZonePointAwardOnTurnStart * ownerFac.multZonePointAwardOnTurnStart * zoneMult);
+		}
+		else {
+			return Mathf.RoundToInt(instance.curData.rules.baseZonePointAwardOnTurnStart * zoneMult);
+		}
+		
+	}
+
+	/// <summary>
+	/// returns the product of the baseMaxUnitsPerZone, the owner faction's maxGarrMult
+	/// and the zone's maxGarrMult
+	/// </summary>
+	/// <param name="ownerFaction"></param>
+	/// <param name="zoneMult"></param>
+	/// <returns></returns>
+	public static int GetResultingMaxGarrForZone(string ownerFaction, float zoneMult) {
+		Faction ownerFac = GetFactionByName(ownerFaction);
+
+		if (ownerFac != null) {
+			return Mathf.RoundToInt(instance.curData.rules.baseMaxUnitsInOneGarrison * ownerFac.multMaxUnitsInOneGarrison * zoneMult);
+		}
+		else {
+			return Mathf.RoundToInt(instance.curData.rules.baseMaxUnitsInOneGarrison * zoneMult);
+		}
+
+	}
 }

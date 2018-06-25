@@ -28,6 +28,10 @@ public class TroopType {
 		}
 
 	}
+
+	public TroopType() {
+
+	}
 }
 
 /// <summary>

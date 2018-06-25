@@ -53,6 +53,6 @@ public class ZonePlacer : MonoBehaviour {
 
     void OnNewZoneConfirmPlacement()
     {
-        World.instance.CreateNewZoneAtPoint(zoneBlueprint.position);
+        World.CreateNewZoneAtPoint(zoneBlueprint.position);
     }
 }

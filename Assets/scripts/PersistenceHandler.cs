@@ -135,7 +135,7 @@ public class PersistenceHandler
                 writer.Close();
                 if (notifyMsg)
                 {
-                    Debug.LogError("saved at: " + filePath);
+                    Debug.Log("saved at: " + filePath);
                 }
             }
         }
@@ -151,7 +151,7 @@ public class PersistenceHandler
         try
         {
             File.Delete(filePath);
-            Debug.LogWarning("deleted file at " + filePath);
+            Debug.Log("deleted file at " + filePath);
         }catch(Exception e)
         {
             Debug.LogError("an error occurred while trying to delete data! error: " + e.ToString());

@@ -6,8 +6,11 @@ using UnityEngine.UI;
 
 public class EditZonePanel : EditDataPanel<Zone> {
 
-    public InputField nameInput, eInfoInput, multTrainingInput, multRecruitInput, multMaxGarrInput, startPoinsInput;
+    public InputField nameInput, eInfoInput, multTrainingInput, multRecruitInput, multMaxGarrInput, startPointsInput;
     public Dropdown ownerFactionDropdown;
+
+	public ZonePointMultInputPredicter trainingMultPredicter, recruitMultPredicter;
+	public ZoneGarrMultInputPredicter garrMultPredicter;
 
 	public Image zoneIconImg;
 
@@ -19,7 +22,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		multTrainingInput.text = dataBeingEdited.multTrainingPoints.ToString(CultureInfo.InvariantCulture);
 		multRecruitInput.text = dataBeingEdited.multRecruitmentPoints.ToString(CultureInfo.InvariantCulture);
 		multMaxGarrInput.text = dataBeingEdited.multMaxUnitsInGarrison.ToString(CultureInfo.InvariantCulture);
-		startPoinsInput.text = dataBeingEdited.pointsGivenAtGameStart.ToString();
+		startPointsInput.text = dataBeingEdited.pointsGivenAtGameStart.ToString();
 		ReFillDropdownOptions();
 		//zoneIconImg.sprite = TODO get icon by path to file
 	}
@@ -32,8 +35,17 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		ownerFactionDropdown.AddOptions(GameInterface.factionDDownOptions);
 		ownerFactionDropdown.RefreshShownValue();
 		ownerFactionDropdown.value = GameInterface.GetDDownIndexForFaction(dataBeingEdited.ownerFaction);
+		RefreshFactionForPredicters();
 	}
 
+	public void RefreshFactionForPredicters() {
+		if (trainingMultPredicter) {
+			trainingMultPredicter.curOwnerFaction = ownerFactionDropdown.captionText.text;
+		}
+		if (recruitMultPredicter) {
+			recruitMultPredicter.curOwnerFaction = ownerFactionDropdown.captionText.text;
+		}
+	}
 
 	public override bool DataIsValid() {
 		if (string.IsNullOrEmpty(nameInput.text)) {
@@ -57,13 +69,13 @@ public class EditZonePanel : EditDataPanel<Zone> {
 	public void CloseAndSaveChanges() {
 		if (!DataIsValid()) return;
 		CheckIfNameIsAlreadyInUse();
-		ZoneSpot thisZoneSpot = World.instance.GetZoneSpotByZoneName(dataBeingEdited.name);
+		ZoneSpot thisZoneSpot = World.GetZoneSpotByZoneName(dataBeingEdited.name);
 		dataBeingEdited.name = nameInput.text;
 		dataBeingEdited.extraInfo = eInfoInput.text;
 		dataBeingEdited.multTrainingPoints = float.Parse(multTrainingInput.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.multRecruitmentPoints = float.Parse(multRecruitInput.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.multMaxUnitsInGarrison = float.Parse(multMaxGarrInput.text, CultureInfo.InvariantCulture);
-		dataBeingEdited.pointsGivenAtGameStart = int.Parse(startPoinsInput.text);
+		dataBeingEdited.pointsGivenAtGameStart = int.Parse(startPointsInput.text);
 		dataBeingEdited.ownerFaction = ownerFactionDropdown.captionText.text;
 		dataBeingEdited.coords = new Vector2(thisZoneSpot.transform.localPosition.x, thisZoneSpot.transform.localPosition.z);
 		thisZoneSpot.RefreshDataDisplay();
@@ -98,7 +110,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 
 	public override void OnConfirmDelete() {
 		gameObject.SetActive(false);
-		World.instance.GetZoneSpotByZoneName(dataBeingEdited.name).DeleteThisSpot();
+		World.GetZoneSpotByZoneName(dataBeingEdited.name).DeleteThisSpot();
 		GameController.RemoveZone(dataBeingEdited);
 		dataBeingEdited = null;
 		OnWindowIsClosing();
