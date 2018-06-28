@@ -96,8 +96,11 @@ public class PersistenceHandler
                     }
 
                 }
-            }
-            else return default(T);
+			}
+			else {
+				Debug.LogWarning(fileName + " load: file does not seem to exist");
+				return default(T);
+			}
         }
         catch (Exception e)
         {

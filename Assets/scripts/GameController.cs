@@ -70,9 +70,11 @@ public class GameController : MonoBehaviour {
 
 	public void LoadData(string gameName, bool isTemplate = false)
     {
-        curData = PersistenceHandler.LoadFromFile<TemplateInfo>(gameName);
+		string fileDir = (isTemplate ? PersistenceHandler.templatesDirectory : PersistenceHandler.gamesDirectory) + gameName + ".xml";
+        curData = PersistenceHandler.LoadFromFile<TemplateInfo>(fileDir);
 		if(curData != null) {
 			Debug.Log("loaded game: " + curData.gameName);
+			GameInterface.instance.HideObject(GameInterface.instance.saveListPanel.gameObject);
 			GameInterface.instance.SwitchInterface(isTemplate ? GameInterface.InterfaceMode.template : GameInterface.InterfaceMode.game);
 		}
     }
