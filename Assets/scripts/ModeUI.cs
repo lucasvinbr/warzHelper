@@ -5,4 +5,6 @@ using UnityEngine;
 public abstract class ModeUI : MonoBehaviour {
 
     abstract public void ShowInitialUI();
+
+	abstract public void ClearUI();
 }

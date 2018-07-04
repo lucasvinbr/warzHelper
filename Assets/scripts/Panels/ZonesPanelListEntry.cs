@@ -13,7 +13,11 @@ public class ZonesPanelListEntry : ListPanelEntry<Zone> {
     {
         base.SetContent(theContent);
         nameTxt.text = myContent.name;
-        ownerTxt.text = "owner: " + myContent.ownerFaction;
-        garrisonTxt.text = "garrison: " + myContent.troopsGarrisoned.ToString();
+        ownerTxt.text = myContent.ownerFaction;
+        garrisonTxt.text = myContent.TotalTroopsInGarrison.ToString();
     }
+
+	public void EntryClicked() {
+		GameInterface.instance.EditZone(myContent, false);
+	}
 }

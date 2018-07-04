@@ -13,4 +13,14 @@ public class ZonesPanel : ListContainerPanel<Zone> {
             AddEntry(zoneList[i]);
         }
     }
+
+	/// <summary>
+	/// closes the panel and begins the zone placement procedure.
+	/// if a spot is selected (placement isnt canceled),
+	/// open the edit zone menu for this new zone
+	/// </summary>
+	public void OnNewZoneBtnClicked() {
+		World.BeginNewZonePlacement();
+		gameObject.SetActive(false);
+	}
 }

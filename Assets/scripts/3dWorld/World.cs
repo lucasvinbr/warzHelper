@@ -30,13 +30,20 @@ public class World : MonoBehaviour {
 		}
 	}
 
+	public static void BeginNewZonePlacement() {
+		instance.zonePlacerScript.StartNewZonePlacement(true);
+	}
+
     public static void CreateNewZoneAtPoint(Vector3 point, bool autoOpenEditMenu = true)
     {
         Zone newZone = new Zone("New Zone");		
         GameObject newSpot = Instantiate(instance.zonePrefab, point, Quaternion.identity);
         newSpot.transform.parent = instance.zonesContainer;
-        newSpot.GetComponent<ZoneSpot>().data = newZone;
-        if (autoOpenEditMenu)
+		ZoneSpot spotScript = newSpot.GetComponent<ZoneSpot>();
+		spotScript.data = newZone;
+		spotScript.RefreshDataDisplay();
+
+		if (autoOpenEditMenu)
         {
             GameInterface.instance.EditZone(newZone, true);
         }
@@ -62,9 +69,13 @@ public class World : MonoBehaviour {
 		Debug.Log("TODO Zone linking");
 	}
 
+	/// <summary>
+	/// place a zone using its saved coordinates
+	/// </summary>
+	/// <param name="targetZone"></param>
     public static void PlaceZone(Zone targetZone)
     {
-		GameObject newSpot = Instantiate(instance.zonePrefab, targetZone.coords, Quaternion.identity);
+		GameObject newSpot = Instantiate(instance.zonePrefab, targetZone.CoordsForWorld, Quaternion.identity);
 		newSpot.transform.parent = instance.zonesContainer;
 		newSpot.GetComponent<ZoneSpot>().data = targetZone;
 	}

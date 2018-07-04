@@ -27,10 +27,13 @@ public class ZonePlacer : MonoBehaviour {
         zoneBlueprint.gameObject.SetActive(false);
     }
 
-    public void StartNewZonePlacement()
+    public void StartNewZonePlacement(bool zoneIsNew)
     {
         this.enabled = true;
-        actionOnSpotSelect += OnNewZoneConfirmPlacement;
+		if (zoneIsNew) {
+			actionOnSpotSelect += OnNewZoneConfirmPlacement;
+		}
+        
     }
 
     void Update()

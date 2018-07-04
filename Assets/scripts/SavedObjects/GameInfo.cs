@@ -10,7 +10,7 @@ public class GameInfo : TemplateInfo {
 
     public GameInfo(string name) : base(name)
     {
-       
+		this.isATemplate = false;
     }
 
     //empty constructor to enable xml serialization

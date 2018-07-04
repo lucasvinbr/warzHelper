@@ -11,13 +11,15 @@ public class GameInterface : MonoBehaviour {
 
     public EditZonePanel editZonePanel;
 
-	public TextInputPanel texInputPanel;
+	public TextInputPanel textInputPanel;
 
 	public ColorInputPanel colorInputPanel;
 
     public SaveListPanel saveListPanel;
 
     public ModeUI startOptionsPanel, templateOptionsPanel, gameOptionsPanel;
+
+	private ModeUI curModeUI;
 
     public Color positiveUIColor, negativeUIColor, selectedUIElementColor, deselectedUIElementColor;
 
@@ -91,25 +93,30 @@ public class GameInterface : MonoBehaviour {
                 templateOptionsPanel.gameObject.SetActive(false);
                 gameOptionsPanel.gameObject.SetActive(false);
                 startOptionsPanel.gameObject.SetActive(true);
-                startOptionsPanel.ShowInitialUI();
+				curModeUI = startOptionsPanel;
                 break;
             case InterfaceMode.game:
                 templateOptionsPanel.gameObject.SetActive(false);
                 gameOptionsPanel.gameObject.SetActive(true);
                 startOptionsPanel.gameObject.SetActive(false);
-                gameOptionsPanel.ShowInitialUI();
+				curModeUI = gameOptionsPanel;
                 break;
             case InterfaceMode.template:
                 templateOptionsPanel.gameObject.SetActive(true);
                 gameOptionsPanel.gameObject.SetActive(false);
                 startOptionsPanel.gameObject.SetActive(false);
-                templateOptionsPanel.ShowInitialUI();
+				curModeUI = templateOptionsPanel;
                 break;
         }
-    }
+		curModeUI.ShowInitialUI();
+	}
+
+	public void ReturnToMenu() {
+		ModalPanel.Instance().YesNoBox("Return to Main Menu", "Any unsaved changes will be lost.\n Proceed?", ()=> { curModeUI.ClearUI(); SwitchInterface(InterfaceMode.start); }, null);
+	}
 
 
-
+	#region dropdowns
 
 	/// <summary>
 	/// rebuilds troop dropdown data in order to make sure it's in sync with the available troop types
@@ -185,4 +192,5 @@ public class GameInterface : MonoBehaviour {
 		return -1;
 	}
 
+	#endregion
 }

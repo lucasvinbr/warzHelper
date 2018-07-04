@@ -15,12 +15,7 @@ public class ZoneSpot : MonoBehaviour {
 
     void Start()
     {
-        if (!myLabel)
-        {
-            myLabel = FollowerTextCanvasRecycler.GetAFollower();
-            myLabel.FollowThis = labelPoint;
-            RefreshDataDisplay();
-        }
+		RefreshDataDisplay();
     }
 
     void OnDestroy()
@@ -36,11 +31,20 @@ public class ZoneSpot : MonoBehaviour {
 
 	}
 
+	public void GuardMyLabel() {
+		if (!myLabel) {
+			myLabel = FollowerTextCanvasRecycler.GetAFollower();
+			myLabel.FollowThis = labelPoint;
+		}
+	}
+
     public void RefreshDataDisplay()
     {
+		GuardMyLabel();
         if(data != null)
         {
             myLabel.SetText(data.name);
+			gameObject.name = data.name;
         }
     }
 

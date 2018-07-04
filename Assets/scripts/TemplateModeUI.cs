@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class TemplateModeUI : ModeUI {
 
-    public override void ShowInitialUI()
+	public override void ClearUI() {
+		World.CleanZonesContainer();
+		World.ToggleWorldDisplay(false);
+	}
+
+	public override void ShowInitialUI()
     {
 		World.CleanZonesContainer();
 		World.ToggleWorldDisplay(true);

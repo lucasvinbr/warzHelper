@@ -5,7 +5,11 @@ using UnityEngine;
 
 public class GameModeUI : ModeUI
 {
-    public override void ShowInitialUI()
+	public override void ClearUI() {
+		//hide the world
+	}
+
+	public override void ShowInitialUI()
     {
         //hide all menus and show the world
     }

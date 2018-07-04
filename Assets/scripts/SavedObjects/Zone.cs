@@ -6,7 +6,7 @@ public class Zone {
 	/// <summary>
 	/// the zone's unique name
 	/// </summary>
-    public string name;
+	public string name;
 
 	/// <summary>
 	/// any text the player might want to add about the zone
@@ -16,7 +16,7 @@ public class Zone {
 	/// <summary>
 	/// name of the faction that currently owns this zone
 	/// </summary>
-    public string ownerFaction;
+	public string ownerFaction;
 
 	/// <summary>
 	/// file path of this zone's picture, shown in the zone description screen and the battle screen
@@ -55,21 +55,41 @@ public class Zone {
 	public int pointsGivenAtGameStart = 0;
 
 	/// <summary>
-	/// the zone's position in the world. Does not take the board into account
+	/// the zone's position in the world. Does not take the board into account, and the Y is actually Z! (use CoordsForWorld when placing the zone)
 	/// </summary>
 	public Vector2 coords;
 
+	public Vector3 CoordsForWorld{
+		get{
+			return Vector3.right * coords.x + Vector3.forward * coords.y;
+		}
+	}
+
 	public List<TroopNumberPair> troopsGarrisoned;
 
-	public Zone() {}
+	public int TotalTroopsInGarrison
+	{
+		get
+		{
+			int total = 0;
+			for(int i = 0; i < troopsGarrisoned.Count; i++) {
+				total += troopsGarrisoned[i].troopAmount;
+			}
+			return total;
+		}
+	}
 
-    public Zone(string name)
-    {
-        this.name = name;
-        while(GameController.GetZoneByName(name) != null)
-        {
-            this.name = name + " copy";
-        }
+	public Zone() { }
+
+	public Zone(string name) {
+		this.name = name;
+		this.ownerFaction = Rules.NO_FACTION_NAME;
+		troopsGarrisoned = new List<TroopNumberPair>();
+		while (GameController.GetZoneByName(this.name) != null) {
+			this.name = name + " copy";
+		}
 		GameController.instance.curData.zones.Add(this);
 	}
+
+	
 }

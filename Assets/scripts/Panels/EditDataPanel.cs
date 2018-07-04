@@ -100,7 +100,7 @@ public abstract class EditDataPanel<T> : MonoBehaviour{
 	/// calls onDoneEditing and then sets it to null
 	/// </summary>
 	public virtual void OnWindowIsClosing() {
-		onDoneEditing();
+		onDoneEditing?.Invoke();
 		onDoneEditing = null;
 	}
 }

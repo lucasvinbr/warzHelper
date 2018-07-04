@@ -29,6 +29,11 @@ public class TemplateInfo {
         this.gameName = name;
         factions = new List<Faction>();
         zones = new List<Zone>();
+		troopTypes = new List<TroopType>();
+		deployedCommanders = new List<Commander>();
+		rules = new Rules();
+		boardInfo = new Board();
+		this.isATemplate = true;
     }
 
     //empty constructor to enable xml serialization

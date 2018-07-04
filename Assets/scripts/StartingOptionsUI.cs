@@ -18,4 +18,8 @@ public class StartingOptionsUI : ModeUI {
     {
         Application.Quit();
     }
+
+	public override void ClearUI() {
+		ShowInitialUI();
+	}
 }

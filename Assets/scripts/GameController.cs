@@ -16,9 +16,9 @@ public class GameController : MonoBehaviour {
 
     public void StartNewGame(bool isTemplate)
     {
-        GameInterface.instance.texInputPanel.SetPanelInfo("Please provide a name for this game", "Confirm", () =>
+        GameInterface.instance.textInputPanel.SetPanelInfo("Please provide a name for this game", "Confirm", () =>
         {
-            string gameName = GameInterface.instance.texInputPanel.theInputField.text;
+            string gameName = GameInterface.instance.textInputPanel.theInputField.text;
             if (!PersistenceHandler.IsAValidFilename(gameName))
             {
                 ModalPanel.Instance().OkBox("Invalid name",
@@ -58,14 +58,14 @@ public class GameController : MonoBehaviour {
                     Debug.Log("saved new game");
                 }
 
-                GameInterface.instance.texInputPanel.Close();
+                GameInterface.instance.textInputPanel.Close();
 
-
-            }
+				GameInterface.instance.SwitchInterface(isTemplate ? GameInterface.InterfaceMode.template : GameInterface.InterfaceMode.game);
+			}
 
 
         });
-        GameInterface.instance.texInputPanel.Open();
+        GameInterface.instance.textInputPanel.Open();
     }
 
 	public void LoadData(string gameName, bool isTemplate = false)
@@ -81,11 +81,54 @@ public class GameController : MonoBehaviour {
 
     public void SaveGame()
     {
-        PersistenceHandler.SaveToFile(curData, curData.gameName, true);
+        PersistenceHandler.SaveToFile(curData, (curData.isATemplate ? PersistenceHandler.templatesDirectory : PersistenceHandler.gamesDirectory) + curData.gameName + ".xml", true);
     }
 
+	public void SaveAs() {
+		bool isTemplate = curData.isATemplate;
+		GameInterface.instance.textInputPanel.SetPanelInfo("Please provide a name for this save", "Confirm", () => {
+			string gameName = GameInterface.instance.textInputPanel.theInputField.text;
+			if (!PersistenceHandler.IsAValidFilename(gameName)) {
+				ModalPanel.Instance().OkBox("Invalid name",
+					"The name provided is invalid for a save. The name must follow the same rules that apply when you create a file.");
+				return;
+			}
 
-    public void GoToTemplate(TemplateInfo templateData)
+			TemplateInfo existingData = null;
+
+			if (isTemplate) {
+				existingData = PersistenceHandler.LoadFromFile<TemplateInfo>(PersistenceHandler.templatesDirectory + gameName + ".xml");
+			}
+			else {
+				existingData = PersistenceHandler.LoadFromFile<TemplateInfo>(PersistenceHandler.gamesDirectory + gameName + ".xml");
+			}
+
+			if (existingData != null) {
+				ModalPanel.Instance().YesNoBox("Save Exists", "A save with the same name already exists. Overwrite?", null, () => { existingData = null; });
+			}
+
+			//even if there actually is data, we pretend there isn't in case we plan to overwrite
+			if (existingData == null) {
+				curData.gameName = gameName;
+				if (isTemplate) {
+					PersistenceHandler.SaveToFile(curData, PersistenceHandler.templatesDirectory + gameName + ".xml");
+				}
+				else {
+					PersistenceHandler.SaveToFile(curData, PersistenceHandler.gamesDirectory + gameName + ".xml");
+				}
+
+				GameInterface.instance.textInputPanel.Close();
+
+			}
+
+
+		});
+		GameInterface.instance.textInputPanel.Open();
+	}
+
+
+
+	public void GoToTemplate(TemplateInfo templateData)
     {
         GameInterface.instance.SwitchInterface(GameInterface.InterfaceMode.template);
     }
