@@ -44,13 +44,13 @@ public class SaveListPanel : ListContainerPanel<TemplateInfo> {
         gameObject.SetActive(true);
     }
 
-    protected override void ClearList()
+    public override void ClearList()
     {
         base.ClearList();
         savesList.Clear();
     }
 
-    protected override void OnEnable()
+    public override void OnEnable()
     {
         ClearList();
         PickedEntry = null;

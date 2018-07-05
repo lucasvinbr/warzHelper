@@ -23,7 +23,7 @@ public class ListContainerPanel<T> : MonoBehaviour {
 		return newEntry;
     }
 
-    protected virtual void ClearList()
+    public virtual void ClearList()
     {
         for (int i = 0; i < listContainer.childCount; i++)
         {
@@ -37,7 +37,7 @@ public class ListContainerPanel<T> : MonoBehaviour {
 	/// <summary>
 	/// calls ClearList
 	/// </summary>
-    protected virtual void OnEnable()
+    public virtual void OnEnable()
     {
         ClearList();
     }

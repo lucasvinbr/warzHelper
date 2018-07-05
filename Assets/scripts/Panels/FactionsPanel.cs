@@ -5,7 +5,7 @@ using UnityEngine;
 public class FactionsPanel : ListContainerPanel<Faction>
 {
 
-    protected override void OnEnable()
+    public override void OnEnable()
     {
         ClearList();
         List<Faction> factionList = GameController.instance.curData.factions;

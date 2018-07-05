@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ZonesPanel : ListContainerPanel<Zone> {
 
-    protected override void OnEnable()
+    public override void OnEnable()
     {
         ClearList();
         List<Zone> zoneList = GameController.instance.curData.zones;

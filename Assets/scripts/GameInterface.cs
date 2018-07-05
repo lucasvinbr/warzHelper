@@ -23,6 +23,9 @@ public class GameInterface : MonoBehaviour {
 
     public Color positiveUIColor, negativeUIColor, selectedUIElementColor, deselectedUIElementColor;
 
+	public ZonesPanel zonesPanel;
+
+	public FactionsPanel factionsPanel;
 
 	public static List<Dropdown.OptionData> factionDDownOptions = new List<Dropdown.OptionData>();
 	public static List<Dropdown.OptionData> troopDDownOptions = new List<Dropdown.OptionData>();

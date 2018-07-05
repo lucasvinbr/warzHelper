@@ -9846,6 +9846,8 @@ MonoBehaviour:
   negativeUIColor: {r: 0.8161765, g: 0.6721453, b: 0.6721453, a: 1}
   selectedUIElementColor: {r: 0.88235295, g: 0.88235295, b: 0.88235295, a: 1}
   deselectedUIElementColor: {r: 0.7352941, g: 0.7352941, b: 0.7352941, a: 1}
+  zonesPanel: {fileID: 1561530813}
+  factionsPanel: {fileID: 208531751}
 --- !u!114 &649191593
 MonoBehaviour:
   m_ObjectHideFlags: 0

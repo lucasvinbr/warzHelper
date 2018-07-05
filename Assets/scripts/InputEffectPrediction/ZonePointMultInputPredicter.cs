@@ -13,7 +13,7 @@ public class ZonePointMultInputPredicter : InputEffectPredicter {
 
 			int resultingPoints = GameController.GetResultingPointsForZone(curOwnerFaction, multValue);
 			if (GameController.GuardGameDataExist()) {
-				predictedEffectText.text = "Applying all points awarded on Turn Start = " + resultingPoints.ToString() + " points";
+				predictedEffectText.text = "Result: " + resultingPoints.ToString() + " points";
 			}
 			else {
 				predictedEffectText.text = "?";

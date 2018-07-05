@@ -136,7 +136,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		addEntryBtn.transform.SetAsLastSibling();
 	}
 
-	protected override void ClearList() {
+	public override void ClearList() {
 		for (int i = 0; i < listContainer.childCount - 1; i++) {
 			Transform entry = listContainer.GetChild(i);
 			FactionTroopListEntry entryScript = entry.GetComponent<FactionTroopListEntry>();
@@ -146,7 +146,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		}
 	}
 
-	protected override void OnEnable() {
+	public override void OnEnable() {
 		//do nothing; the faction panel takes care of clearing and refilling the tree
 	}
 
