@@ -1009,6 +1009,7 @@ GameObject:
   - component: {fileID: 78288162}
   - component: {fileID: 78288161}
   - component: {fileID: 78288160}
+  - component: {fileID: 78288164}
   m_Layer: 5
   m_Name: tempOptionsPanel
   m_TagString: Untagged
@@ -1105,6 +1106,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 78288158}
+--- !u!114 &78288164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 78288158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1cb587ac745757458ccaa5e070b3222, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &82498805
 GameObject:
   m_ObjectHideFlags: 0
@@ -17221,6 +17233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5e5062e0679f0e498baff6bd1d881dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tempSaveOptionsPanel: {fileID: 78288164}
 --- !u!1 &1062684691
 GameObject:
   m_ObjectHideFlags: 0

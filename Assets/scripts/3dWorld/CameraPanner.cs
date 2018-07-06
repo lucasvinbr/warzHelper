@@ -15,7 +15,7 @@ public class CameraPanner : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (theGround.gameObject.activeSelf)
+        if (theGround.gameObject.activeSelf && GameInterface.openedPanelsOverlayLevel == 0)
         {
             curPos = transform.position;
             float inputX = Input.GetAxis("Horizontal"), inputY = Input.GetAxis("Vertical");

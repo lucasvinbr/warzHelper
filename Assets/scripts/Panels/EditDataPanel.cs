@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /// it should also have a "close" and a "delete" button to save, delete or discard changes
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public abstract class EditDataPanel<T> : MonoBehaviour{
+public abstract class EditDataPanel<T> : GenericOverlayPanel{
 
     public T dataBeingEdited;
 

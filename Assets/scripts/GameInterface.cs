@@ -27,6 +27,12 @@ public class GameInterface : MonoBehaviour {
 
 	public FactionsPanel factionsPanel;
 
+	/// <summary>
+	/// a variable that should be incremented whenever an overlay panel is opened, and decremented whenever one closes.
+	/// it can be used to check if a menu is open
+	/// </summary>
+	public static int openedPanelsOverlayLevel = 0;
+
 	public static List<Dropdown.OptionData> factionDDownOptions = new List<Dropdown.OptionData>();
 	public static List<Dropdown.OptionData> troopDDownOptions = new List<Dropdown.OptionData>();
 

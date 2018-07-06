@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class ZonesPanel : ListContainerPanel<Zone> {
 
-    public override void OnEnable()
-    {
-        ClearList();
-        List<Zone> zoneList = GameController.instance.curData.zones;
-        for (int i = 0; i < zoneList.Count; i++)
-        {
-            AddEntry(zoneList[i]);
-        }
-    }
+	public override void FillEntries() {
+		List<Zone> zoneList = GameController.instance.curData.zones;
+		for (int i = 0; i < zoneList.Count; i++) {
+			AddEntry(zoneList[i]);
+		}
+	}
 
 	/// <summary>
 	/// closes the panel and begins the zone placement procedure.

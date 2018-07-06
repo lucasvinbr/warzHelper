@@ -6,7 +6,7 @@ using UnityEngine;
 /// a panel that contains multiple entries in a scroll view.
 /// this entry list is cleared and filled again every time this panel is opened
 /// </summary>
-public class ListContainerPanel<T> : MonoBehaviour {
+public class ListContainerPanel<T> : GenericOverlayPanel {
 
     public Transform listContainer;
 
@@ -23,6 +23,10 @@ public class ListContainerPanel<T> : MonoBehaviour {
 		return newEntry;
     }
 
+	public virtual void FillEntries() {
+
+	}
+
     public virtual void ClearList()
     {
         for (int i = 0; i < listContainer.childCount; i++)
@@ -37,8 +41,10 @@ public class ListContainerPanel<T> : MonoBehaviour {
 	/// <summary>
 	/// calls ClearList
 	/// </summary>
-    public virtual void OnEnable()
+    public override void OnEnable()
     {
+		base.OnEnable();
         ClearList();
+		FillEntries();
     }
 }

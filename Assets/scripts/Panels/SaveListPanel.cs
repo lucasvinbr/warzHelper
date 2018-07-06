@@ -52,25 +52,24 @@ public class SaveListPanel : ListContainerPanel<TemplateInfo> {
 
     public override void OnEnable()
     {
-        ClearList();
-        PickedEntry = null;
-
-        if (inGameMode)
-        {
-            savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.gamesDirectory);
-        }
-        else
-        {
-            savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.templatesDirectory);
-        }
-
-        for(int i = 0; i < savesList.Count; i++)
-        {
-            AddEntry(savesList[i]);
-        }
+		PickedEntry = null;
+		base.OnEnable();
     }
 
-    public void SelectEntry(SavePanelListEntry chosenEntry)
+	public override void FillEntries() {
+		if (inGameMode) {
+			savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.gamesDirectory);
+		}
+		else {
+			savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.templatesDirectory);
+		}
+
+		for (int i = 0; i < savesList.Count; i++) {
+			AddEntry(savesList[i]);
+		}
+	}
+
+	public void SelectEntry(SavePanelListEntry chosenEntry)
     {
         if(PickedEntry != null)
         {

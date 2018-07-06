@@ -147,7 +147,11 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 	}
 
 	public override void OnEnable() {
-		//do nothing; the faction panel takes care of clearing and refilling the tree
+		//do nothing; the faction panel takes care of clearing and refilling the tree, and this is no overlay panel, so we shouldnt increment the overlay level
+	}
+
+	public override void OnDisable() {
+		//do nothing; this is no overlay panel, so we shouldnt increment the overlay level
 	}
 
 	/// <summary>
