@@ -128,7 +128,7 @@ public class GameInterface : MonoBehaviour {
 	#region dropdowns
 
 	/// <summary>
-	/// rebuilds troop dropdown data in order to make sure it's in sync with the available troop types
+	/// rebuilds faction dropdown data in order to make sure it's in sync with the available factions
 	/// </summary>
 	public static void ReBakeFactionDDowns() {
 		factionDDownOptions.Clear();

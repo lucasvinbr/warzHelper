@@ -30,7 +30,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 	public void ReFillDropdownOptions() {
 		ownerFactionDropdown.ClearOptions();
 		if (GameInterface.factionDDownsAreStale) {
-			GameInterface.ReBakeTroopTypeDDowns();
+			GameInterface.ReBakeFactionDDowns();
 		}
 		ownerFactionDropdown.AddOptions(GameInterface.factionDDownOptions);
 		ownerFactionDropdown.RefreshShownValue();
