@@ -11,6 +11,8 @@ public class GameInterface : MonoBehaviour {
 
     public EditZonePanel editZonePanel;
 
+	public EditTroopPanel editTroopPanel;
+
 	public TextInputPanel textInputPanel;
 
 	public ColorInputPanel colorInputPanel;
@@ -81,7 +83,11 @@ public class GameInterface : MonoBehaviour {
         editZonePanel.Open(targetZone, isNewEntry);
     }
 
-    public void OpenLoadGameMenu(bool templateMode = false)
+	public void EditTroopType(TroopType targetTT, bool isNewEntry) {
+		editTroopPanel.Open(targetTT, isNewEntry);
+	}
+
+	public void OpenLoadGameMenu(bool templateMode = false)
     {
         saveListPanel.OpenUp(!templateMode, "Select one of the saved entries", UIStartLoadGame);
     }

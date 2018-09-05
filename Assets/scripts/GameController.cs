@@ -48,13 +48,15 @@ public class GameController : MonoBehaviour {
                 if (isTemplate)
                 {
                     curData = new TemplateInfo(gameName);
+					PersistenceHandler.CreateDirIfNotExists(PersistenceHandler.templatesDirectory);
                     PersistenceHandler.SaveToFile(curData, PersistenceHandler.templatesDirectory + gameName + ".xml");
                     Debug.Log("saved new template");
                 }
                 else
                 {
                     curData = new GameInfo(gameName);
-                    PersistenceHandler.SaveToFile(curData, PersistenceHandler.gamesDirectory + gameName + ".xml");
+					PersistenceHandler.CreateDirIfNotExists(PersistenceHandler.gamesDirectory);
+					PersistenceHandler.SaveToFile(curData, PersistenceHandler.gamesDirectory + gameName + ".xml");
                     Debug.Log("saved new game");
                 }
 

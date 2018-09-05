@@ -47,7 +47,7 @@ public class SaveListPanel : ListContainerPanel<TemplateInfo> {
     public override void ClearList()
     {
         base.ClearList();
-        savesList.Clear();
+        savesList?.Clear();
     }
 
     public override void OnEnable()
@@ -64,8 +64,10 @@ public class SaveListPanel : ListContainerPanel<TemplateInfo> {
 			savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.templatesDirectory);
 		}
 
-		for (int i = 0; i < savesList.Count; i++) {
-			AddEntry(savesList[i]);
+		if (savesList != null) {
+			for (int i = 0; i < savesList.Count; i++) {
+				AddEntry(savesList[i]);
+			}
 		}
 	}
 

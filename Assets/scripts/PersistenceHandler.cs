@@ -1,4 +1,4 @@
-﻿// PersistenceHandler
+// PersistenceHandler
 
 using System;
 using System.Collections.Generic;
@@ -39,6 +39,12 @@ public class PersistenceHandler
 
         return true;
     }
+
+	public static void CreateDirIfNotExists(string path) {
+		if (!Directory.Exists(path)) {
+			Directory.CreateDirectory(path);
+		}
+	}
 
     /// <summary>
     /// does a LoadFromFile on each file found in the directory;

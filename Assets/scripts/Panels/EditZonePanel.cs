@@ -79,7 +79,6 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		dataBeingEdited.ownerFaction = ownerFactionDropdown.captionText.text;
 		dataBeingEdited.coords = new Vector2(thisZoneSpot.transform.localPosition.x, thisZoneSpot.transform.localPosition.z);
 		thisZoneSpot.RefreshDataDisplay();
-		OnWindowIsClosing();
 		gameObject.SetActive(false);
 		OnWindowIsClosing();
 	}
