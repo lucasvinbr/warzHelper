@@ -175,7 +175,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 
 		if(newTierData == null) {
 			if (GameController.GuardGameDataExist()) {
-				newTierData = GameController.instance.curData.troopTypes[0];
+				newTierData = GameController.instance.LastRelevantTType;
 			}
 			
 		}

@@ -13,9 +13,12 @@ public class FactionsPanel : ListContainerPanel<Faction>
 		}
 	}
 
+	/// <summary>
+	/// closes the panel and opens the edit faction panel for a new faction
+	/// </summary>
 	public void OnNewFactionBtnClicked() {
-		//opens the edit faction menu with a new faction in it
-		GameInterface.instance.EditFaction(new Faction(), true);
-		//TODO decide if we should auto create a troop type for this faction if no troop types exist
+		Faction newFaction = new Faction("New Faction");
+		GameInterface.instance.EditFaction(newFaction, true);
+		gameObject.SetActive(false);
 	}
 }

@@ -94,7 +94,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 			CloseAndSaveChanges();
 		}
 		else {
-			ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes (including zone positioning and links) and close the window.", OnConfirmDelete, CloseWithoutSaving, null);
+			ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes (including zone positioning and links) and close the window.", CloseAndSaveChanges, CloseWithoutSaving, null);
 		}
 	}
 

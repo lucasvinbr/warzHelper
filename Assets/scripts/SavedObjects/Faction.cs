@@ -82,4 +82,15 @@ public class Faction
 	/// </summary>
 	public List<string> troopTree;
 
+	public Faction(string name) {
+		this.name = name;
+		troopTree = new List<string>();
+		color = Color.white;
+		while (GameController.GetFactionByName (this.name) != null) {
+			this.name = name + " copy";
+		}
+		GameController.instance.curData.factions.Add(this);
+	}
+
+	public Faction() {}
 }

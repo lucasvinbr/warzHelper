@@ -10,7 +10,7 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 
     public Image factionColorImg, factionIconImg;
 
-	FactionTroopTreeEditPanel troopTreePanel;
+	public FactionTroopTreeEditPanel troopTreePanel;
 
     public override void Open(Faction editedFaction, bool isNewEntry)
     {
@@ -83,7 +83,7 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 			CloseAndSaveChanges();
 		}
 		else {
-			ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes and close the window.", OnConfirmDelete, JustClose, null);
+			ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes and close the window.", CloseAndSaveChanges, JustClose, null);
 		}
 	}
 

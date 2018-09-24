@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class FactionsPanelListEntry : ListPanelEntry<Faction> {
 
-    public Text nameTxt, turnPriorityTxt;
+    public Text nameTxt, turnPriorityTxt, zonesOwnedTxt;
 
     public Image backgroundImg;
 
@@ -13,8 +13,9 @@ public class FactionsPanelListEntry : ListPanelEntry<Faction> {
     {
         myContent = targetFaction;
         nameTxt.text = targetFaction.name;
-        turnPriorityTxt.text = "Turn Priority: " + targetFaction.turnPriority.ToString();
+        turnPriorityTxt.text = targetFaction.turnPriority.ToString();
         backgroundImg.color = targetFaction.color;
+		zonesOwnedTxt.text = "TODO"; //TODO get number of zones owned by this faction
     }
 
     public void OpenEditFactionPanel()

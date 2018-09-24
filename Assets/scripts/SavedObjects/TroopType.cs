@@ -26,7 +26,7 @@ public class TroopType {
 		while (GameController.GetTroopTypeByName(name) != null) {
 			this.name = name + " copy";
 		}
-
+		GameController.instance.curData.troopTypes.Add(this);
 	}
 
 	public TroopType() {

@@ -9,6 +9,32 @@ public class GameController : MonoBehaviour {
 
     public static GameController instance;
 
+	
+	private TroopType m_lastRelevantTType;
+
+	/// <summary>
+	/// the last relevant troop type. It's the one that will be used when adding a new troop tier to a faction, for example.
+	/// Could be the last troop type created or edited, or one automatically created by the GameController
+	/// </summary>
+	public TroopType LastRelevantTType
+	{
+		get
+		{
+			if(m_lastRelevantTType == null) {
+				//get the first troop from the available ones... or create a new one if no troops exist at all
+				if(curData.troopTypes.Count > 0) {
+					m_lastRelevantTType = curData.troopTypes[0];
+				}
+				else {
+					m_lastRelevantTType = new TroopType("New Troop");
+				}
+
+			}
+
+			return m_lastRelevantTType;
+		}
+	}
+
     void Awake()
     {
         instance = this;

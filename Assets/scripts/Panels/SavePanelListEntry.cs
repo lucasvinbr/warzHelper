@@ -24,11 +24,11 @@ public class SavePanelListEntry : ListPanelEntry<TemplateInfo> {
         //if it's a game, show elapsed turns
         if(theContent.GetType() == typeof(GameInfo))
         {
-            gameExtraInfoTxt.text = "elapsed turns: " + (theContent as GameInfo).elapsedTurns.ToString();
+            gameExtraInfoTxt.text = "Elapsed Turns: " + (theContent as GameInfo).elapsedTurns.ToString();
         }
         else
         {
-            gameExtraInfoTxt.text = theContent.factions.Count.ToString() + " factions";
+            gameExtraInfoTxt.text = "Num. Factions: " + theContent.factions.Count.ToString();
         }
     }
 
