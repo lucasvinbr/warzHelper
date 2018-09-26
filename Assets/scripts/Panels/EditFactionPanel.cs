@@ -14,7 +14,8 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 
     public override void Open(Faction editedFaction, bool isNewEntry)
     {
-        //set data
+		//set data
+		troopTreePanel.ClearList();
         base.Open(editedFaction, isNewEntry);
         facNameField.text = dataBeingEdited.name;
 		facInfoField.text = dataBeingEdited.extraInfo;

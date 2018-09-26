@@ -131,9 +131,10 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 
 		SetMaxGarrTroopLvl(maxGarrLvl);
 
-		UpdateTreeTierValues();
 
 		addEntryBtn.transform.SetAsLastSibling();
+
+		UpdateTreeTierValues();
 	}
 
 	public override void ClearList() {
@@ -144,6 +145,9 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 				Destroy(entry.gameObject);
 			}
 		}
+
+		editEntryBtn.interactable = false;
+		delEntryBtn.interactable = false;
 	}
 
 	public override void OnEnable() {
@@ -151,7 +155,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 	}
 
 	public override void OnDisable() {
-		//do nothing; this is no overlay panel, so we shouldnt increment the overlay level
+		//do nothing; this is no overlay panel, so we shouldnt increment/decrement the overlay level
 	}
 
 	/// <summary>
@@ -164,6 +168,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		if(listContainer.childCount > 2) {
 			FactionTroopListEntry entryScript = listContainer.GetChild(listContainer.childCount - 2).
 				GetComponent<FactionTroopListEntry>();
+			
 			if (!entryScript) {//maybe it's the maxGarrLvlDelimiter
 				entryScript = listContainer.GetChild(listContainer.childCount - 3).
 				GetComponent<FactionTroopListEntry>();
@@ -179,12 +184,11 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 			}
 			
 		}
-
 		AddEntry(newTierData);
 
-		UpdateTreeTierValues();
-
 		addEntryBtn.transform.SetAsLastSibling();
+
+		UpdateTreeTierValues();
 	}
 
 	public override GameObject AddEntry(TroopType entryData) {

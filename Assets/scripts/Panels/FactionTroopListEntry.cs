@@ -34,7 +34,7 @@ public class FactionTroopListEntry : ListPanelEntry<TroopType> {
 	}
 
 	public void OpenEditTroopPanel() {
-		Debug.Log("GameInterface.instance.EditTroop(myContent)");
+		GameInterface.instance.EditTroopType(myContent, false);
 	}
 
 
