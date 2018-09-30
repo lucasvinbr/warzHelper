@@ -6,13 +6,14 @@ using UnityEngine.UI;
 
 public class EditTroopPanel : EditDataPanel<TroopType> {
 
-    public InputField nameInput, pointCostInput, autocalcPowerInput;
+    public InputField nameInput, pointCostInput, autocalcPowerInput, extraInfoInput;
 
 	public override void Open(TroopType editedTroop, bool isNewEntry) {
 		base.Open(editedTroop, isNewEntry);
 		nameInput.text = dataBeingEdited.name;
 		pointCostInput.text = dataBeingEdited.pointCost.ToString(CultureInfo.InvariantCulture);
 		autocalcPowerInput.text = dataBeingEdited.autoResolvePower.ToString(CultureInfo.InvariantCulture);
+		extraInfoInput.text = dataBeingEdited.extraInfo;
 	}
 
 	public override bool DataIsValid() {
@@ -40,6 +41,9 @@ public class EditTroopPanel : EditDataPanel<TroopType> {
 		dataBeingEdited.name = nameInput.text;
 		dataBeingEdited.pointCost = int.Parse(pointCostInput.text);
 		dataBeingEdited.autoResolvePower = float.Parse(autocalcPowerInput.text, CultureInfo.InvariantCulture);
+		dataBeingEdited.extraInfo = extraInfoInput.text;
+		GameInterface.troopDDownsAreStale = true;
+		GameController.instance.LastRelevantTType = dataBeingEdited;
 		gameObject.SetActive(false);
 		OnWindowIsClosing();
 	}
@@ -55,7 +59,7 @@ public class EditTroopPanel : EditDataPanel<TroopType> {
 			CloseAndSaveChanges();
 		}
 		else {
-			ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes and close the window.", OnConfirmDelete, CloseWithoutSaving, null);
+			ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes and close the window.", CloseAndSaveChanges, CloseWithoutSaving, null);
 		}
 	}
 

@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Zone {
+
+	/// <summary>
+	/// the zone's unique ID
+	/// </summary>
+	public int ID;
+
+
 	/// <summary>
 	/// the zone's unique name
 	/// </summary>
@@ -14,9 +21,9 @@ public class Zone {
 	public string extraInfo;
 
 	/// <summary>
-	/// name of the faction that currently owns this zone
+	/// ID of the faction that currently owns this zone. a negative number probably means this zone is neutral
 	/// </summary>
-	public string ownerFaction;
+	public int ownerFaction;
 
 	/// <summary>
 	/// file path of this zone's picture, shown in the zone description screen and the battle screen
@@ -27,7 +34,7 @@ public class Zone {
 	/// the other zones this one is linked to.
 	/// commanders can only move between zones that are linked to each other
 	/// </summary>
-	public List<string> linkedZones;
+	public List<int> linkedZones;
 
 	/// <summary>
 	/// this value multiplies any points invested in training. 
@@ -82,8 +89,9 @@ public class Zone {
 	public Zone() { }
 
 	public Zone(string name) {
+		this.ID = GameController.GetUnusedZoneID();
 		this.name = name;
-		this.ownerFaction = Rules.NO_FACTION_NAME;
+		this.ownerFaction = -1;
 		troopsGarrisoned = new List<TroopNumberPair>();
 		while (GameController.GetZoneByName(this.name) != null) {
 			this.name = name + " copy";

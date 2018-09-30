@@ -33,6 +33,10 @@ public class GameController : MonoBehaviour {
 
 			return m_lastRelevantTType;
 		}
+		set
+		{
+			m_lastRelevantTType = value;
+		}
 	}
 
     void Awake()
@@ -166,26 +170,84 @@ public class GameController : MonoBehaviour {
 
     }
 
+
+	public static void RemoveFaction(Faction targetFaction) {
+		instance.curData.factions.Remove(targetFaction);
+		GameInterface.factionDDownsAreStale = true;
+		//TODO set all zones controlled by this faction as neutral
+	}
+
 	public static void RemoveZone(Zone targetZone) {
 		instance.curData.zones.Remove(targetZone);
 		//TODO all zones should check their links
 	}
 
-	public static void RemoveFaction(Faction targetFaction) {
-		instance.curData.factions.Remove(targetFaction);
-		//TODO set all zones controlled by this faction as neutral
-	}
-
 	public static void RemoveTroopType(TroopType targetTroop) {
 		instance.curData.troopTypes.Remove(targetTroop);
+		GameInterface.troopDDownsAreStale = true;
 		//TODO remove all references to this type
 	}
 
-	public static int GetUnusedID() {
-		instance.curData.lastIDGiven++;
-		return instance.curData.lastIDGiven;
+	public static int GetUnusedFactionID() {
+		int freeID = 0;
+		while(GetFactionByID(freeID) != null) {
+			freeID++;
+		}
+
+		return freeID;
 	}
 
+	public static int GetUnusedZoneID() {
+		int freeID = 0;
+		while (GetZoneByID(freeID) != null) {
+			freeID++;
+		}
+
+		return freeID;
+	}
+
+	public static int GetUnusedTroopTypeID() {
+		int freeID = 0;
+		while (GetTroopTypeByID(freeID) != null) {
+			freeID++;
+		}
+
+		return freeID;
+	}
+
+
+	public static Faction GetFactionByID(int factionID) {
+		List<Faction> factionList = instance.curData.factions;
+		for (int i = 0; i < factionList.Count; i++) {
+			if (factionList[i].ID == factionID) {
+				return factionList[i];
+			}
+		}
+
+		return null;
+	}
+
+	public static Zone GetZoneByID(int zoneID) {
+		List<Zone> zoneList = instance.curData.zones;
+		for (int i = 0; i < zoneList.Count; i++) {
+			if (zoneList[i].ID == zoneID) {
+				return zoneList[i];
+			}
+		}
+
+		return null;
+	}
+
+	public static TroopType GetTroopTypeByID(int troopID) {
+		List<TroopType> TTList = instance.curData.troopTypes;
+		for (int i = 0; i < TTList.Count; i++) {
+			if (TTList[i].ID == troopID) {
+				return TTList[i];
+			}
+		}
+
+		return null;
+	}
 
 	public static Faction GetFactionByName(string factionName)
     {
@@ -227,6 +289,38 @@ public class GameController : MonoBehaviour {
 		
 
 		return null;
+	}
+
+	/// <summary>
+	/// returns the NO_FACTION_NAME if not found
+	/// </summary>
+	/// <param name="factionID"></param>
+	/// <returns></returns>
+	public static string GetFactionNameByID(int factionID) {
+		List<Faction> factionList = instance.curData.factions;
+		for (int i = 0; i < factionList.Count; i++) {
+			if (factionList[i].ID == factionID) {
+				return factionList[i].name;
+			}
+		}
+
+		return Rules.NO_FACTION_NAME;
+	}
+
+	/// <summary>
+	/// returns -1 if not found, which should mean "no faction"
+	/// </summary>
+	/// <param name="factionName"></param>
+	/// <returns></returns>
+	public static int GetFactionIDByName(string factionName) {
+		List<Faction> factionList = instance.curData.factions;
+		for (int i = 0; i < factionList.Count; i++) {
+			if (factionList[i].name == factionName) {
+				return factionList[i].ID;
+			}
+		}
+
+		return -1;
 	}
 
 	/// <summary>

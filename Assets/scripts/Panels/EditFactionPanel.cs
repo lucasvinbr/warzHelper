@@ -70,6 +70,7 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 		dataBeingEdited.turnPriority = int.Parse(turnPriorityField.text);
 		dataBeingEdited.maxGarrisonedTroopTier = int.Parse(troopTreePanel.maxGarrTroopLvlText.text);
 		dataBeingEdited.troopTree = troopTreePanel.BakeIntoTroopTree();
+		GameInterface.factionDDownsAreStale = true;
 		gameObject.SetActive(false);
 		OnWindowIsClosing();
     }

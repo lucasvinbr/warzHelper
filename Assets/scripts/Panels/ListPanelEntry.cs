@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 public abstract class ListPanelEntry<T> : MonoBehaviour {
 
-    protected T myContent;
+    public T myContent;
 
     public virtual void SetContent(T theContent)
     {

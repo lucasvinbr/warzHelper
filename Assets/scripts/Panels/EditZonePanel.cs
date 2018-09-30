@@ -76,7 +76,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		dataBeingEdited.multRecruitmentPoints = float.Parse(multRecruitInput.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.multMaxUnitsInGarrison = float.Parse(multMaxGarrInput.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.pointsGivenAtGameStart = int.Parse(startPointsInput.text);
-		dataBeingEdited.ownerFaction = ownerFactionDropdown.captionText.text;
+		dataBeingEdited.ownerFaction = GameController.GetFactionIDByName(ownerFactionDropdown.captionText.text);
 		dataBeingEdited.coords = new Vector2(thisZoneSpot.transform.localPosition.x, thisZoneSpot.transform.localPosition.z);
 		thisZoneSpot.RefreshDataDisplay();
 		gameObject.SetActive(false);

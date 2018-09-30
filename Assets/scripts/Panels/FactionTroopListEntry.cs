@@ -14,13 +14,17 @@ public class FactionTroopListEntry : ListPanelEntry<TroopType> {
 	public override void SetContent(TroopType targetTroop) {
 		if (targetTroop != null) {
 			myContent = targetTroop;
-			tierTxt.text = targetTroop.name;
 			costTxt.text = targetTroop.pointCost.ToString();
 		}
 	}
 
-	public void RefreshInfoLabels() {
+	public void SetContentAccordingToDDown(int ddownValue) {
+		SetContent(GameController.GetTroopTypeByName(troopTypeDropdown.options[ddownValue].text));
+	}
+
+	public void RefreshInfoLabels(bool alsoRefillDropdown = true) {
 		costTxt.text = myContent.pointCost.ToString();
+		if (alsoRefillDropdown) ReFillDropdownOptions();
 	}
 
 	public void ReFillDropdownOptions() {
@@ -37,6 +41,9 @@ public class FactionTroopListEntry : ListPanelEntry<TroopType> {
 		GameInterface.instance.EditTroopType(myContent, false);
 	}
 
-
+	public void CreateNewTroopTypeForMe() {
+		GameInterface.instance.editFactionPanel.troopTreePanel.CreateNewTroopTypeForEntry(this);
+		troopTypeDropdown.Hide();
+	}
 
 }

@@ -153,14 +153,12 @@ public class GameInterface : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// returns the dropdown index for the faction with the name specified, or -1 if it isn't found
+	/// returns the dropdown index for the faction with the ID specified, or -1 if it isn't found
 	/// </summary>
-	/// <param name="factionName"></param>
+	/// <param name="factionID"></param>
 	/// <returns></returns>
-	public static int GetDDownIndexForFaction(string factionName) {
-		if (string.IsNullOrEmpty(factionName)) {
-			factionName = Rules.NO_FACTION_NAME;
-		}
+	public static int GetDDownIndexForFaction(int factionID) {
+		string factionName = GameController.GetFactionNameByID(factionID);
 		if (factionDDownsAreStale) {
 			ReBakeFactionDDowns();
 		}

@@ -10,8 +10,6 @@ public class TemplateInfo {
 
     public bool isATemplate = false;
 
-	public int lastIDGiven = -1;
-
 	public Rules rules;
 
 	public Board boardInfo;

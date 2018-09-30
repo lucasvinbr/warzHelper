@@ -31,11 +31,24 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 	/// </summary>
 	/// <returns></returns>
 	public bool CheckIfCanDeleteMoreEntries() {
-		return listContainer.childCount > 2;
+		return listContainer.childCount > 3;
 	}
 
+	/// <summary>
+	/// opens the edit troop panel for the selected entry's Troop type
+	/// </summary>
 	public void EditTierEntry() {
 		selectedEntry.OpenEditTroopPanel();
+		GameInterface.instance.editTroopPanel.onDoneEditing += UpdateTreeTroopOptions;
+	}
+
+	/// <summary>
+	/// opens the edit troop panel for the target entry's Troop type
+	/// </summary>
+	/// <param name="targetEntry"></param>
+	public void EditTierEntry(FactionTroopListEntry targetEntry) {
+		targetEntry.OpenEditTroopPanel();
+		GameInterface.instance.editTroopPanel.onDoneEditing += UpdateTreeTroopOptions;
 	}
 
 	public void StartDeleteTierProcedure() {
@@ -111,28 +124,28 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		}
 	}
 
-	public List<string> BakeIntoTroopTree() {
-		List<string> returnedTree = new List<string>();
+	public List<int> BakeIntoTroopTree() {
+		List<int> returnedTree = new List<int>();
 		for (int i = 0; i < listContainer.childCount - 1; i++) {
 			Transform entry = listContainer.GetChild(i);
 			FactionTroopListEntry entryScript = entry.GetComponent<FactionTroopListEntry>();
 			if (entryScript) {
-				returnedTree.Add(entryScript.troopTypeDropdown.captionText.text);
+				returnedTree.Add(entryScript.myContent.ID);
 			}
 		}
 
 		return returnedTree;
 	}
 
-	public void ImportTroopTreeData(List<string> tree, int maxGarrLvl) {
+	public void ImportTroopTreeData(List<int> tree, int maxGarrLvl) {
 		for(int i = 0; i < tree.Count; i++) {
-			AddEntry(GameController.GetTroopTypeByName(tree[i]));
+			AddEntry(GameController.GetTroopTypeByID(tree[i]));
 		}
+
+		addEntryBtn.transform.SetAsLastSibling();
 
 		SetMaxGarrTroopLvl(maxGarrLvl);
 
-
-		addEntryBtn.transform.SetAsLastSibling();
 
 		UpdateTreeTierValues();
 	}
@@ -154,8 +167,14 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		//do nothing; the faction panel takes care of clearing and refilling the tree, and this is no overlay panel, so we shouldnt increment the overlay level
 	}
 
+	/// <summary>
+	/// (does a clearList)
+	/// </summary>
 	public override void OnDisable() {
-		//do nothing; this is no overlay panel, so we shouldnt increment/decrement the overlay level
+		//this is no overlay panel, so we shouldnt increment/decrement the overlay level
+		//...but, in order for the tiers to be shown correctly the next time this panel is opened,
+		//we must clear our list beforehand
+		ClearList();
 	}
 
 	/// <summary>
@@ -196,9 +215,22 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		newEntry.transform.SetParent(listContainer, false);
 		FactionTroopListEntry entryScript = newEntry.GetComponent<FactionTroopListEntry>();
 		entryScript.SetContent(entryData);
+		entryScript.ReFillDropdownOptions();
 		entryScript.selectEntryBtn.onClick.AddListener(()=>SelectTierEntry(entryScript));
 
 		newEntry.transform.SetSiblingIndex(listContainer.childCount - 2);
 		return newEntry;
+	}
+
+	/// <summary>
+	/// called by the "create new troop..." option from the demanding troop tier entry.
+	/// should open the edit troop type panel for a new TT and then assign that new TT to the demandingEntry
+	/// </summary>
+	/// <param name="theDemandingEntry"></param>
+	public void CreateNewTroopTypeForEntry(FactionTroopListEntry theDemandingEntry) {
+		TroopType newTT = new TroopType(GameController.instance.LastRelevantTType);
+		theDemandingEntry.SetContent(newTT);
+		theDemandingEntry.RefreshInfoLabels();
+		EditTierEntry(theDemandingEntry);
 	}
 }
