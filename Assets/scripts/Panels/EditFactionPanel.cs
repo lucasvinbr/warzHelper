@@ -94,7 +94,7 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 			OnConfirmDelete();
 		}
 		else {
-			ModalPanel.Instance().YesNoBox("Confirm Faction Deletion", "You are about to delete this faction. Are you sure?", OnConfirmDelete, null);
+			ModalPanel.Instance().YesNoBox("Confirm Faction Deletion", "You are about to delete this faction. This cannot be undone unless this game is reloaded without saving. Are you sure?", OnConfirmDelete, null);
 		}
 	}
 

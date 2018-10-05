@@ -8,6 +8,13 @@ public class EditTroopPanel : EditDataPanel<TroopType> {
 
     public InputField nameInput, pointCostInput, autocalcPowerInput, extraInfoInput;
 
+	protected override void Start() {
+		nameInput.onValueChanged.AddListener(onInputFieldValueChangedAction);
+		pointCostInput.onValueChanged.AddListener(onInputFieldValueChangedAction);
+		autocalcPowerInput.onValueChanged.AddListener(onInputFieldValueChangedAction);
+		extraInfoInput.onValueChanged.AddListener(onInputFieldValueChangedAction);
+	}
+
 	public override void Open(TroopType editedTroop, bool isNewEntry) {
 		base.Open(editedTroop, isNewEntry);
 		nameInput.text = dataBeingEdited.name;
@@ -59,7 +66,12 @@ public class EditTroopPanel : EditDataPanel<TroopType> {
 			CloseAndSaveChanges();
 		}
 		else {
-			ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes and close the window.", CloseAndSaveChanges, CloseWithoutSaving, null);
+			if(isDirty) {
+				ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes and close the window.", CloseAndSaveChanges, CloseWithoutSaving, null);
+			}
+			else {
+				CloseWithoutSaving();
+			}
 		}
 	}
 
@@ -68,7 +80,7 @@ public class EditTroopPanel : EditDataPanel<TroopType> {
 			OnConfirmDelete();
 		}
 		else {
-			ModalPanel.Instance().YesNoBox("Confirm Troop Type Deletion", "You are about to delete this troop type. Are you sure?", OnConfirmDelete, null);
+			ModalPanel.Instance().YesNoBox("Confirm Troop Type Deletion", "You are about to delete this troop type. This cannot be undone unless this game is reloaded without saving. Are you sure?", OnConfirmDelete, null);
 		}
 	}
 

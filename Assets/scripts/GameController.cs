@@ -20,7 +20,7 @@ public class GameController : MonoBehaviour {
 	{
 		get
 		{
-			if(m_lastRelevantTType == null) {
+			if(m_lastRelevantTType == null || !curData.troopTypes.Contains(m_lastRelevantTType)) {
 				//get the first troop from the available ones... or create a new one if no troops exist at all
 				if(curData.troopTypes.Count > 0) {
 					m_lastRelevantTType = curData.troopTypes[0];
@@ -185,7 +185,14 @@ public class GameController : MonoBehaviour {
 	public static void RemoveTroopType(TroopType targetTroop) {
 		instance.curData.troopTypes.Remove(targetTroop);
 		GameInterface.troopDDownsAreStale = true;
-		//TODO remove all references to this type
+		//remove all references to this type
+		foreach (Faction f in instance.curData.factions) {
+			for(int i = 0; i < f.troopTree.Count; i++) {
+				if(f.troopTree[i] == targetTroop.ID) {
+					f.troopTree[i] = instance.LastRelevantTType.ID;
+				}
+			}
+		}
 	}
 
 	public static int GetUnusedFactionID() {

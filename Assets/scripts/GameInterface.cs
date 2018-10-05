@@ -139,11 +139,13 @@ public class GameInterface : MonoBehaviour {
 	public static void ReBakeFactionDDowns() {
 		factionDDownOptions.Clear();
 		if (GameController.GuardGameDataExist()) {
-			factionDDownOptions.Add(new Dropdown.OptionData(Rules.NO_FACTION_NAME));
 			List<Faction> factions = GameController.instance.curData.factions;
 			for (int i = 0; i < factions.Count; i++) {
 				factionDDownOptions.Add(new Dropdown.OptionData(factions[i].name));
 			}
+			factionDDownOptions.Sort(CompareDDownEntriesByName);
+
+			factionDDownOptions.Insert(0, new Dropdown.OptionData(Rules.NO_FACTION_NAME));
 		}
 		else {
 			factionDDownOptions.Add(new Dropdown.OptionData("?"));
@@ -180,6 +182,7 @@ public class GameInterface : MonoBehaviour {
 			for (int i = 0; i < tTypes.Count; i++) {
 				troopDDownOptions.Add(new Dropdown.OptionData(tTypes[i].name));
 			}
+			troopDDownOptions.Sort(CompareDDownEntriesByName);
 		}
 		else {
 			troopDDownOptions.Add(new Dropdown.OptionData("?"));
@@ -203,6 +206,11 @@ public class GameInterface : MonoBehaviour {
 			}
 		}
 		return -1;
+	}
+
+
+	public static int CompareDDownEntriesByName(Dropdown.OptionData x, Dropdown.OptionData y) {
+		return x.text.CompareTo(y.text);
 	}
 
 	#endregion

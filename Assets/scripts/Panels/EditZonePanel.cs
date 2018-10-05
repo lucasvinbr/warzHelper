@@ -103,7 +103,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 			OnConfirmDelete();
 		}
 		else {
-			ModalPanel.Instance().YesNoBox("Confirm Zone Deletion", "You are about to delete this zone. Are you sure?", OnConfirmDelete, null);
+			ModalPanel.Instance().YesNoBox("Confirm Zone Deletion", "You are about to delete this zone. This cannot be undone unless this game is reloaded without saving. Are you sure?", OnConfirmDelete, null);
 		}
 	}
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 /// <summary>
@@ -19,9 +20,21 @@ public abstract class EditDataPanel<T> : GenericOverlayPanel{
 	public Button closeBtn, deleteBtn;
 
 	/// <summary>
+	/// this should be marked as true whenever a change is made in one of the input options,
+	/// so that we can only show a "save changes?" prompt if there really was a change
+	/// </summary>
+	public bool isDirty;
+
+	/// <summary>
 	/// true if this panel was opened because we're creating a new object, not editing an existing one
 	/// </summary>
 	public bool creatingNewEntry = false;
+
+	public UnityAction<string> onInputFieldValueChangedAction;
+
+	protected virtual void Start() {
+		InitializeValueChangedActions();
+	}
 
 	/// <summary>
 	/// sets the menu's GO to active, sets dataBeingEdited to the target object and sets the close/delete buttons' texts to something relative to whether this is a new entry or not
@@ -31,7 +44,8 @@ public abstract class EditDataPanel<T> : GenericOverlayPanel{
     public virtual void Open(T editedData, bool isNewEntry)
     {
 		gameObject.SetActive(true);
-        //set data
+		//set data
+		isDirty = false;
         dataBeingEdited = editedData;
 		creatingNewEntry = isNewEntry;
 		ContextualizeFinishBtns();
@@ -103,4 +117,13 @@ public abstract class EditDataPanel<T> : GenericOverlayPanel{
 		onDoneEditing?.Invoke();
 		onDoneEditing = null;
 	}
+
+	/// <summary>
+	/// defines generic unityactions that are mostly used to set isDirty to true...
+	/// but that can be changed if this method is overridden
+	/// </summary>
+	public virtual void InitializeValueChangedActions() {
+		onInputFieldValueChangedAction = (x) => { isDirty = true; };
+	}
+
 }
