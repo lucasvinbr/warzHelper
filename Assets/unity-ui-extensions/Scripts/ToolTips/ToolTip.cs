@@ -1,7 +1,8 @@
 /// Credit drHogan 
 /// Sourced from - http://forum.unity3d.com/threads/screenspace-camera-tooltip-controller-sweat-and-tears.293991/#post-1938929
 /// updated ddreaper - refactored code to be more performant.
-/// *Note - only works for Screenspace Camera canvases at present, needs updating to include Screenspace and Worldspace!
+/// updated lucasvinbr - mixed with BoundTooltip, should work with Screenspace Camera (non-rotated) and Overlay
+/// *Note - only works for non-rotated Screenspace Camera and Screenspace Overlay canvases at present, needs updating to include rotated Screenspace Camera and Worldspace!
 
 //ToolTip is written by Emiliano Pastorelli, H&R Tallinn (Estonia), http://www.hammerandravens.com
 //Copyright (c) 2015 Emiliano Pastorelli, H&R - Hammer&Ravens, Tallinn, Estonia.
@@ -29,12 +30,20 @@ namespace UnityEngine.UI.Extensions
         private Text _text;
         private RectTransform _rectTransform, canvasRectTransform;
 
-		[Tooltip("The canvas used by the tooltip as positioning and scaling reference. Should usually be the root Canvas of the hierarchy this component is in")]
-		public Canvas canvas;
+        [Tooltip("The canvas used by the tooltip as positioning and scaling reference. Should usually be the root Canvas of the hierarchy this component is in")]
+        public Canvas canvas;
 
-		[Tooltip("Sets if tooltip triggers will run ForceUpdateCanvases and refresh the tooltip's layout group " +
-			"(if any) when hovered, in order to prevent momentaneous misplacement sometimes caused by ContentSizeFitters")]
-		public bool tooltipTriggersCanForceCanvasUpdate = false;
+        [Tooltip("Sets if tooltip triggers will run ForceUpdateCanvases and refresh the tooltip's layout group " +
+            "(if any) when hovered, in order to prevent momentaneous misplacement sometimes caused by ContentSizeFitters")]
+        public bool tooltipTriggersCanForceCanvasUpdate = false;
+
+		[Tooltip("If enabled and the tooltip pivot isn't centered, " +
+			"the pivot will be flipped in the appropriate direction when crossing edges. " +
+			"This helps in preventing the tooltip from getting in front of the mouse")]
+		public bool pivotFlipping = true;
+
+		[Tooltip("Extra offset applied to the tooltip's position")]
+		public Vector3 offset;
 
 		/// <summary>
 		/// the tooltip's Layout Group, if any
@@ -44,81 +53,122 @@ namespace UnityEngine.UI.Extensions
         //if the tooltip is inside a UI element
         private bool _inside;
 
-        private float width, height;//, canvasWidth, canvasHeight;
-
-        public float YShift,xShift;
-
-        private RenderMode _guiMode;
-
-		[HideInInspector]
-        public Camera guiCamera;
-
-		private Vector3 screenLowerLeft, screenUpperRight, shiftingVector;
+		//the tooltip's dimensions, considering its pivot
+        private float rightWidth, leftWidth, topHeight, bottomHeight;
 
 		/// <summary>
-		/// a screen-space point where the tooltip would be placed before applying X and Y shifts and border checks
+		/// the tooltip rect transform's pivot before any flipping made when touching edges of the screen
 		/// </summary>
-		private Vector3 baseTooltipPos;
+		private Vector2 originalPivot;
 
-		private Vector3 newTTPos;
-		private Vector3 adjustedNewTTPos;
-		private Vector3 adjustedTTLocalPos;
-		private Vector3 shifterForBorders;
+		/// <summary>
+		/// pivot applied to the tooltip
+		/// </summary>
+		private Vector2 adjustedPivot;
 
-		private float borderTest;
+        [HideInInspector]
+        public RenderMode guiMode;
 
-		// Standard Singleton Access
-		private static ToolTip instance;
-		
-		public static ToolTip Instance
-		{
-			get
-			{
-				if (instance == null)
-					instance = FindObjectOfType<ToolTip>();
-				return instance;
-			}
-		}
+        private Camera _guiCamera;
 
-		void Reset() {
-			canvas = GetComponentInParent<Canvas>();
-			canvas = canvas.rootCanvas;
-		}
-
-		// Use this for initialization
-		public void Awake()
+        public Camera GuiCamera
         {
-			instance = this;
-			if (!canvas) {
-				canvas = GetComponentInParent<Canvas>();
-				canvas = canvas.rootCanvas;
-			}
+            get
+            {
+                if (!_guiCamera) {
+                    _guiCamera = Camera.main;
+                }
 
-			guiCamera = canvas.worldCamera;
-            _guiMode = canvas.renderMode;
+                return _guiCamera;
+            }
+        }
+
+		//screen bounds, relative to the screen space context
+        private Vector3 screenLowerLeft, screenUpperRight;
+
+        /// <summary>
+        /// a screen-space point where the tooltip would be placed before applying X and Y shifts and border checks
+        /// </summary>
+        private Vector3 baseTooltipPos;
+
+        private Vector3 newTTPos;
+        private Vector3 adjustedNewTTPos;
+        private Vector3 adjustedTTLocalPos;
+        private Vector3 shifterForBorders;
+
+        private float borderTest;
+
+		
+
+        // Standard Singleton Access
+        private static ToolTip instance;
+        
+        public static ToolTip Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = FindObjectOfType<ToolTip>();
+                return instance;
+            }
+        }
+
+        
+        void Reset() {
+            canvas = GetComponentInParent<Canvas>();
+            canvas = canvas.rootCanvas;
+        }
+
+        // Use this for initialization
+        public void Awake()
+        {
+            instance = this;
+            if (!canvas) {
+                canvas = GetComponentInParent<Canvas>();
+                canvas = canvas.rootCanvas;
+            }
+
+            _guiCamera = canvas.worldCamera;
+            guiMode = canvas.renderMode;
             _rectTransform = GetComponent<RectTransform>();
-			canvasRectTransform = canvas.GetComponent<RectTransform>();
-			_layoutGroup = GetComponentInChildren<LayoutGroup>();
+			SetNewDefaultPivot(_rectTransform.pivot);
+            canvasRectTransform = canvas.GetComponent<RectTransform>();
+            _layoutGroup = GetComponentInChildren<LayoutGroup>();
 
-			_text = GetComponentInChildren<Text>();
+            _text = GetComponentInChildren<Text>();
 
             _inside = false;
 
             this.gameObject.SetActive(false);
         }
 
+		/// <summary>
+		/// sets the default pivot for the tooltip RectTransform while it isn't trespassing any screen edges
+		/// (this pivot will flip if any edges are touched).
+		/// Also checks if it's worth flipping the pivot in case the edges are touched
+		/// </summary>
+		/// <param name="newPivot"></param>
+		public void SetNewDefaultPivot(Vector2 newPivot) {
+			originalPivot = newPivot;
+		}
+
         //Call this function externally to set the text of the template and activate the tooltip
         public void SetTooltip(string ttext, Vector3 basePos, bool refreshCanvasesBeforeGetSize = false)
         {
 
-			baseTooltipPos = basePos;
-				
+            baseTooltipPos = basePos;
+
             //set the text
-            _text.text = ttext;
+            if (_text) {
+                _text.text = ttext;
+            }
+            else {
+                Debug.LogWarning("[ToolTip] Couldn't set tooltip text, tooltip has no child Text component");
+            }
 
-			ContextualTooltipUpdate(refreshCanvasesBeforeGetSize);
+            ContextualTooltipUpdate(refreshCanvasesBeforeGetSize);
 
-		}
+        }
 
         //call this function on mouse exit to deactivate the template
         public void HideTooltip()
@@ -132,169 +182,234 @@ namespace UnityEngine.UI.Extensions
         {
             if (_inside)
             {
-				ContextualTooltipUpdate();
+                ContextualTooltipUpdate();
             }
         }
 
-		/// <summary>
-		/// forces rebuilding of Canvases in order to update the tooltip's content size fitting.
-		/// Can prevent the tooltip from being visibly misplaced for one frame when being resized.
-		/// Only runs if tooltipTriggersCanForceCanvasUpdate is true
-		/// </summary>
-		public void RefreshTooltipSize() {
-			if (tooltipTriggersCanForceCanvasUpdate) {
-				Canvas.ForceUpdateCanvases();
+        /// <summary>
+        /// forces rebuilding of Canvases in order to update the tooltip's content size fitting.
+        /// Can prevent the tooltip from being visibly misplaced for one frame when being resized.
+        /// Only runs if tooltipTriggersCanForceCanvasUpdate is true
+        /// </summary>
+        public void RefreshTooltipSize() {
+            if (tooltipTriggersCanForceCanvasUpdate) {
+                Canvas.ForceUpdateCanvases();
 
-				if (_layoutGroup) {
-					_layoutGroup.enabled = false;
-					_layoutGroup.enabled = true;
-				}
-				
-			}
-			
-		}
+                if (_layoutGroup) {
+                    _layoutGroup.enabled = false;
+                    _layoutGroup.enabled = true;
+                }
+                
+            }
+            
+        }
 
-		/// <summary>
-		/// Runs the appropriate tooltip placement method, according to the parent canvas's render mode
-		/// </summary>
-		/// <param name="refreshCanvasesBeforeGettingSize"></param>
-		public void ContextualTooltipUpdate(bool refreshCanvasesBeforeGettingSize = false) {
-			switch (_guiMode) {
-				case RenderMode.ScreenSpaceCamera:
-					OnScreenSpaceCamera(refreshCanvasesBeforeGettingSize);
-					break;
-				case RenderMode.ScreenSpaceOverlay:
-					OnScreenSpaceOverlay(refreshCanvasesBeforeGettingSize);
-					break;
-			}
-		}
+        /// <summary>
+        /// Runs the appropriate tooltip placement method, according to the parent canvas's render mode
+        /// </summary>
+        /// <param name="refreshCanvasesBeforeGettingSize"></param>
+        public void ContextualTooltipUpdate(bool refreshCanvasesBeforeGettingSize = false) {
+            switch (guiMode) {
+                case RenderMode.ScreenSpaceCamera:
+                    OnScreenSpaceCamera(refreshCanvasesBeforeGettingSize);
+                    break;
+                case RenderMode.ScreenSpaceOverlay:
+                    OnScreenSpaceOverlay(refreshCanvasesBeforeGettingSize);
+                    break;
+            }
+        }
 
-        //main tooltip edge of screen guard and movement
+        //main tooltip edge of screen guard and movement - camera
         public void OnScreenSpaceCamera(bool refreshCanvasesBeforeGettingSize = false)
         {
-			shiftingVector.x = xShift;
-			shiftingVector.y = YShift;
 
-			baseTooltipPos.z = canvas.planeDistance;
+            baseTooltipPos.z = canvas.planeDistance;
 
-			newTTPos = guiCamera.ScreenToViewportPoint(baseTooltipPos - shiftingVector);
-            adjustedNewTTPos = guiCamera.ViewportToWorldPoint(newTTPos);
+            newTTPos = GuiCamera.ScreenToViewportPoint(baseTooltipPos - offset);
+            adjustedNewTTPos = GuiCamera.ViewportToWorldPoint(newTTPos);
+
+			adjustedPivot = originalPivot;
+			_rectTransform.pivot = originalPivot;
 
 			gameObject.SetActive(true);
 
-			if (refreshCanvasesBeforeGettingSize) RefreshTooltipSize();
+            if (refreshCanvasesBeforeGettingSize) RefreshTooltipSize();
 
-			width = transform.lossyScale.x * _rectTransform.sizeDelta[0];
-            height = transform.lossyScale.y * _rectTransform.sizeDelta[1];
+			//consider scaled dimensions when comparing against the edges
+			CalcTooltipVerticalDimensions(true);
+			CalcTooltipHorizontalDimensions(true);
 
-            // check and solve problems for the tooltip that goes out of the screen on the horizontal axis
+			//get screen bounds in the canvas's rect
+			RectTransformUtility.ScreenPointToWorldPointInRectangle(canvasRectTransform, Vector2.zero, GuiCamera, out screenLowerLeft);
+			RectTransformUtility.ScreenPointToWorldPointInRectangle(canvasRectTransform, new Vector2(Screen.width, Screen.height), GuiCamera, out screenUpperRight);
 
-            RectTransformUtility.ScreenPointToWorldPointInRectangle(canvasRectTransform, Vector2.zero, guiCamera, out screenLowerLeft);
-			RectTransformUtility.ScreenPointToWorldPointInRectangle(canvasRectTransform, new Vector2(Screen.width, Screen.height), guiCamera, out screenUpperRight);
+			BorderAdjustments(true);
 
+			_rectTransform.pivot = adjustedPivot;
 
-			//check for right edge of screen
-			borderTest = (adjustedNewTTPos.x + width / 2);
-            if (borderTest > screenUpperRight.x)
-            {
-				shifterForBorders.x = borderTest - screenUpperRight.x;
-				adjustedNewTTPos.x -= shifterForBorders.x;
-            }
-            //check for left edge of screen
-            borderTest = (adjustedNewTTPos.x - width / 2);
-            if (borderTest < screenLowerLeft.x)
-            {
-				shifterForBorders.x = screenLowerLeft.x - borderTest;
-				adjustedNewTTPos.x += shifterForBorders.x;
-            }
-
-			// check and solve problems for the tooltip that goes out of the screen on the vertical axis
-
-			//check for lower edge of the screen
-			borderTest = (adjustedNewTTPos.y - height / 2);
-			if (borderTest < screenLowerLeft.y) {
-				shifterForBorders.y = screenLowerLeft.y - borderTest;
-				adjustedNewTTPos.y += shifterForBorders.y;
-			}
-
-			//check for upper edge of the screen
-			borderTest = (adjustedNewTTPos.y + height / 2);
-            if (borderTest > screenUpperRight.y)
-            {
-				shifterForBorders.y = borderTest - screenUpperRight.y;
-				adjustedNewTTPos.y -= shifterForBorders.y;
-            }
-
-
+			//failed attempt to circumvent issues caused when rotating the camera
 			adjustedNewTTPos = transform.rotation * adjustedNewTTPos;
 
-			//adjustedTTPos *= canvas.scaleFactor;
+            transform.position = adjustedNewTTPos;
+            adjustedTTLocalPos = transform.localPosition;
+            adjustedTTLocalPos.z = 0;
+            transform.localPosition = adjustedTTLocalPos;
 
-			//transform.localPosition = transform.poi;
-			//transform.position = transform.rotation * newPosWVP;
-			transform.position = adjustedNewTTPos;
-			adjustedTTLocalPos = transform.localPosition;
-			adjustedTTLocalPos.z = 0;
-			transform.localPosition = adjustedTTLocalPos;
-			//tempDebugVector = transform.position;
-
-			_inside = true;
+            _inside = true;
         }
 
 
-		//main tooltip edge of screen guard and movement
-		public void OnScreenSpaceOverlay(bool refreshCanvasesBeforeGettingSize = false) {
-			shiftingVector.x = xShift;
-			shiftingVector.y = YShift;
-			newTTPos = (baseTooltipPos - shiftingVector) / canvas.scaleFactor;
-			adjustedNewTTPos = newTTPos;
+        //main tooltip edge of screen guard and movement - overlay
+        public void OnScreenSpaceOverlay(bool refreshCanvasesBeforeGettingSize = false) {
+
+            newTTPos = (baseTooltipPos - offset) / canvas.scaleFactor;
+            adjustedNewTTPos = newTTPos;
+
+			adjustedPivot = originalPivot;
+			_rectTransform.pivot = originalPivot;
 
 			gameObject.SetActive(true);
 
-			if (refreshCanvasesBeforeGettingSize) RefreshTooltipSize();
+            if (refreshCanvasesBeforeGettingSize) RefreshTooltipSize();
 
-			width = _rectTransform.sizeDelta[0];
-			height = _rectTransform.sizeDelta[1];
+            
+			CalcTooltipHorizontalDimensions();
+			CalcTooltipVerticalDimensions();
 
-			// check and solve problems for the tooltip that goes out of the screen on the horizontal axis
 			//screen's 0 = overlay canvas's 0 (always?)
 			screenLowerLeft = Vector3.zero;
-			screenUpperRight = canvasRectTransform.sizeDelta;
+            screenUpperRight = canvasRectTransform.sizeDelta;
 
+			BorderAdjustments();
+
+			_rectTransform.pivot = adjustedPivot;
+            //remove scale factor for the actual positioning of the TT
+            adjustedNewTTPos *= canvas.scaleFactor;
+            transform.position = adjustedNewTTPos;
+
+            _inside = true;
+        }
+
+		/// <summary>
+		/// sets left and right width variables according to the adjustedPivot and, optionally, world scale of the tooltip object
+		/// </summary>
+		public void CalcTooltipHorizontalDimensions(bool considerLossyScale = false) {
+			rightWidth = _rectTransform.sizeDelta[0] * (1 - adjustedPivot[0]);
+			leftWidth = _rectTransform.sizeDelta[0] * (adjustedPivot[0]);
+			if (considerLossyScale) {
+				rightWidth *= transform.lossyScale.x;
+				leftWidth *= transform.lossyScale.x;
+			}
+		}
+
+		/// <summary>
+		/// sets top and bottom height variables according to the adjustedPivot and, optionally, world scale of the tooltip object
+		/// </summary>
+		public void CalcTooltipVerticalDimensions(bool considerLossyScale = false) {
+			topHeight = _rectTransform.sizeDelta[1] * (1 - adjustedPivot[1]);
+			bottomHeight = _rectTransform.sizeDelta[1] * (adjustedPivot[1]);
+			if (considerLossyScale) {
+				topHeight *= transform.lossyScale.y;
+				bottomHeight *= transform.lossyScale.y;
+			}
+		}
+
+		/// <summary>
+		/// uses the tooltip's and the screen's "dimensions" variables (topHeight, screenLowerLeft etc) to check
+		/// if the tooltip is crossing any of the screen's edges, and sets the adjustedNewTTPos variable accordingly.
+		/// It will always try to at least keep the top and left sides
+		/// of the tooltip visible.
+		/// </summary>
+		/// <param name="considerLossyScale">If true, makes the "dimensions" variables of the tooltip's rectTransform consider its lossyScale</param>
+		public void BorderAdjustments(bool considerLossyScale = false) {
+			// check and solve problems for the tooltip that goes out of the screen on the horizontal axis
 			//check for right edge of screen
-			borderTest = (newTTPos.x + width / 2);
+			borderTest = (adjustedNewTTPos.x + rightWidth);
 			if (borderTest > screenUpperRight.x) {
-				shifterForBorders.x = borderTest - screenUpperRight.x;
+				//pivot check... if appropriate and allowed,
+				//flip and recalculate dimensions before applying the adjustment
+				if (pivotFlipping && originalPivot.x < 0.5f) {
+					adjustedPivot.x = 1 - originalPivot.x;
+					CalcTooltipHorizontalDimensions(considerLossyScale);
+					borderTest = (adjustedNewTTPos.x + rightWidth);
+					if (borderTest > screenUpperRight.x) {
+						shifterForBorders.x = borderTest - screenUpperRight.x;
+					}
+					else {
+						shifterForBorders.x = 0;
+					}
+				}
+				else {
+					shifterForBorders.x = borderTest - screenUpperRight.x;
+				}
+
 				adjustedNewTTPos.x -= shifterForBorders.x;
 			}
 			//check for left edge of screen
-			borderTest = (adjustedNewTTPos.x - width / 2);
+			borderTest = (adjustedNewTTPos.x - leftWidth);
 			if (borderTest < screenLowerLeft.x) {
-				shifterForBorders.x = screenLowerLeft.x - borderTest;
+				if (pivotFlipping && originalPivot.x > 0.5f) {
+					adjustedPivot.x = 1 - originalPivot.x;
+					CalcTooltipHorizontalDimensions(considerLossyScale);
+					borderTest = (adjustedNewTTPos.x - leftWidth);
+					if (borderTest < screenLowerLeft.x) {
+						shifterForBorders.x = screenLowerLeft.x - borderTest;
+					}
+					else {
+						shifterForBorders.x = 0;
+					}
+				}
+				else {
+					shifterForBorders.x = screenLowerLeft.x - borderTest;
+				}
+
 				adjustedNewTTPos.x += shifterForBorders.x;
+
 			}
 
 			// check and solve problems for the tooltip that goes out of the screen on the vertical axis
 
 			//check for lower edge of the screen
-			borderTest = (adjustedNewTTPos.y - height / 2);
+			borderTest = (adjustedNewTTPos.y - bottomHeight);
 			if (borderTest < screenLowerLeft.y) {
-				shifterForBorders.y = screenLowerLeft.y - borderTest;
+				if (pivotFlipping && originalPivot.y > 0.5f) {
+					adjustedPivot.y = 1 - originalPivot.y;
+					CalcTooltipVerticalDimensions(considerLossyScale);
+					borderTest = (adjustedNewTTPos.y - bottomHeight);
+					if (borderTest < screenLowerLeft.y) {
+						shifterForBorders.y = screenLowerLeft.y - borderTest;
+					}
+					else {
+						shifterForBorders.y = 0;
+					}
+				}
+				else {
+					shifterForBorders.y = screenLowerLeft.y - borderTest;
+				}
+
 				adjustedNewTTPos.y += shifterForBorders.y;
 			}
 
 			//check for upper edge of the screen
-			borderTest = (adjustedNewTTPos.y + height / 2);
+			borderTest = (adjustedNewTTPos.y + topHeight);
 			if (borderTest > screenUpperRight.y) {
-				shifterForBorders.y = borderTest - screenUpperRight.y;
+				if (pivotFlipping && originalPivot.y < 0.5f) {
+					adjustedPivot.y = 1 - originalPivot.y;
+					CalcTooltipVerticalDimensions(considerLossyScale);
+					borderTest = (adjustedNewTTPos.y + topHeight);
+					if (borderTest > screenUpperRight.y) {
+						shifterForBorders.y = borderTest - screenUpperRight.y;
+					}
+					else {
+						shifterForBorders.y = 0;
+					}
+				}
+				else {
+					shifterForBorders.y = borderTest - screenUpperRight.y;
+				}
+
 				adjustedNewTTPos.y -= shifterForBorders.y;
 			}
-
-			//remove scale factor for the actual positioning of the TT
-			adjustedNewTTPos *= canvas.scaleFactor;
-			transform.position = adjustedNewTTPos;
-
-			_inside = true;
 		}
 	}
 }

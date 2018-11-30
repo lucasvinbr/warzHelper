@@ -2455,7 +2455,7 @@ MonoBehaviour:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 35
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 3
     m_MaxSize: 40
     m_Alignment: 4
@@ -21572,7 +21572,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: Load or Play a new Game, using an existing Template
-  isInOverlayCanvas: 1
   tooltipPositioningType: 0
   offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1175113150
@@ -32518,9 +32517,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvas: {fileID: 649191595}
   tooltipTriggersCanForceCanvasUpdate: 0
-  YShift: 0
-  xShift: 0
-  guiCamera: {fileID: 0}
+  pivotFlipping: 1
+  offset: {x: 0, y: 0, z: 0}
+  guiMode: 0
 --- !u!223 &1714301437
 Canvas:
   m_ObjectHideFlags: 0
@@ -33034,7 +33033,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: Load and Edit or Create a new Game Template
-  isInOverlayCanvas: 1
   tooltipPositioningType: 0
   offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1741975712

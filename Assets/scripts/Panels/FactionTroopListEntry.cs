@@ -20,6 +20,7 @@ public class FactionTroopListEntry : ListPanelEntry<TroopType> {
 
 	public void SetContentAccordingToDDown(int ddownValue) {
 		SetContent(GameController.GetTroopTypeByName(troopTypeDropdown.options[ddownValue].text));
+		GameInterface.instance.editFactionPanel.isDirty = true;
 	}
 
 	public void RefreshInfoLabels(bool alsoRefillDropdown = true) {

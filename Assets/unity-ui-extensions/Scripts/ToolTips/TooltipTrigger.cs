@@ -5,88 +5,115 @@ using UnityEngine.EventSystems;
 
 namespace UnityEngine.UI.Extensions
 {
+    [RequireComponent(typeof(RectTransform))]
     [AddComponentMenu("UI/Extensions/Tooltip/Tooltip Trigger")]
-	public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler
-	{
-		[TextAreaAttribute]
-		public string text;
+    public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler
+    {
+        [TextAreaAttribute]
+        public string text;
 
-		[Tooltip("Prevents the use of WorldToScreenPoint to get the desired tooltip position, which causes issues in overlay canvases")]
-		public bool isInOverlayCanvas = false;
+        public enum TooltipPositioningType {
+            mousePosition,
+            mousePositionAndFollow,
+            transformPosition
+        }
 
-		public enum TooltipPositioningType {
-			mousePosition,
-			mousePositionAndFollow,
-			transformPosition
-		}
+        [Tooltip("Defines where the tooltip will be placed and how that placement will occur. Transform position will always be used if this element wasn't selected via mouse")]
+        public TooltipPositioningType tooltipPositioningType = TooltipPositioningType.mousePosition;
 
-		[Tooltip("Defines where the tooltip will be placed and how that placement will occur. Transform position will always be used if this element wasn't selected via pointer")]
-		public TooltipPositioningType tooltipPositioningType = TooltipPositioningType.mousePosition;
+        /// <summary>
+        /// This info is needed to make sure we make the necessary translations if the tooltip and this trigger are children of different space canvases
+        /// </summary>
+        private bool isChildOfOverlayCanvas = false;
 
-		private bool hovered = false;
+        private bool hovered = false;
 
-		public Vector3 offset;
-
-
-		void Reset() {
-			//attempt to check if our canvas is overlay or not and check our "is overlay" accordingly
-			Canvas ourCanvas = GetComponentInParent<Canvas>();
-			if (ourCanvas && ourCanvas.renderMode == RenderMode.ScreenSpaceOverlay) {
-				isInOverlayCanvas = true;
-			}
-		}
+        public Vector3 offset;
 
 
-		public void OnPointerEnter(PointerEventData eventData)
-		{
+        void Start() {
+            //attempt to check if our canvas is overlay or not and check our "is overlay" accordingly
+            Canvas ourCanvas = GetComponentInParent<Canvas>();
+            if (ourCanvas && ourCanvas.renderMode == RenderMode.ScreenSpaceOverlay) {
+                isChildOfOverlayCanvas = true;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the tooltip and the transform this trigger is attached to are children of differently-spaced Canvases
+        /// </summary>
+        public bool WorldToScreenIsRequired
+        {
+            get
+            {
+                return (isChildOfOverlayCanvas && ToolTip.Instance.guiMode == RenderMode.ScreenSpaceCamera) ||
+                    (!isChildOfOverlayCanvas && ToolTip.Instance.guiMode == RenderMode.ScreenSpaceOverlay);
+            }
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+			hovered = true;
+
 			switch (tooltipPositioningType) {
-				case TooltipPositioningType.mousePosition:
-					StartHover(Input.mousePosition + offset, true);
-					break;
-				case TooltipPositioningType.mousePositionAndFollow:
-					StartHover(Input.mousePosition + offset, true);
-					hovered = true;
-					StartCoroutine(HoveredMouseFollowingLoop());
-					break;
-				case TooltipPositioningType.transformPosition:
-					StartHover((isInOverlayCanvas ? transform.position :
-						ToolTip.Instance.guiCamera.WorldToScreenPoint(transform.position)) + offset, true);
-					break;
+                case TooltipPositioningType.mousePosition:
+                    StartHover(Input.mousePosition + offset, true);
+                    break;
+                case TooltipPositioningType.mousePositionAndFollow:
+                    StartHover(Input.mousePosition + offset, true);
+                    StartCoroutine(HoveredMouseFollowingLoop());
+                    break;
+                case TooltipPositioningType.transformPosition:
+                    StartHover((WorldToScreenIsRequired ? 
+                        ToolTip.Instance.GuiCamera.WorldToScreenPoint(transform.position) :
+                        transform.position) + offset, true);
+                    break;
+            }
+        }
+
+        IEnumerator HoveredMouseFollowingLoop() {
+            while (hovered) {
+                StartHover(Input.mousePosition + offset);
+                yield return null;
+            }
+        }
+
+        public void OnSelect(BaseEventData eventData)
+        {
+			if (!hovered) {
+				hovered = true;
+				StartHover((WorldToScreenIsRequired ?
+				ToolTip.Instance.GuiCamera.WorldToScreenPoint(transform.position) :
+						transform.position) + offset, true);
+			}
+            
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            StopHover();
+        }
+
+        public void OnDeselect(BaseEventData eventData)
+        {
+            StopHover();
+        }
+
+		void OnDisable() {
+			if (hovered) {
+				StopHover();
 			}
 		}
 
-		IEnumerator HoveredMouseFollowingLoop() {
-			while (hovered) {
-				StartHover(Input.mousePosition + offset);
-				yield return null;
-			}
-		}
+        void StartHover(Vector3 position, bool shouldCanvasUpdate = false)
+        {
+            ToolTip.Instance.SetTooltip(text, position, shouldCanvasUpdate);
+        }
 
-		public void OnSelect(BaseEventData eventData)
-		{
-			StartHover((isInOverlayCanvas ? transform.position :
-						ToolTip.Instance.guiCamera.WorldToScreenPoint(transform.position)) + offset, true);
-		}
-
-		public void OnPointerExit(PointerEventData eventData)
-		{
-			StopHover();
-		}
-
-		public void OnDeselect(BaseEventData eventData)
-		{
-			StopHover();
-		}
-
-		void StartHover(Vector3 position, bool shouldCanvasUpdate = false)
-		{
-			ToolTip.Instance.SetTooltip(text, position, shouldCanvasUpdate);
-		}
-
-		void StopHover()
-		{
-			hovered = false;
-			ToolTip.Instance.HideTooltip();
-		}
-	}
+        void StopHover()
+        {
+            hovered = false;
+            ToolTip.Instance.HideTooltip();
+        }
+    }
 }

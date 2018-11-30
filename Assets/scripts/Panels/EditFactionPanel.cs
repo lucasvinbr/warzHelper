@@ -28,6 +28,7 @@ public class EditFactionPanel : EditDataPanel<Faction> {
         factionColorImg.color = dataBeingEdited.color;
 		//factionIconImg.sprite = TODO get icon by path to file
 		troopTreePanel.ImportTroopTreeData(dataBeingEdited.troopTree, dataBeingEdited.maxGarrisonedTroopTier);
+		isDirty = false;
     }
 
 
@@ -85,7 +86,14 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 			CloseAndSaveChanges();
 		}
 		else {
-			ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes and close the window.", CloseAndSaveChanges, JustClose, null);
+			if (isDirty) {
+				//TODO use isDirty for real!
+				ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes and close the window.", CloseAndSaveChanges, JustClose, null);
+			}
+			else {
+				JustClose();
+			}
+			
 		}
 	}
 

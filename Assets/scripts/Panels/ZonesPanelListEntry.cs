@@ -19,6 +19,6 @@ public class ZonesPanelListEntry : ListPanelEntry<Zone> {
 
 	public void EntryClicked() {
 		GameInterface.instance.EditZone(myContent, false);
-		GameInterface.instance.editZonePanel.onDoneEditing += GameInterface.instance.zonesPanel.OnEnable;
+		GameInterface.instance.editZonePanel.onDoneEditing += GameInterface.instance.zonesPanel.RefillList;
 	}
 }

@@ -39,12 +39,19 @@ public class ListContainerPanel<T> : GenericOverlayPanel {
 
     
 	/// <summary>
-	/// calls ClearList
+	/// calls ClearList and increments the overlay count
 	/// </summary>
     public override void OnEnable()
     {
 		base.OnEnable();
-        ClearList();
-		FillEntries();
+		RefillList();
     }
+
+	/// <summary>
+	/// clear list, then fill entries again
+	/// </summary>
+	public virtual void RefillList() {
+		ClearList();
+		FillEntries();
+	}
 }

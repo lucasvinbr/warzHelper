@@ -105,7 +105,7 @@ public class SaveListPanel : ListContainerPanel<TemplateInfo> {
                         PersistenceHandler.DeleteFile(PersistenceHandler.templatesDirectory + PickedEntry.gameNameTxt.text + ".xml");
                     }
 
-					OnEnable();
+					RefillList();
                 }, null);
         }
     }

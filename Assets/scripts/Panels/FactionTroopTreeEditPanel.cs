@@ -63,6 +63,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 			RefreshMaxGarrLvlText();
 			editEntryBtn.interactable = false;
 			delEntryBtn.interactable = false;
+			GameInterface.instance.editFactionPanel.isDirty = true;
 		}
 	}
 
@@ -106,6 +107,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		if(delimiterPos < listContainer.childCount - 2) { //can't go below the "add tier" btn
 			maxGarrTroopLvlDelimiter.SetSiblingIndex(delimiterPos + 1);
 			RefreshMaxGarrLvlText();
+			GameInterface.instance.editFactionPanel.isDirty = true;
 		}
 	}
 
@@ -121,6 +123,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		if (delimiterPos >= 1) {
 			maxGarrTroopLvlDelimiter.SetSiblingIndex(delimiterPos - 1);
 			RefreshMaxGarrLvlText();
+			GameInterface.instance.editFactionPanel.isDirty = true;
 		}
 	}
 
@@ -208,6 +211,8 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		addEntryBtn.transform.SetAsLastSibling();
 
 		UpdateTreeTierValues();
+
+		GameInterface.instance.editFactionPanel.isDirty = true;
 	}
 
 	public override GameObject AddEntry(TroopType entryData) {
@@ -232,5 +237,6 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		theDemandingEntry.SetContent(newTT);
 		theDemandingEntry.RefreshInfoLabels();
 		EditTierEntry(theDemandingEntry);
+		GameInterface.instance.editFactionPanel.isDirty = true;
 	}
 }
