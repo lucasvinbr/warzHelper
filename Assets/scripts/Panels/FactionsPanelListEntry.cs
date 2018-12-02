@@ -21,6 +21,7 @@ public class FactionsPanelListEntry : ListPanelEntry<Faction> {
     public void OpenEditFactionPanel()
     {
 		GameInterface.instance.EditFaction(myContent, false);
-    }
+		GameInterface.instance.editFactionPanel.onDoneEditing += GameInterface.instance.factionsPanel.RefillList;
+	}
 
 }

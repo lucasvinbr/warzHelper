@@ -8,19 +8,13 @@ public class EditTroopPanel : EditDataPanel<TroopType> {
 
     public InputField nameInput, pointCostInput, autocalcPowerInput, extraInfoInput;
 
-	protected override void Start() {
-		nameInput.onValueChanged.AddListener(onInputFieldValueChangedAction);
-		pointCostInput.onValueChanged.AddListener(onInputFieldValueChangedAction);
-		autocalcPowerInput.onValueChanged.AddListener(onInputFieldValueChangedAction);
-		extraInfoInput.onValueChanged.AddListener(onInputFieldValueChangedAction);
-	}
-
 	public override void Open(TroopType editedTroop, bool isNewEntry) {
 		base.Open(editedTroop, isNewEntry);
 		nameInput.text = dataBeingEdited.name;
 		pointCostInput.text = dataBeingEdited.pointCost.ToString(CultureInfo.InvariantCulture);
 		autocalcPowerInput.text = dataBeingEdited.autoResolvePower.ToString(CultureInfo.InvariantCulture);
 		extraInfoInput.text = dataBeingEdited.extraInfo;
+		isDirty = false;
 	}
 
 	public override bool DataIsValid() {

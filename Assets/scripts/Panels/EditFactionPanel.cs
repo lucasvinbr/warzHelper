@@ -87,7 +87,6 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 		}
 		else {
 			if (isDirty) {
-				//TODO use isDirty for real!
 				ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes and close the window.", CloseAndSaveChanges, JustClose, null);
 			}
 			else {

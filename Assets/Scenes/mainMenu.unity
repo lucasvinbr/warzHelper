@@ -206,8 +206,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -269.14}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -235.43185}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &12296804
 MonoBehaviour:
@@ -739,6 +739,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   theSlider: {fileID: 717938736}
   theLabel: {fileID: 82498806}
+  addRefreshLabelListener: 0
 --- !u!114 &66724883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -817,8 +818,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 604.91785, y: -56.1}
-  m_SizeDelta: {x: 797.41785, y: 80}
+  m_AnchoredPosition: {x: 670.55994, y: -56.1}
+  m_SizeDelta: {x: 863.05994, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &71239779
 MonoBehaviour:
@@ -938,6 +939,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   thePanel: {fileID: 1282633104}
   colorImg: {fileID: 71239780}
+  parentDirtablePanel: {fileID: 950007147}
 --- !u!1 &74530412
 GameObject:
   m_ObjectHideFlags: 0
@@ -1240,7 +1242,7 @@ MonoBehaviour:
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 0
@@ -1266,8 +1268,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 314.83334, y: -42.35}
-  m_SizeDelta: {x: 30, y: 80}
+  m_AnchoredPosition: {x: 304.83334, y: -42.35}
+  m_SizeDelta: {x: 60, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &86451715
 GameObject:
@@ -1507,8 +1509,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 103.10446, y: -56.1}
-  m_SizeDelta: {x: 206.20891, y: 100}
+  m_AnchoredPosition: {x: 119.51498, y: -56.1}
+  m_SizeDelta: {x: 239.02995, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &105836486
 MonoBehaviour:
@@ -1875,7 +1877,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1877395073}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -2014,7 +2027,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1877395073}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -2675,8 +2699,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 167.27112, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 183.68164, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &146783861
 MonoBehaviour:
@@ -3680,8 +3704,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 167.27112, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 183.68164, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &189392518
 MonoBehaviour:
@@ -5493,7 +5517,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 284.54224, y: -50}
+  m_AnchoredPosition: {x: 317.36328, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &301103049
@@ -5828,7 +5852,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 145, y: -54.71335}
+  m_AnchoredPosition: {x: 145, y: -43.477272}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &325108907
@@ -6285,8 +6309,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 117.271126, y: -50}
-  m_SizeDelta: {x: 234.54225, y: 100}
+  m_AnchoredPosition: {x: 133.68164, y: -50}
+  m_SizeDelta: {x: 267.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &352900039
 GameObject:
@@ -7783,7 +7807,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1289683263}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -8269,8 +8304,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 109.29027, y: -40}
-  m_SizeDelta: {x: 218.58054, y: 80}
+  m_AnchoredPosition: {x: 109.207085, y: -40}
+  m_SizeDelta: {x: 218.41417, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &456155259
 MonoBehaviour:
@@ -8491,8 +8526,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 551.0449, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &466522241
 MonoBehaviour:
@@ -8547,7 +8582,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 950007147}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -9129,8 +9175,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 305.74408, y: -40}
-  m_SizeDelta: {x: 297.90448, y: 80}
+  m_AnchoredPosition: {x: 340.2552, y: -40}
+  m_SizeDelta: {x: 324.76892, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &495907861
 MonoBehaviour:
@@ -9367,8 +9413,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 551.0449, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &500584191
 MonoBehaviour:
@@ -9423,7 +9469,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 950007147}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -10009,7 +10066,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 32.966675, y: -42.35}
+  m_AnchoredPosition: {x: 27.966663, y: -42.35}
   m_SizeDelta: {x: 30, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &537164026
@@ -10214,8 +10271,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -470.99503}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -412.0057}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &575370940
 MonoBehaviour:
@@ -10463,8 +10520,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 148.95224, y: -40}
-  m_SizeDelta: {x: 194.86986, y: 80}
+  m_AnchoredPosition: {x: 162.38446, y: -40}
+  m_SizeDelta: {x: 203.53365, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &585267503
 MonoBehaviour:
@@ -10598,8 +10655,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 117.271126, y: -50}
-  m_SizeDelta: {x: 234.54225, y: 100}
+  m_AnchoredPosition: {x: 133.68164, y: -50}
+  m_SizeDelta: {x: 267.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &611851174
 GameObject:
@@ -11028,8 +11085,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -336.42502}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -294.2898}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &633760407
 MonoBehaviour:
@@ -12461,8 +12518,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 836.3556, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 918.4082, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &690548842
 MonoBehaviour:
@@ -12813,8 +12870,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 117.271126, y: -50}
-  m_SizeDelta: {x: 234.54225, y: 100}
+  m_AnchoredPosition: {x: 133.68164, y: -50}
+  m_SizeDelta: {x: 267.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &715865024
 GameObject:
@@ -12848,7 +12905,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 32.966675, y: -42.35}
+  m_AnchoredPosition: {x: 27.966663, y: -42.35}
   m_SizeDelta: {x: 30, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &715865026
@@ -13114,6 +13171,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 66724882}
+        m_MethodName: RefreshLabelText
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!224 &717938737
@@ -13134,7 +13202,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 173.9, y: -42.35}
+  m_AnchoredPosition: {x: 158.9, y: -42.35}
   m_SizeDelta: {x: 180, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &727450740
@@ -13546,8 +13614,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 78.39592, y: -40}
-  m_SizeDelta: {x: 53.757202, y: 80}
+  m_AnchoredPosition: {x: 88.935356, y: -40}
+  m_SizeDelta: {x: 56.63545, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &747949472
 MonoBehaviour:
@@ -13959,8 +14027,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 152.31207, y: -40}
-  m_SizeDelta: {x: 201.58951, y: 80}
+  m_AnchoredPosition: {x: 164.1543, y: -40}
+  m_SizeDelta: {x: 207.07335, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &767395124
 MonoBehaviour:
@@ -14227,8 +14295,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -201.85501}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -176.57387}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &780201672
 MonoBehaviour:
@@ -15713,7 +15781,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1877395073}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -15908,7 +15987,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1877395073}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -16344,8 +16434,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 117.271126, y: -50}
-  m_SizeDelta: {x: 234.54225, y: 100}
+  m_AnchoredPosition: {x: 133.68164, y: -50}
+  m_SizeDelta: {x: 267.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &907656332
 GameObject:
@@ -16502,8 +16592,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 132.15312, y: -40}
-  m_SizeDelta: {x: 161.2716, y: 80}
+  m_AnchoredPosition: {x: 145.5708, y: -40}
+  m_SizeDelta: {x: 169.90634, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &912974382
 MonoBehaviour:
@@ -16673,8 +16763,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 103.10446, y: -56.1}
-  m_SizeDelta: {x: 206.20891, y: 100}
+  m_AnchoredPosition: {x: 119.51498, y: -56.1}
+  m_SizeDelta: {x: 239.02995, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &933644335
 MonoBehaviour:
@@ -17007,8 +17097,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 117.271126, y: -50}
-  m_SizeDelta: {x: 234.54225, y: 100}
+  m_AnchoredPosition: {x: 133.68164, y: -50}
+  m_SizeDelta: {x: 267.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &948222787
 MonoBehaviour:
@@ -17121,9 +17211,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ac9f63e8c6fdab4c902afd32cf802d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDirty: 0
   closeBtn: {fileID: 1760041547}
   deleteBtn: {fileID: 1618996316}
-  isDirty: 0
   creatingNewEntry: 0
   facNameField: {fileID: 1642069112}
   facInfoField: {fileID: 1034554528}
@@ -17238,7 +17328,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 32.966675, y: -42.35}
+  m_AnchoredPosition: {x: 27.966663, y: -42.35}
   m_SizeDelta: {x: 30, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &951390899
@@ -17415,8 +17505,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 551.0449, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &958741105
 MonoBehaviour:
@@ -17471,7 +17561,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 950007147}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -17678,8 +17779,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -67.285}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -58.857956}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &966276841
 MonoBehaviour:
@@ -17795,8 +17896,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 117.271126, y: -50}
-  m_SizeDelta: {x: 234.54225, y: 100}
+  m_AnchoredPosition: {x: 133.68164, y: -50}
+  m_SizeDelta: {x: 267.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &976994399
 GameObject:
@@ -18289,8 +18390,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 836.3556, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 918.4082, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &999002646
 MonoBehaviour:
@@ -18980,6 +19081,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   theSlider: {fileID: 1791671440}
   theLabel: {fileID: 1323259905}
+  addRefreshLabelListener: 0
 --- !u!114 &1032720065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19059,8 +19161,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 604.91785, y: -56.1}
-  m_SizeDelta: {x: 797.41785, y: 100}
+  m_AnchoredPosition: {x: 670.55994, y: -56.1}
+  m_SizeDelta: {x: 863.05994, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1034554527
 MonoBehaviour:
@@ -19134,7 +19236,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 950007147}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -19662,7 +19775,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 284.54224, y: -50}
+  m_AnchoredPosition: {x: 317.36328, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1067420505
@@ -19757,8 +19870,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 836.3556, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 918.4082, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1073324393
 MonoBehaviour:
@@ -20800,8 +20913,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1636318076}
   m_HandleRect: {fileID: 1636318075}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -21607,8 +21720,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 836.3556, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 918.4082, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1175113152
 MonoBehaviour:
@@ -21702,8 +21815,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 836.3556, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 918.4082, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1177623706
 MonoBehaviour:
@@ -22423,8 +22536,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 551.0449, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1219690588
 MonoBehaviour:
@@ -22479,7 +22592,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 950007147}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -23231,8 +23355,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 836.3556, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 918.4082, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1240973777
 MonoBehaviour:
@@ -23327,8 +23451,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -448.5667}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -392.3864}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1242015414
 MonoBehaviour:
@@ -23535,8 +23659,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 167.27112, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 183.68164, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1258097350
 MonoBehaviour:
@@ -23631,8 +23755,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -448.5667}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -392.3864}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1260466037
 MonoBehaviour:
@@ -23691,8 +23815,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 78.395935, y: -40}
-  m_SizeDelta: {x: 156.79184, y: 80}
+  m_AnchoredPosition: {x: 88.935356, y: -40}
+  m_SizeDelta: {x: 177.87071, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1264708511
 MonoBehaviour:
@@ -24584,9 +24708,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0566ba3ccd2164f81c6fac964dbe42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDirty: 0
   closeBtn: {fileID: 165318012}
   deleteBtn: {fileID: 1124012984}
-  isDirty: 0
   creatingNewEntry: 0
   nameInput: {fileID: 1698526395}
   pointCostInput: {fileID: 1950306788}
@@ -24987,8 +25111,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 314.83334, y: -42.35}
-  m_SizeDelta: {x: 30, y: 80}
+  m_AnchoredPosition: {x: 304.83334, y: -42.35}
+  m_SizeDelta: {x: 60, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1307311962
 MonoBehaviour:
@@ -25019,7 +25143,7 @@ MonoBehaviour:
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 0
@@ -25152,8 +25276,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 167.27112, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 183.68164, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1322468302
 MonoBehaviour:
@@ -25262,7 +25386,7 @@ MonoBehaviour:
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 0
@@ -25288,8 +25412,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 314.83334, y: -42.35}
-  m_SizeDelta: {x: 30, y: 80}
+  m_AnchoredPosition: {x: 304.83334, y: -42.35}
+  m_SizeDelta: {x: 60, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1328829271
 GameObject:
@@ -25518,7 +25642,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 284.54224, y: -50}
+  m_AnchoredPosition: {x: 317.36328, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1335598908
@@ -25710,7 +25834,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 284.54224, y: -50}
+  m_AnchoredPosition: {x: 317.36328, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1344080796
@@ -26728,8 +26852,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -89.71335}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -78.47728}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1393600486
 MonoBehaviour:
@@ -28473,8 +28597,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -89.71335}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -78.47728}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1484251425
 MonoBehaviour:
@@ -28872,8 +28996,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 571.0901, y: -40}
-  m_SizeDelta: {x: 232.01984, y: 80}
+  m_AnchoredPosition: {x: 571.69836, y: -40}
+  m_SizeDelta: {x: 230.80318, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1506409629
 MonoBehaviour:
@@ -29096,7 +29220,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 284.54224, y: -50}
+  m_AnchoredPosition: {x: 317.36328, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1520010744
@@ -30206,8 +30330,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 604.91785, y: -56.1}
-  m_SizeDelta: {x: 797.41785, y: 80}
+  m_AnchoredPosition: {x: 670.55994, y: -56.1}
+  m_SizeDelta: {x: 863.05994, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1576296426
 MonoBehaviour:
@@ -30392,8 +30516,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 167.27112, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 183.68164, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1582349093
 MonoBehaviour:
@@ -30938,7 +31062,7 @@ RectTransform:
   m_Father: {fileID: 848275219}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 0.00000011920929}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -31013,8 +31137,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 604.91785, y: -56.1}
-  m_SizeDelta: {x: 797.41785, y: 100}
+  m_AnchoredPosition: {x: 670.55994, y: -56.1}
+  m_SizeDelta: {x: 863.05994, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1642069111
 MonoBehaviour:
@@ -31088,7 +31212,29 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 950007147}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -31289,7 +31435,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 145, y: -443.56668}
+  m_AnchoredPosition: {x: 145, y: -387.38638}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1655209386
@@ -31814,8 +31960,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 607.0084, y: -40}
-  m_SizeDelta: {x: 304.62415, y: 80}
+  m_AnchoredPosition: {x: 666.79395, y: -40}
+  m_SizeDelta: {x: 328.3086, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1672995966
 MonoBehaviour:
@@ -32013,7 +32159,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1877395073}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -32336,7 +32493,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1289683263}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -32731,8 +32899,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 551.0449, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1728866103
 MonoBehaviour:
@@ -32806,7 +32974,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 950007147}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -33258,8 +33437,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 167.27112, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 183.68164, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1744889439
 MonoBehaviour:
@@ -33437,8 +33616,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -269.14}
-  m_SizeDelta: {x: 1003.6267, y: 112.2}
+  m_AnchoredPosition: {x: 551.0449, y: -235.43185}
+  m_SizeDelta: {x: 1102.0898, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1747842588
 MonoBehaviour:
@@ -34200,6 +34379,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1032720064}
+        m_MethodName: RefreshLabelText
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!224 &1791671441
@@ -34220,7 +34410,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 173.9, y: -42.35}
+  m_AnchoredPosition: {x: 158.9, y: -42.35}
   m_SizeDelta: {x: 180, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1796362557
@@ -34532,7 +34722,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1289683263}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -35411,7 +35612,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 284.54224, y: -50}
+  m_AnchoredPosition: {x: 317.36328, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1858605258
@@ -35690,9 +35891,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42543188a0f9eec438a7640d019f2db8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDirty: 0
   closeBtn: {fileID: 1853980163}
   deleteBtn: {fileID: 907656334}
-  isDirty: 0
   creatingNewEntry: 0
   nameInput: {fileID: 1889548348}
   eInfoInput: {fileID: 111387308}
@@ -35816,7 +36017,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1877395073}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -36375,8 +36587,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 891.4736, y: -40}
-  m_SizeDelta: {x: 264.30624, y: 80}
+  m_AnchoredPosition: {x: 976.51904, y: -40}
+  m_SizeDelta: {x: 291.1416, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1918066597
 MonoBehaviour:
@@ -37028,7 +37240,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1289683263}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
@@ -37453,8 +37676,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 103.10446, y: -56.1}
-  m_SizeDelta: {x: 206.20891, y: 100}
+  m_AnchoredPosition: {x: 119.51498, y: -56.1}
+  m_SizeDelta: {x: 239.02995, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1967393631
 MonoBehaviour:
@@ -38087,6 +38310,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   theSlider: {fileID: 2041343620}
   theLabel: {fileID: 1307311962}
+  addRefreshLabelListener: 0
 --- !u!114 &2002681632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38218,8 +38442,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 336.83032, y: -40}
-  m_SizeDelta: {x: 236.4996, y: 80}
+  m_AnchoredPosition: {x: 337.35547, y: -40}
+  m_SizeDelta: {x: 237.8826, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2021252795
 MonoBehaviour:
@@ -38695,7 +38919,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 173.9, y: -42.35}
+  m_AnchoredPosition: {x: 158.9, y: -42.35}
   m_SizeDelta: {x: 180, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2041343620
@@ -38747,6 +38971,17 @@ MonoBehaviour:
       - m_Target: {fileID: 1282633104}
         m_MethodName: SetB
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2002681631}
+        m_MethodName: RefreshLabelText
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -39055,8 +39290,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 103.10446, y: -56.1}
-  m_SizeDelta: {x: 206.20891, y: 100}
+  m_AnchoredPosition: {x: 119.51498, y: -56.1}
+  m_SizeDelta: {x: 239.02995, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2068515859
 MonoBehaviour:
@@ -39359,7 +39594,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 145, y: -249.14001}
+  m_AnchoredPosition: {x: 145, y: -215.43182}
   m_SizeDelta: {x: 250, y: 220}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2095564257
@@ -39515,7 +39750,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00005904306}
+  m_AnchoredPosition: {x: 0, y: -0.0000029397477}
   m_SizeDelta: {x: 0, y: 110}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2115011251
@@ -39592,8 +39827,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 501.81335, y: -56.1}
-  m_SizeDelta: {x: 334.54224, y: 100}
+  m_AnchoredPosition: {x: 551.0449, y: -56.1}
+  m_SizeDelta: {x: 367.36328, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2116057692
 MonoBehaviour:
@@ -39648,7 +39883,18 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 950007147}
+        m_MethodName: MarkDirty
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.InputField+OnChangeEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}

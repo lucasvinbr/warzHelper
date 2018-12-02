@@ -25,6 +25,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		startPointsInput.text = dataBeingEdited.pointsGivenAtGameStart.ToString();
 		ReFillDropdownOptions();
 		//zoneIconImg.sprite = TODO get icon by path to file
+		isDirty = false;
 	}
 
 	public void ReFillDropdownOptions() {
@@ -94,7 +95,12 @@ public class EditZonePanel : EditDataPanel<Zone> {
 			CloseAndSaveChanges();
 		}
 		else {
-			ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes (including zone positioning and links) and close the window.", CloseAndSaveChanges, CloseWithoutSaving, null);
+			if (isDirty) {
+				ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes (including zone positioning and links) and close the window.", CloseAndSaveChanges, CloseWithoutSaving, null);
+			}
+			else {
+				CloseWithoutSaving();
+			}
 		}
 	}
 

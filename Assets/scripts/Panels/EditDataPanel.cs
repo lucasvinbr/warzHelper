@@ -9,7 +9,7 @@ using UnityEngine.UI;
 /// it should also have a "close" and a "delete" button to save, delete or discard changes
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public abstract class EditDataPanel<T> : GenericOverlayPanel{
+public abstract class EditDataPanel<T> : DirtableOverlayPanel{
 
     public T dataBeingEdited;
 
@@ -20,21 +20,9 @@ public abstract class EditDataPanel<T> : GenericOverlayPanel{
 	public Button closeBtn, deleteBtn;
 
 	/// <summary>
-	/// this should be marked as true whenever a change is made in one of the input options,
-	/// so that we can only show a "save changes?" prompt if there really was a change
-	/// </summary>
-	public bool isDirty;
-
-	/// <summary>
 	/// true if this panel was opened because we're creating a new object, not editing an existing one
 	/// </summary>
 	public bool creatingNewEntry = false;
-
-	public UnityAction<string> onInputFieldValueChangedAction;
-
-	protected virtual void Start() {
-		InitializeValueChangedActions();
-	}
 
 	/// <summary>
 	/// sets the menu's GO to active, sets dataBeingEdited to the target object and sets the close/delete buttons' texts to something relative to whether this is a new entry or not
@@ -118,12 +106,6 @@ public abstract class EditDataPanel<T> : GenericOverlayPanel{
 		onDoneEditing = null;
 	}
 
-	/// <summary>
-	/// defines generic unityactions that are mostly used to set isDirty to true...
-	/// but that can be changed if this method is overridden
-	/// </summary>
-	public virtual void InitializeValueChangedActions() {
-		onInputFieldValueChangedAction = (x) => { isDirty = true; };
-	}
+
 
 }

@@ -8,13 +8,17 @@ public class SliderAndLabel : MonoBehaviour {
 
     public Slider theSlider;
     public Text theLabel;
+	public bool addRefreshLabelListener = true;
 
 	// Use this for initialization
 	void Start () {
-        theSlider.onValueChanged.AddListener((float newValue) =>
-        {
-            theLabel.text = theSlider.value.ToString();
-        });
+		if (addRefreshLabelListener) {
+			theSlider.onValueChanged.AddListener((float newValue) =>
+			{
+				RefreshLabelText();
+			});
+		}
+        
 	}
 	
 
@@ -22,4 +26,8 @@ public class SliderAndLabel : MonoBehaviour {
     {
         theSlider.value = newValue;
     }
+
+	public void RefreshLabelText() {
+		theLabel.text = theSlider.value.ToString("0.00");
+	}
 }

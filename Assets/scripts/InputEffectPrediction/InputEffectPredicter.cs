@@ -29,7 +29,7 @@ public class InputEffectPredicter : MonoBehaviour {
 	protected void Start() {
 		if (attachEventToInputOnStart && theInput) {
 			theInput.onValueChanged.AddListener(WriteProjection);
-			theInput.onValueChanged.Invoke(theInput.text);
+			WriteProjection(theInput.text);
 		}
 	}
 
