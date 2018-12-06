@@ -13,7 +13,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 
 	public Color selectedEntryColor, unselectedEntryColor;
 
-	public Button editEntryBtn, delEntryBtn, addEntryBtn;
+	public Button editEntryBtn, delEntryBtn, moveEntryUpBtn, moveEntryDownBtn, addEntryBtn;
 
 
 	public void SelectTierEntry(FactionTroopListEntry theEntry) {
@@ -22,8 +22,19 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		}
 		selectedEntry = theEntry;
 		selectedEntry.selectEntryBtn.image.color = selectedEntryColor;
-		editEntryBtn.interactable = true;
+		SetEntryButtonsInteractable(true);
 		delEntryBtn.interactable = CheckIfCanDeleteMoreEntries();
+	}
+
+	/// <summary>
+	/// set interactable for the delete, edit and move buttons that should only be usable when one of the troop tiers is selected
+	/// </summary>
+	/// <param name="interactable"></param>
+	public void SetEntryButtonsInteractable(bool interactable) {
+		editEntryBtn.interactable = interactable;
+		delEntryBtn.interactable = interactable;
+		moveEntryUpBtn.interactable = interactable;
+		moveEntryDownBtn.interactable = interactable;
 	}
 
 	/// <summary>
@@ -51,6 +62,47 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		GameInterface.instance.editTroopPanel.onDoneEditing += UpdateTreeTroopOptions;
 	}
 
+	/// <summary>
+	/// moves the selected entry up (false) or down (true) in the troop tree. Down is actually increasing the entry's tier
+	/// </summary>
+	/// <param name="down"></param>
+	public void MoveSelectedEntry(bool down) {
+		if (selectedEntry) {
+			int selectedEntryIndex = selectedEntry.transform.GetSiblingIndex();
+			int increment = down ? 1 : -1;
+			selectedEntryIndex += increment;
+			if(selectedEntryIndex < 0 || selectedEntryIndex > listContainer.childCount - 2) {
+				//can't move in that direction, already in the limit
+				return;
+			}
+			else {
+				//check if we're not going to mess with the garrison delimiter
+				//"invalid" here means it's probably the delimiter
+				bool replacedEntryIsValid = listContainer.GetChild(selectedEntryIndex).GetComponent<FactionTroopListEntry>();
+				if (!replacedEntryIsValid) selectedEntryIndex += increment;
+				if (selectedEntryIndex < 0 || selectedEntryIndex > listContainer.childCount - 2) {
+					//can't move in that direction, we'd only be messing with the garrison delimiter
+					return;
+				}
+
+				//if we had to go past the garrison delimiter,
+				//we'll probably have to relocate it after moving the selected entry
+				if (!replacedEntryIsValid) {
+					increment = maxGarrTroopLvlDelimiter.GetSiblingIndex(); //reusing the increment variable here
+				}
+
+				selectedEntry.transform.SetSiblingIndex(selectedEntryIndex);
+				UpdateTreeTierValues();
+
+				if (!replacedEntryIsValid) {
+					SetMaxGarrTroopLvl(increment);
+				}
+
+				GameInterface.instance.editFactionPanel.isDirty = true;
+			}
+		}
+	}
+
 	public void StartDeleteTierProcedure() {
 		StartCoroutine(DeleteSelectedTierEntry());
 	}
@@ -61,11 +113,11 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 			yield return null;
 			UpdateTreeTierValues();
 			RefreshMaxGarrLvlText();
-			editEntryBtn.interactable = false;
-			delEntryBtn.interactable = false;
+			SetEntryButtonsInteractable(false);
 			GameInterface.instance.editFactionPanel.isDirty = true;
 		}
 	}
+
 
 	/// <summary>
 	/// updates tier numbers for all entries
@@ -162,8 +214,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 			}
 		}
 
-		editEntryBtn.interactable = false;
-		delEntryBtn.interactable = false;
+		SetEntryButtonsInteractable(false);
 	}
 
 	public override void OnEnable() {
