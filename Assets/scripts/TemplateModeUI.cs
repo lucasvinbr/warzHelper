@@ -18,5 +18,6 @@ public class TemplateModeUI : ModeUI {
 		World.ToggleWorldDisplay(true);
 		World.SetupAllZonesFromData();
 		World.LinkAllZonesFromData();
+		World.SetGroundSizeAccordingToRules();
     }
 }

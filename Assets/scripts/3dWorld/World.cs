@@ -18,6 +18,12 @@ public class World : MonoBehaviour {
         instance = this;
     }
 
+
+	public static void SetGroundSizeAccordingToRules() {
+		Vector2 boardDim = GameController.instance.curData.rules.boardDimensions;
+		instance.ground.localScale = new Vector3(boardDim.x, boardDim.y, 1);
+	}
+
     public static void ToggleWorldDisplay(bool active)
     {
         instance.ground.gameObject.SetActive(active);

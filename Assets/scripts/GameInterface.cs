@@ -13,6 +13,8 @@ public class GameInterface : MonoBehaviour {
 
 	public EditTroopPanel editTroopPanel;
 
+	public EditRulesBoardPanel editRulesPanel;
+
 	public TextInputPanel textInputPanel;
 
 	public ColorInputPanel colorInputPanel;
@@ -85,6 +87,13 @@ public class GameInterface : MonoBehaviour {
 
 	public void EditTroopType(TroopType targetTT, bool isNewEntry) {
 		editTroopPanel.Open(targetTT, isNewEntry);
+	}
+
+	/// <summary>
+	/// the rules are never "new" and there is always only one
+	/// </summary>
+	public void EditRules() {
+		editRulesPanel.Open(GameController.instance.curData.rules, false);
 	}
 
 	public void OpenLoadGameMenu(bool templateMode = false)

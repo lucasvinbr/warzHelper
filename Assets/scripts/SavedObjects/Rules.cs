@@ -37,6 +37,17 @@ public class Rules {
 
 	public const string NO_FACTION_NAME = "No Faction";
 
+	/// <summary>
+	/// the board's x and y dimensions. Affects camera boundaries.
+	/// doesn't affect zone placement, but may make some zones inacessible to the player!
+	/// </summary>
+	public Vector2 boardDimensions = new Vector2(100, 100);
+
+	/// <summary>
+	/// the path to a "ground" texture used in this board. Can be a map or something depicting a landscape, for example
+	/// </summary>
+	public string boardTexturePath = "";
+
 	//empty constructor to enable xml serialization
 	public Rules() {}
 }

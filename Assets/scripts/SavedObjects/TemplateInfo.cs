@@ -12,8 +12,6 @@ public class TemplateInfo {
 
 	public Rules rules;
 
-	public Board boardInfo;
-
     public List<Faction> factions;
 
     public List<Zone> zones;
@@ -30,7 +28,6 @@ public class TemplateInfo {
 		troopTypes = new List<TroopType>();
 		deployedCommanders = new List<Commander>();
 		rules = new Rules();
-		boardInfo = new Board();
 		this.isATemplate = true;
     }
 
