@@ -31,6 +31,8 @@ public class GameInterface : MonoBehaviour {
 
 	public FactionsPanel factionsPanel;
 
+	public TroopsPanel troopsPanel;
+
 	/// <summary>
 	/// a variable that should be incremented whenever an overlay panel is opened, and decremented whenever one closes.
 	/// it can be used to check if a menu is open

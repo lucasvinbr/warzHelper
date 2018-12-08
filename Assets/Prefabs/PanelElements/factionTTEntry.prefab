@@ -251,7 +251,7 @@ GameObject:
   - component: {fileID: 114334751918760844}
   - component: {fileID: 114001339101755366}
   m_Layer: 5
-  m_Name: TTEntry
+  m_Name: factionTTEntry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
