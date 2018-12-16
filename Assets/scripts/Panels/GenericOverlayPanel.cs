@@ -9,9 +9,11 @@ public class GenericOverlayPanel : MonoBehaviour {
 
 	public virtual void OnEnable() {
 		GameInterface.openedPanelsOverlayLevel++;
+		GameInterface.instance.overlayPanelsCurrentlyOpen.Add(this);
 	}
 
 	public virtual void OnDisable() {
 		GameInterface.openedPanelsOverlayLevel--;
+		GameInterface.instance.overlayPanelsCurrentlyOpen.Remove(this);
 	}
 }

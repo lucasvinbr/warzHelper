@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class World : MonoBehaviour {
 
@@ -37,7 +38,11 @@ public class World : MonoBehaviour {
 	}
 
 	public static void BeginNewZonePlacement() {
-		instance.zonePlacerScript.StartNewZonePlacement(true);
+		instance.zonePlacerScript.StartNewZonePlacement();
+	}
+
+	public static void BeginCustomZonePlacement(UnityAction actionOnConfirmPlacement) {
+		instance.zonePlacerScript.StartCustomPlacement(actionOnConfirmPlacement);
 	}
 
     public static void CreateNewZoneAtPoint(Vector3 point, bool autoOpenEditMenu = true)
@@ -52,7 +57,7 @@ public class World : MonoBehaviour {
 		if (autoOpenEditMenu)
         {
             GameInterface.instance.EditZone(newZone, true);
-        }
+        } 
     }
 
 	public static ZoneSpot GetZoneSpotByZoneName(string zoneName) {

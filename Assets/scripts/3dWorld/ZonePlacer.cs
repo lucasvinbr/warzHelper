@@ -27,14 +27,18 @@ public class ZonePlacer : MonoBehaviour {
         zoneBlueprint.gameObject.SetActive(false);
     }
 
-    public void StartNewZonePlacement(bool zoneIsNew)
+	/// <summary>
+	/// enables this script, and when the user clicks on a spot, a new zone is created there
+	/// </summary>
+    public void StartNewZonePlacement()
     {
-        this.enabled = true;
-		if (zoneIsNew) {
-			actionOnSpotSelect += OnNewZoneConfirmPlacement;
-		}
-        
+        StartCustomPlacement(OnNewZoneConfirmPlacement);
     }
+
+	public void StartCustomPlacement(UnityAction actionOnConfirmPlace) {
+		this.enabled = true;
+		actionOnSpotSelect += actionOnConfirmPlace;
+	}
 
     void Update()
     {
@@ -58,4 +62,5 @@ public class ZonePlacer : MonoBehaviour {
     {
         World.CreateNewZoneAtPoint(zoneBlueprint.position);
     }
+
 }

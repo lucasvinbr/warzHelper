@@ -295,8 +295,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -235.40164}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -217.47955}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &12296804
 MonoBehaviour:
@@ -1249,8 +1249,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 670.6244, y: -56.1}
-  m_SizeDelta: {x: 863.1244, y: 80}
+  m_AnchoredPosition: {x: 710.95154, y: -56.1}
+  m_SizeDelta: {x: 903.45154, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &71239779
 MonoBehaviour:
@@ -2052,8 +2052,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 119.53109, y: -56.1}
-  m_SizeDelta: {x: 239.06218, y: 100}
+  m_AnchoredPosition: {x: 129.61288, y: -56.1}
+  m_SizeDelta: {x: 259.22577, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &105836486
 MonoBehaviour:
@@ -3289,6 +3289,7 @@ GameObject:
   - component: {fileID: 146783863}
   - component: {fileID: 146783862}
   - component: {fileID: 146783861}
+  - component: {fileID: 146783864}
   m_Layer: 5
   m_Name: editFactionCPLabel
   m_TagString: Untagged
@@ -3311,8 +3312,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 183.69775, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 193.77954, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &146783861
 MonoBehaviour:
@@ -3346,7 +3347,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -3373,6 +3374,22 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 146783859}
   m_CullTransparentMesh: 0
+--- !u!114 &146783864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 146783859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: "Multiplier applied to the points awarded to each\n commander of this faction
+    in the beginning\nof the faction's turn.\nThe zone the commander is in also affects
+    points\n awarded to them"
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &147283040
 GameObject:
   m_ObjectHideFlags: 0
@@ -4653,6 +4670,7 @@ GameObject:
   - component: {fileID: 189392520}
   - component: {fileID: 189392519}
   - component: {fileID: 189392518}
+  - component: {fileID: 189392521}
   m_Layer: 5
   m_Name: editFactionZPLabel
   m_TagString: Untagged
@@ -4675,8 +4693,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 183.69775, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 193.77954, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &189392518
 MonoBehaviour:
@@ -4710,7 +4728,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -4737,6 +4755,21 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 189392516}
   m_CullTransparentMesh: 0
+--- !u!114 &189392521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 189392516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: "Multiplier applied to the points awarded \nto owned zones in the beginning
+    of the faction's turn"
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &203590409
 GameObject:
   m_ObjectHideFlags: 0
@@ -7565,7 +7598,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 317.3955, y: -50}
+  m_AnchoredPosition: {x: 337.55908, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &301103049
@@ -8060,7 +8093,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 145, y: -43.4672}
+  m_AnchoredPosition: {x: 145, y: -37.493183}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &325108907
@@ -8517,8 +8550,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 133.69775, y: -50}
-  m_SizeDelta: {x: 267.3955, y: 100}
+  m_AnchoredPosition: {x: 143.77954, y: -50}
+  m_SizeDelta: {x: 287.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &352900039
 GameObject:
@@ -11044,8 +11077,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 109.25876, y: -40}
-  m_SizeDelta: {x: 218.51752, y: 80}
+  m_AnchoredPosition: {x: 110.162766, y: -40}
+  m_SizeDelta: {x: 220.32553, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &456155259
 MonoBehaviour:
@@ -11266,8 +11299,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 581.3386, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &466522241
 MonoBehaviour:
@@ -12027,8 +12060,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 342.2331, y: -40}
-  m_SizeDelta: {x: 322.7976, y: 80}
+  m_AnchoredPosition: {x: 363.64948, y: -40}
+  m_SizeDelta: {x: 339.01038, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &495907861
 MonoBehaviour:
@@ -12265,8 +12298,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 581.3386, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &500584191
 MonoBehaviour:
@@ -13499,8 +13532,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -411.95282}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -392.69998}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &575370940
 MonoBehaviour:
@@ -13748,8 +13781,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 161.3988, y: -40}
-  m_SizeDelta: {x: 196.04463, y: 80}
+  m_AnchoredPosition: {x: 169.50519, y: -40}
+  m_SizeDelta: {x: 201.86258, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &585267503
 MonoBehaviour:
@@ -14112,8 +14145,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 133.69775, y: -50}
-  m_SizeDelta: {x: 267.3955, y: 100}
+  m_AnchoredPosition: {x: 143.77954, y: -50}
+  m_SizeDelta: {x: 287.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &607683019
 GameObject:
@@ -15046,8 +15079,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -294.252}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -280.5}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &633760407
 MonoBehaviour:
@@ -16758,8 +16791,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 918.4888, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 968.8977, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &690548842
 MonoBehaviour:
@@ -17520,8 +17553,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 133.69775, y: -50}
-  m_SizeDelta: {x: 267.3955, y: 100}
+  m_AnchoredPosition: {x: 143.77954, y: -50}
+  m_SizeDelta: {x: 287.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &715865024
 GameObject:
@@ -18473,8 +18506,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 90.41714, y: -40}
-  m_SizeDelta: {x: 54.08128, y: 80}
+  m_AnchoredPosition: {x: 97.07215, y: -40}
+  m_SizeDelta: {x: 56.996494, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &747949472
 MonoBehaviour:
@@ -19084,8 +19117,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 164.7789, y: -40}
-  m_SizeDelta: {x: 202.8048, y: 80}
+  m_AnchoredPosition: {x: 170.69263, y: -40}
+  m_SizeDelta: {x: 204.23744, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &767395124
 MonoBehaviour:
@@ -19449,8 +19482,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -176.55121}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -168.29999}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &780201672
 MonoBehaviour:
@@ -21838,8 +21871,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 133.69775, y: -50}
-  m_SizeDelta: {x: 267.3955, y: 100}
+  m_AnchoredPosition: {x: 143.77954, y: -50}
+  m_SizeDelta: {x: 287.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &907656332
 GameObject:
@@ -21996,8 +22029,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 144.49841, y: -40}
-  m_SizeDelta: {x: 162.24384, y: 80}
+  m_AnchoredPosition: {x: 154.06865, y: -40}
+  m_SizeDelta: {x: 170.98949, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &912974382
 MonoBehaviour:
@@ -22262,8 +22295,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 119.53109, y: -56.1}
-  m_SizeDelta: {x: 239.06218, y: 100}
+  m_AnchoredPosition: {x: 129.61288, y: -56.1}
+  m_SizeDelta: {x: 259.22577, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &933644335
 MonoBehaviour:
@@ -22596,8 +22629,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 133.69775, y: -50}
-  m_SizeDelta: {x: 267.3955, y: 100}
+  m_AnchoredPosition: {x: 143.77954, y: -50}
+  m_SizeDelta: {x: 287.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &948222787
 MonoBehaviour:
@@ -23004,8 +23037,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 581.3386, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &958741105
 MonoBehaviour:
@@ -23278,8 +23311,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -58.850403}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -56.1}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &966276841
 MonoBehaviour:
@@ -23600,8 +23633,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 133.69775, y: -50}
-  m_SizeDelta: {x: 267.3955, y: 100}
+  m_AnchoredPosition: {x: 143.77954, y: -50}
+  m_SizeDelta: {x: 287.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &976994399
 GameObject:
@@ -24094,8 +24127,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 918.4888, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 968.8977, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &999002646
 MonoBehaviour:
@@ -24330,6 +24363,7 @@ GameObject:
   - component: {fileID: 1013386165}
   - component: {fileID: 1013386164}
   - component: {fileID: 1013386163}
+  - component: {fileID: 1013386166}
   m_Layer: 5
   m_Name: editFactionZGLabel
   m_TagString: Untagged
@@ -24387,7 +24421,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -24414,6 +24448,22 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1013386161}
   m_CullTransparentMesh: 0
+--- !u!114 &1013386166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1013386161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: 'Multiplier applied to points used in the recruitment of
+
+    new troops'
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1013548117
 GameObject:
   m_ObjectHideFlags: 0
@@ -24977,8 +25027,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 670.6244, y: -56.1}
-  m_SizeDelta: {x: 863.1244, y: 100}
+  m_AnchoredPosition: {x: 710.95154, y: -56.1}
+  m_SizeDelta: {x: 903.45154, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1034554527
 MonoBehaviour:
@@ -25660,7 +25710,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 317.3955, y: -50}
+  m_AnchoredPosition: {x: 337.55908, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1067420505
@@ -25755,8 +25805,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 918.4888, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 968.8977, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1073324393
 MonoBehaviour:
@@ -27081,7 +27131,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1636318075}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -27889,8 +27939,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 918.4888, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 968.8977, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1175113152
 MonoBehaviour:
@@ -28079,8 +28129,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 918.4888, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 968.8977, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1177623706
 MonoBehaviour:
@@ -28897,8 +28947,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 581.3386, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1219690588
 MonoBehaviour:
@@ -29074,6 +29124,7 @@ GameObject:
   - component: {fileID: 1222704694}
   - component: {fileID: 1222704693}
   - component: {fileID: 1222704692}
+  - component: {fileID: 1222704695}
   m_Layer: 5
   m_Name: editFactionZGLabel
   m_TagString: Untagged
@@ -29131,7 +29182,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -29158,6 +29209,21 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1222704690}
   m_CullTransparentMesh: 0
+--- !u!114 &1222704695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1222704690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: "Multiplier applied to the max number of troops \ngarrisoned in this zone.
+    The owner faciton also\nhas its own multiplier applied to this limit"
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1223324506
 GameObject:
   m_ObjectHideFlags: 0
@@ -29811,8 +29877,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 918.4888, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 968.8977, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1240973777
 MonoBehaviour:
@@ -29907,8 +29973,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -392.33606}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -362.46594}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1242015414
 MonoBehaviour:
@@ -30224,6 +30290,7 @@ GameObject:
   - component: {fileID: 1258097352}
   - component: {fileID: 1258097351}
   - component: {fileID: 1258097350}
+  - component: {fileID: 1258097353}
   m_Layer: 5
   m_Name: editFactionCALabel
   m_TagString: Untagged
@@ -30246,8 +30313,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 183.69775, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 193.77954, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1258097350
 MonoBehaviour:
@@ -30281,7 +30348,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -30308,6 +30375,21 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1258097348}
   m_CullTransparentMesh: 0
+--- !u!114 &1258097353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1258097348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: "Multiplier applied to the max number of troops \ncontrolled by commanders
+    of this faction"
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1260466035
 GameObject:
   m_ObjectHideFlags: 0
@@ -30342,8 +30424,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -392.33606}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -362.46594}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1260466037
 MonoBehaviour:
@@ -30402,8 +30484,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 90.41714, y: -40}
-  m_SizeDelta: {x: 180.83427, y: 80}
+  m_AnchoredPosition: {x: 97.07215, y: -40}
+  m_SizeDelta: {x: 194.1443, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1264708511
 MonoBehaviour:
@@ -32214,6 +32296,7 @@ GameObject:
   - component: {fileID: 1322468304}
   - component: {fileID: 1322468303}
   - component: {fileID: 1322468302}
+  - component: {fileID: 1322468305}
   m_Layer: 5
   m_Name: editFactionTPLabel
   m_TagString: Untagged
@@ -32236,8 +32319,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 183.69775, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 193.77954, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1322468302
 MonoBehaviour:
@@ -32271,7 +32354,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -32300,6 +32383,21 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1322468300}
   m_CullTransparentMesh: 0
+--- !u!114 &1322468305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1322468300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: Factions with a smaller priority will take their turns before those with a
+    bigger priority
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1323259904
 GameObject:
   m_ObjectHideFlags: 0
@@ -32602,7 +32700,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 317.3955, y: -50}
+  m_AnchoredPosition: {x: 337.55908, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1335598908
@@ -32675,6 +32773,7 @@ GameObject:
   - component: {fileID: 1336567774}
   - component: {fileID: 1336567773}
   - component: {fileID: 1336567772}
+  - component: {fileID: 1336567775}
   m_Layer: 5
   m_Name: editFactionZPLabel
   m_TagString: Untagged
@@ -32732,7 +32831,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -32759,6 +32858,20 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1336567770}
   m_CullTransparentMesh: 0
+--- !u!114 &1336567775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1336567770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: "Multiplier applied to points used in the upgrading \nof troops"
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1343701951
 GameObject:
   m_ObjectHideFlags: 0
@@ -32889,7 +33002,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 317.3955, y: -50}
+  m_AnchoredPosition: {x: 337.55908, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1344080796
@@ -33982,8 +34095,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -78.46721}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -72.49319}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1393600486
 MonoBehaviour:
@@ -36483,8 +36596,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -78.46721}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -72.49319}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1484251425
 MonoBehaviour:
@@ -37088,8 +37201,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 571.08105, y: -40}
-  m_SizeDelta: {x: 232.03784, y: 80}
+  m_AnchoredPosition: {x: 572.1875, y: -40}
+  m_SizeDelta: {x: 229.82495, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1506409629
 MonoBehaviour:
@@ -37312,7 +37425,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 317.3955, y: -50}
+  m_AnchoredPosition: {x: 337.55908, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1520010744
@@ -39253,8 +39366,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 670.6244, y: -56.1}
-  m_SizeDelta: {x: 863.1244, y: 80}
+  m_AnchoredPosition: {x: 710.95154, y: -56.1}
+  m_SizeDelta: {x: 903.45154, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1576296426
 MonoBehaviour:
@@ -39417,6 +39530,7 @@ GameObject:
   - component: {fileID: 1582349095}
   - component: {fileID: 1582349094}
   - component: {fileID: 1582349093}
+  - component: {fileID: 1582349096}
   m_Layer: 5
   m_Name: editFactionZGLabel
   m_TagString: Untagged
@@ -39439,8 +39553,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 183.69775, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 193.77954, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1582349093
 MonoBehaviour:
@@ -39474,7 +39588,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -39501,6 +39615,21 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1582349091}
   m_CullTransparentMesh: 0
+--- !u!114 &1582349096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1582349091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: "Multiplier applied to the max number of troops \ngarrisoned in owned zones.\nEach
+    zone also has their own multiplier"
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1589989274
 GameObject:
   m_ObjectHideFlags: 0
@@ -40441,8 +40570,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 670.6244, y: -56.1}
-  m_SizeDelta: {x: 863.1244, y: 100}
+  m_AnchoredPosition: {x: 710.95154, y: -56.1}
+  m_SizeDelta: {x: 903.45154, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1642069111
 MonoBehaviour:
@@ -40834,7 +40963,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 145, y: -387.33603}
+  m_AnchoredPosition: {x: 145, y: -357.46594}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1655209386
@@ -41438,8 +41567,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 668.41077, y: -40}
-  m_SizeDelta: {x: 329.5578, y: 80}
+  m_AnchoredPosition: {x: 703.8473, y: -40}
+  m_SizeDelta: {x: 341.38525, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1672995966
 MonoBehaviour:
@@ -42766,8 +42895,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 581.3386, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1728866103
 MonoBehaviour:
@@ -43507,6 +43636,7 @@ GameObject:
   - component: {fileID: 1744889441}
   - component: {fileID: 1744889440}
   - component: {fileID: 1744889439}
+  - component: {fileID: 1744889442}
   m_Layer: 5
   m_Name: editFactionMCLabel
   m_TagString: Untagged
@@ -43529,8 +43659,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 183.69775, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 193.77954, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1744889439
 MonoBehaviour:
@@ -43564,7 +43694,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -43591,6 +43721,20 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1744889437}
   m_CullTransparentMesh: 0
+--- !u!114 &1744889442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1744889437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: "Number added to the max deployed commanders \nof this faction"
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1745389897
 GameObject:
   m_ObjectHideFlags: 0
@@ -43708,8 +43852,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -235.40164}
-  m_SizeDelta: {x: 1102.1865, y: 112.2}
+  m_AnchoredPosition: {x: 581.3386, y: -217.47955}
+  m_SizeDelta: {x: 1162.6772, y: 112.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1747842588
 MonoBehaviour:
@@ -46145,7 +46289,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 317.3955, y: -50}
+  m_AnchoredPosition: {x: 337.55908, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1858605258
@@ -47405,8 +47549,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 977.6881, y: -40}
-  m_SizeDelta: {x: 288.99683, y: 80}
+  m_AnchoredPosition: {x: 1028.6085, y: -40}
+  m_SizeDelta: {x: 308.1373, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1918066597
 MonoBehaviour:
@@ -48871,8 +49015,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 119.53109, y: -56.1}
-  m_SizeDelta: {x: 239.06218, y: 100}
+  m_AnchoredPosition: {x: 129.61288, y: -56.1}
+  m_SizeDelta: {x: 259.22577, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1967393631
 MonoBehaviour:
@@ -49746,8 +49890,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 336.78983, y: -40}
-  m_SizeDelta: {x: 236.5446, y: 80}
+  m_AnchoredPosition: {x: 338.8003, y: -40}
+  m_SizeDelta: {x: 236.9495, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2021252795
 MonoBehaviour:
@@ -50935,6 +51079,7 @@ GameObject:
   - component: {fileID: 2066445080}
   - component: {fileID: 2066445079}
   - component: {fileID: 2066445078}
+  - component: {fileID: 2066445081}
   m_Layer: 5
   m_Name: editZoneOwnerLabel
   m_TagString: Untagged
@@ -50992,7 +51137,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -51019,6 +51164,23 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2066445076}
   m_CullTransparentMesh: 0
+--- !u!114 &2066445081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2066445076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe02588cca16964c8571b21eefea5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: "A zone is considered to be owned by a faction \nif there is any troop in
+    its region,\nwhether garrisoned in the zone or controlled by\na commander. An
+    owned zone receives points,\nautomatically used recruiting and training\n troops
+    for the garrison"
+  tooltipPositioningType: 0
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &2068515857
 GameObject:
   m_ObjectHideFlags: 0
@@ -51052,8 +51214,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 119.53109, y: -56.1}
-  m_SizeDelta: {x: 239.06218, y: 100}
+  m_AnchoredPosition: {x: 129.61288, y: -56.1}
+  m_SizeDelta: {x: 259.22577, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2068515859
 MonoBehaviour:
@@ -51356,7 +51518,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 145, y: -215.40161}
+  m_AnchoredPosition: {x: 145, y: -197.47955}
   m_SizeDelta: {x: 250, y: 220}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2095564257
@@ -51512,7 +51674,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.0000029397477}
+  m_AnchoredPosition: {x: 0, y: 0.000008932029}
   m_SizeDelta: {x: 0, y: 110}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2115011251
@@ -51589,8 +51751,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 551.09326, y: -56.1}
-  m_SizeDelta: {x: 367.3955, y: 100}
+  m_AnchoredPosition: {x: 581.3386, y: -56.1}
+  m_SizeDelta: {x: 387.55908, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2116057692
 MonoBehaviour:

@@ -33,6 +33,10 @@ public class GameInterface : MonoBehaviour {
 
 	public TroopsPanel troopsPanel;
 
+	public List<GenericOverlayPanel> overlayPanelsCurrentlyOpen = new List<GenericOverlayPanel>();
+
+	private List<GenericOverlayPanel> overlayPanelsOpenBeforeClear = new List<GenericOverlayPanel>();
+
 	/// <summary>
 	/// a variable that should be incremented whenever an overlay panel is opened, and decremented whenever one closes.
 	/// it can be used to check if a menu is open
@@ -139,6 +143,31 @@ public class GameInterface : MonoBehaviour {
 
 	public void ReturnToMenu() {
 		ModalPanel.Instance().YesNoBox("Return to Main Menu", "Any unsaved changes will be lost.\n Proceed?", ()=> { curModeUI.ClearUI(); SwitchInterface(InterfaceMode.start); }, null);
+	}
+
+
+	/// <summary>
+	/// disables and "remembers" which panels were open so that they can be restored
+	/// </summary>
+	public void DisableAndStoreAllOpenOverlayPanels() {
+		overlayPanelsOpenBeforeClear.Clear(); //we only store the ones from the last time this ran
+		foreach(GenericOverlayPanel GOP in overlayPanelsCurrentlyOpen) {
+			overlayPanelsOpenBeforeClear.Add(GOP);
+		}
+		foreach (GenericOverlayPanel GOP in overlayPanelsOpenBeforeClear) {
+			GOP.gameObject.SetActive(false);
+		}
+	}
+
+	/// <summary>
+	/// setActives the overlay panels stored with DisableAndStoreAllOpenOverlayPanels
+	/// </summary>
+	public void RestoreOpenOverlayPanels() {
+		foreach (GenericOverlayPanel GOP in overlayPanelsOpenBeforeClear) {
+			GOP.gameObject.SetActive(true);
+		}
+
+		overlayPanelsOpenBeforeClear.Clear();
 	}
 
 

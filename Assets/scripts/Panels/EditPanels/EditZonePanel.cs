@@ -86,7 +86,6 @@ public class EditZonePanel : EditDataPanel<Zone> {
 
 	public void CloseWithoutSaving() {
 		gameObject.SetActive(false);
-		dataBeingEdited = null;
 		OnWindowIsClosing();
 	}
 
@@ -96,7 +95,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		}
 		else {
 			if (isDirty) {
-				ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes (including zone positioning and links) and close the window.", CloseAndSaveChanges, CloseWithoutSaving, null);
+				ModalPanel.Instance().YesNoCancelBox("Save Changes?", "Pressing 'No' will discard changes (including zone positioning) and close the window.", CloseAndSaveChanges, CloseWithoutSaving, null);
 			}
 			else {
 				CloseWithoutSaving();
@@ -123,10 +122,13 @@ public class EditZonePanel : EditDataPanel<Zone> {
 
     public void EditZoneLocation()
     {
-        //TODO menu closes, zone movement mode is activated.
-		//zone is "glued" to the user's mouse.
-		//clicking will set the new position.
-        //menu opens again once a spot is defined
+		GameInterface.instance.DisableAndStoreAllOpenOverlayPanels();
+		World.BeginCustomZonePlacement(() => {
+			World.GetZoneSpotByZoneName(dataBeingEdited.name).transform.position =
+			World.instance.zonePlacerScript.zoneBlueprint.position;
+			isDirty = true;
+			GameInterface.instance.RestoreOpenOverlayPanels();
+		});
     }
 
 	public void EditZoneLinks() {
@@ -135,7 +137,10 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		//menu opens again once a "done" button is clicked or ESC is pressed
 	}
 
-
+	public override void OnWindowIsClosing() {
+		World.GetZoneSpotByZoneName(dataBeingEdited.name).transform.position = dataBeingEdited.CoordsForWorld;
+		base.OnWindowIsClosing();
+	}
 
 
 }
