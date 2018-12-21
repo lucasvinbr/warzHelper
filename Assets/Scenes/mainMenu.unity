@@ -15626,6 +15626,7 @@ GameObject:
   - component: {fileID: 649191597}
   - component: {fileID: 649191598}
   - component: {fileID: 649191599}
+  - component: {fileID: 649191600}
   m_Layer: 5
   m_Name: generalInterface
   m_TagString: Untagged
@@ -15761,6 +15762,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f0c3e3f674ba664091c74c55d1f545a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  facMatsHandler: {fileID: 649191600}
 --- !u!114 &649191598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15795,6 +15797,19 @@ MonoBehaviour:
   followerPrefab: {fileID: 1934009555639580, guid: bac17d80b19d21e4cb2bd6b0382fc0ae,
     type: 2}
   followerTextsParent: {fileID: 1649009520}
+--- !u!114 &649191600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 649191591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cf2422d7cdb24042964a7bc25d0ce28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseFactionMaterial: {fileID: 2100000, guid: c71ef2c080bcf724b89ce91905df5b9c, type: 2}
+  neutralZoneMaterial: {fileID: 2100000, guid: d9744d2901e54544d9ef0ba4d82ee338, type: 2}
 --- !u!1 &654898549
 GameObject:
   m_ObjectHideFlags: 0

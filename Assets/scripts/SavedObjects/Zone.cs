@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
 public class Zone {
@@ -83,6 +84,23 @@ public class Zone {
 				total += troopsGarrisoned[i].troopAmount;
 			}
 			return total;
+		}
+	}
+
+	private ZoneSpot _mySpot;
+
+	/// <summary>
+	/// basically a cached GetZoneSpotByZoneName
+	/// </summary>
+	public ZoneSpot MyZoneSpot
+	{
+		get
+		{
+			if(_mySpot == null) {
+				_mySpot = World.GetZoneSpotByZoneName(name);
+			}
+
+			return _mySpot;
 		}
 	}
 

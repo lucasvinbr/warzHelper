@@ -7,7 +7,7 @@ public class StartingOptionsUI : ModeUI {
     public GameObject initialOptions, templateOptions, gameOptions;
 	
 
-    public override void ShowInitialUI()
+    public override void InitializeUI()
     {
         initialOptions.SetActive(true);
         templateOptions.SetActive(false);
@@ -20,6 +20,6 @@ public class StartingOptionsUI : ModeUI {
     }
 
 	public override void ClearUI() {
-		ShowInitialUI();
+		InitializeUI();
 	}
 }

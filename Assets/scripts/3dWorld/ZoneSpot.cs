@@ -13,6 +13,8 @@ public class ZoneSpot : MonoBehaviour {
 
     public Transform labelPoint;
 
+	public Renderer spotRenderer;
+
     void Start()
     {
 		RefreshDataDisplay();
@@ -38,12 +40,20 @@ public class ZoneSpot : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// refreshes label text and the spot's 3d representation color
+	/// </summary>
     public void RefreshDataDisplay()
     {
 		GuardMyLabel();
         if(data != null)
         {
             myLabel.SetText(data.name);
+			Faction ownerFac = GameController.GetFactionByID(data.ownerFaction);
+			myLabel.myText.color = ownerFac != null ? ownerFac.color : Color.white;
+			spotRenderer.sharedMaterial = ownerFac != null ?
+				GameController.instance.facMatsHandler.factionMaterialsDict[ownerFac.ID] :
+				GameController.instance.facMatsHandler.neutralZoneMaterial;
 			gameObject.name = data.name;
         }
     }

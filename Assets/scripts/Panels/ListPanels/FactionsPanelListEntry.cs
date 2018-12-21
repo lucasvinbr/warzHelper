@@ -15,7 +15,7 @@ public class FactionsPanelListEntry : ListPanelEntry<Faction> {
         nameTxt.text = targetFaction.name;
         turnPriorityTxt.text = targetFaction.turnPriority.ToString();
         backgroundImg.color = targetFaction.color;
-		zonesOwnedTxt.text = "TODO"; //TODO get number of zones owned by this faction
+		zonesOwnedTxt.text = GameController.GetZonesOwnedByFaction(targetFaction).Count.ToString();
     }
 
     public void OpenEditFactionPanel()

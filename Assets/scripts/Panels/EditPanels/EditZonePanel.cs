@@ -70,7 +70,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 	public void CloseAndSaveChanges() {
 		if (!DataIsValid()) return;
 		CheckIfNameIsAlreadyInUse();
-		ZoneSpot thisZoneSpot = World.GetZoneSpotByZoneName(dataBeingEdited.name);
+		ZoneSpot mySpot = dataBeingEdited.MyZoneSpot; //we must get it before applying the new name (we get the spot by name if it's not cached)
 		dataBeingEdited.name = nameInput.text;
 		dataBeingEdited.extraInfo = eInfoInput.text;
 		dataBeingEdited.multTrainingPoints = float.Parse(multTrainingInput.text, CultureInfo.InvariantCulture);
@@ -78,14 +78,16 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		dataBeingEdited.multMaxUnitsInGarrison = float.Parse(multMaxGarrInput.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.pointsGivenAtGameStart = int.Parse(startPointsInput.text);
 		dataBeingEdited.ownerFaction = GameController.GetFactionIDByName(ownerFactionDropdown.captionText.text);
-		dataBeingEdited.coords = new Vector2(thisZoneSpot.transform.localPosition.x, thisZoneSpot.transform.localPosition.z);
-		thisZoneSpot.RefreshDataDisplay();
+		dataBeingEdited.coords = new Vector2(mySpot.transform.localPosition.x,
+			mySpot.transform.localPosition.z);
+		mySpot.RefreshDataDisplay();
 		gameObject.SetActive(false);
 		OnWindowIsClosing();
 	}
 
 	public void CloseWithoutSaving() {
 		gameObject.SetActive(false);
+		dataBeingEdited.MyZoneSpot.transform.position = dataBeingEdited.CoordsForWorld;
 		OnWindowIsClosing();
 	}
 
@@ -114,7 +116,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 
 	public override void OnConfirmDelete() {
 		gameObject.SetActive(false);
-		World.GetZoneSpotByZoneName(dataBeingEdited.name).DeleteThisSpot();
+		dataBeingEdited.MyZoneSpot.DeleteThisSpot();
 		GameController.RemoveZone(dataBeingEdited);
 		dataBeingEdited = null;
 		OnWindowIsClosing();
@@ -124,17 +126,12 @@ public class EditZonePanel : EditDataPanel<Zone> {
     {
 		GameInterface.instance.DisableAndStoreAllOpenOverlayPanels();
 		World.BeginCustomZonePlacement(() => {
-			World.GetZoneSpotByZoneName(dataBeingEdited.name).transform.position =
+			dataBeingEdited.MyZoneSpot.transform.position =
 			World.instance.zonePlacerScript.zoneBlueprint.position;
 			isDirty = true;
 			GameInterface.instance.RestoreOpenOverlayPanels();
 		});
     }
-
-	public override void OnWindowIsClosing() {
-		World.GetZoneSpotByZoneName(dataBeingEdited.name).transform.position = dataBeingEdited.CoordsForWorld;
-		base.OnWindowIsClosing();
-	}
 
 
 }

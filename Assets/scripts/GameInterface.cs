@@ -138,7 +138,7 @@ public class GameInterface : MonoBehaviour {
 				curModeUI = templateOptionsPanel;
                 break;
         }
-		curModeUI.ShowInitialUI();
+		curModeUI.InitializeUI();
 	}
 
 	public void ReturnToMenu() {

@@ -86,12 +86,12 @@ public class Faction
 	/// <summary>
 	/// the troops used by this faction, starting by the base troop and ending with the top-tier one... or not, if you want troops to get worse with time
 	/// </summary>
-	public List<int> troopTree;
+	public List<int> troopLine;
 
 	public Faction(string name) {
 		this.ID = GameController.GetUnusedFactionID();
 		this.name = name;
-		troopTree = new List<int>();
+		troopLine = new List<int>();
 		color = Color.white;
 		while (GameController.GetFactionByName (this.name) != null) {
 			this.name = name + " copy";

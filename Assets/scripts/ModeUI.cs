@@ -7,7 +7,7 @@ public abstract class ModeUI : MonoBehaviour {
 	[HideInInspector]
 	public GameObject curDisplayedLowerHUD;
 
-	abstract public void ShowInitialUI();
+	abstract public void InitializeUI();
 
 	abstract public void ClearUI();
 

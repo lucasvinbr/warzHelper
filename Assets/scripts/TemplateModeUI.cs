@@ -12,10 +12,12 @@ public class TemplateModeUI : ModeUI {
 		World.CleanZonesContainer();
 		World.ToggleWorldDisplay(false);
 		tempSaveOptionsPanel.gameObject.SetActive(false);
+		GameController.instance.facMatsHandler.PurgeFactionColorsDict();
 	}
 
-	public override void ShowInitialUI()
+	public override void InitializeUI()
     {
+		GameController.instance.facMatsHandler.ReBakeFactionColorsDict();
 		World.CleanZonesContainer();
 		World.ToggleWorldDisplay(true);
 		World.SetupAllZonesFromData();

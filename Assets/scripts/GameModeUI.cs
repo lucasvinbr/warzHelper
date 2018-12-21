@@ -9,7 +9,7 @@ public class GameModeUI : ModeUI
 		//hide the world
 	}
 
-	public override void ShowInitialUI()
+	public override void InitializeUI()
     {
         //hide all menus and show the world
     }

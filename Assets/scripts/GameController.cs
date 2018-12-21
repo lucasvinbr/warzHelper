@@ -9,7 +9,8 @@ public class GameController : MonoBehaviour {
 
     public static GameController instance;
 
-	
+	public GameMaterialsHandler facMatsHandler;
+
 	private TroopType m_lastRelevantTType;
 
 	/// <summary>
@@ -187,13 +188,15 @@ public class GameController : MonoBehaviour {
 		GameInterface.troopDDownsAreStale = true;
 		//remove all references to this type
 		foreach (Faction f in instance.curData.factions) {
-			for(int i = 0; i < f.troopTree.Count; i++) {
-				if(f.troopTree[i] == targetTroop.ID) {
-					f.troopTree[i] = instance.LastRelevantTType.ID;
+			for(int i = 0; i < f.troopLine.Count; i++) {
+				if(f.troopLine[i] == targetTroop.ID) {
+					f.troopLine[i] = instance.LastRelevantTType.ID;
 				}
 			}
 		}
 	}
+
+	#region game data getters
 
 	public static int GetUnusedFactionID() {
 		int freeID = 0;
@@ -330,18 +333,14 @@ public class GameController : MonoBehaviour {
 		return -1;
 	}
 
-	/// <summary>
-	/// returns true if curData exists; shows a modal warning and returns false otherwise
-	/// </summary>
-	/// <returns></returns>
-	public static bool GuardGameDataExist() {
-		if(instance.curData != null) {
-			return true;
+	public static List<Zone> GetZonesOwnedByFaction(Faction fac) {
+		List<Zone> returnedList = new List<Zone>();
+		foreach(Zone z in instance.curData.zones) {
+			if(z.ownerFaction == fac.ID) {
+				returnedList.Add(z);
+			}
 		}
-		else {
-			ModalPanel.Instance().OkBox("No Game Data Found", "Unexpected: there is no current game data to save to/load from. Actions won't work properly. Please load or start a new game.");
-			return false;
-		}
+		return returnedList;
 	}
 
 	/// <summary>
@@ -353,14 +352,14 @@ public class GameController : MonoBehaviour {
 	/// <returns></returns>
 	public static int GetResultingPointsForZone(string ownerFaction, float zoneMult) {
 		Faction ownerFac = GetFactionByName(ownerFaction);
-		
-		if(ownerFac != null) {
+
+		if (ownerFac != null) {
 			return Mathf.RoundToInt(instance.curData.rules.baseZonePointAwardOnTurnStart * ownerFac.multZonePointAwardOnTurnStart * zoneMult);
 		}
 		else {
 			return Mathf.RoundToInt(instance.curData.rules.baseZonePointAwardOnTurnStart * zoneMult);
 		}
-		
+
 	}
 
 	/// <summary>
@@ -381,4 +380,22 @@ public class GameController : MonoBehaviour {
 		}
 
 	}
+
+	#endregion
+
+	/// <summary>
+	/// returns true if curData exists; shows a modal warning and returns false otherwise
+	/// </summary>
+	/// <returns></returns>
+	public static bool GuardGameDataExist() {
+		if(instance.curData != null) {
+			return true;
+		}
+		else {
+			ModalPanel.Instance().OkBox("No Game Data Found", "Unexpected: there is no current game data to save to/load from. Actions won't work properly. Please load or start a new game.");
+			return false;
+		}
+	}
+
+
 }

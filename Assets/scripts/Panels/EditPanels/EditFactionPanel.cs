@@ -27,7 +27,7 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 		turnPriorityField.text = dataBeingEdited.turnPriority.ToString();
         factionColorImg.color = dataBeingEdited.color;
 		//factionIconImg.sprite = TODO get icon by path to file
-		troopTreePanel.ImportTroopTreeData(dataBeingEdited.troopTree, dataBeingEdited.maxGarrisonedTroopTier);
+		troopTreePanel.ImportTroopTreeData(dataBeingEdited.troopLine, dataBeingEdited.maxGarrisonedTroopTier);
 		isDirty = false;
     }
 
@@ -70,11 +70,13 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 		dataBeingEdited.extraMaxCommanders = int.Parse(maxCmdsField.text);
 		dataBeingEdited.turnPriority = int.Parse(turnPriorityField.text);
 		dataBeingEdited.maxGarrisonedTroopTier = int.Parse(troopTreePanel.maxGarrTroopLvlText.text);
-		dataBeingEdited.troopTree = troopTreePanel.BakeIntoTroopTree();
+		dataBeingEdited.troopLine = troopTreePanel.BakeIntoTroopTree();
 		GameInterface.factionDDownsAreStale = true;
 		gameObject.SetActive(false);
 		OnWindowIsClosing();
-    }
+		GameController.instance.facMatsHandler.ReBakeFactionColorsDict();
+		World.RefreshZoneSpotsOwnedByFaction(dataBeingEdited);
+	}
 
 	public void JustClose() {
 		gameObject.SetActive(false);

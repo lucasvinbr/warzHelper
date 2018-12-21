@@ -87,6 +87,15 @@ public class World : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// makes all zoneSpots use the respective faction's colors
+	/// </summary>
+	public static void RefreshZoneSpotsOwnedByFaction(Faction fac) {
+		foreach(Zone z in GameController.GetZonesOwnedByFaction(fac)) {
+			z.MyZoneSpot.RefreshDataDisplay();
+		}
+	}
+
+	/// <summary>
 	/// place a zone using its saved coordinates
 	/// </summary>
 	/// <param name="targetZone"></param>
