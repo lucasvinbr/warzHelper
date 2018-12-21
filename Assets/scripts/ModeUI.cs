@@ -4,7 +4,16 @@ using UnityEngine;
 
 public abstract class ModeUI : MonoBehaviour {
 
-    abstract public void ShowInitialUI();
+	[HideInInspector]
+	public GameObject curDisplayedLowerHUD;
+
+	abstract public void ShowInitialUI();
 
 	abstract public void ClearUI();
+
+	public virtual void SetDisplayedLowerHUD(GameObject targetHUD) {
+		if(curDisplayedLowerHUD) curDisplayedLowerHUD.SetActive(false);
+		curDisplayedLowerHUD = targetHUD;
+		curDisplayedLowerHUD.SetActive(true);
+	}
 }

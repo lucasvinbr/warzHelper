@@ -6,6 +6,8 @@ public class TemplateModeUI : ModeUI {
 
 	public GenericOverlayPanel tempSaveOptionsPanel;
 
+	public GameObject mainLowerHUD, zoneLinkingLowerHUD;
+
 	public override void ClearUI() {
 		World.CleanZonesContainer();
 		World.ToggleWorldDisplay(false);
@@ -19,5 +21,8 @@ public class TemplateModeUI : ModeUI {
 		World.SetupAllZonesFromData();
 		World.LinkAllZonesFromData();
 		World.SetGroundSizeAccordingToRules();
+		SetDisplayedLowerHUD(mainLowerHUD);
     }
+
+
 }

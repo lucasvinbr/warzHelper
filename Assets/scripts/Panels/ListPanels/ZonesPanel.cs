@@ -20,4 +20,13 @@ public class ZonesPanel : ListContainerPanel<Zone> {
 		World.BeginNewZonePlacement();
 		gameObject.SetActive(false);
 	}
+
+	public void EditZoneLinks() {
+		GameInterface.instance.DisableAndStoreAllOpenOverlayPanels();
+		TemplateModeUI templateUI = GameInterface.instance.templateOptionsPanel as TemplateModeUI;
+		templateUI.SetDisplayedLowerHUD(templateUI.zoneLinkingLowerHUD);
+		World.BeginZoneLinking(() => {
+			GameInterface.instance.RestoreOpenOverlayPanels();
+		});
+	}
 }

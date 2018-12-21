@@ -14,6 +14,8 @@ public class World : MonoBehaviour {
 
     public ZonePlacer zonePlacerScript;
 
+	public ZoneLinker zoneLinkerScript;
+
     void Awake()
     {
         instance = this;
@@ -43,6 +45,10 @@ public class World : MonoBehaviour {
 
 	public static void BeginCustomZonePlacement(UnityAction actionOnConfirmPlacement) {
 		instance.zonePlacerScript.StartCustomPlacement(actionOnConfirmPlacement);
+	}
+
+	public static void BeginZoneLinking(UnityAction actionOnDoneLinking) {
+		instance.zoneLinkerScript.StartZoneLinking(actionOnDoneLinking);
 	}
 
     public static void CreateNewZoneAtPoint(Vector3 point, bool autoOpenEditMenu = true)

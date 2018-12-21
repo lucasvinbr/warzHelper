@@ -131,12 +131,6 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		});
     }
 
-	public void EditZoneLinks() {
-		//TODO menu closes, zone linking mode is activated.
-		//clicking another zone will create a link between this zone and the target.
-		//menu opens again once a "done" button is clicked or ESC is pressed
-	}
-
 	public override void OnWindowIsClosing() {
 		World.GetZoneSpotByZoneName(dataBeingEdited.name).transform.position = dataBeingEdited.CoordsForWorld;
 		base.OnWindowIsClosing();
