@@ -173,9 +173,13 @@ public class GameController : MonoBehaviour {
 
 
 	public static void RemoveFaction(Faction targetFaction) {
+		foreach(Zone z in GetZonesOwnedByFaction(targetFaction)) {
+			z.ownerFaction = -1;
+		}
 		instance.curData.factions.Remove(targetFaction);
 		GameInterface.factionDDownsAreStale = true;
 		//TODO set all zones controlled by this faction as neutral
+		
 	}
 
 	public static void RemoveZone(Zone targetZone) {
@@ -379,6 +383,22 @@ public class GameController : MonoBehaviour {
 			return Mathf.RoundToInt(instance.curData.rules.baseMaxUnitsInOneGarrison * zoneMult);
 		}
 
+	}
+
+	public static bool AreZonesLinked(Zone z1, Zone z2) {
+		foreach(int i in z1.linkedZones) {
+			if(GetZoneByID(i) == z2) {
+				return true;
+			}
+		}
+
+		foreach (int i in z2.linkedZones) {
+			if (GetZoneByID(i) == z1) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	#endregion

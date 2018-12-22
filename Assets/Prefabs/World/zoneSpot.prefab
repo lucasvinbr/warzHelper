@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4407485219502782}
   - component: {fileID: 65896056478444728}
   - component: {fileID: 114919923362029962}
-  m_Layer: 2
+  m_Layer: 8
   m_Name: zoneSpot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -36,7 +36,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4427111437474500}
-  m_Layer: 2
+  m_Layer: 8
   m_Name: zoneLabelPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53,7 +53,7 @@ GameObject:
   - component: {fileID: 4514722222547076}
   - component: {fileID: 33114200050774652}
   - component: {fileID: 23395539876857084}
-  m_Layer: 2
+  m_Layer: 8
   m_Name: zoneMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

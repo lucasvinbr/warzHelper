@@ -10,6 +10,7 @@ public class TemplateModeUI : ModeUI {
 
 	public override void ClearUI() {
 		World.CleanZonesContainer();
+		World.CleanZoneLinks();
 		World.ToggleWorldDisplay(false);
 		tempSaveOptionsPanel.gameObject.SetActive(false);
 		GameController.instance.facMatsHandler.PurgeFactionColorsDict();
@@ -19,6 +20,7 @@ public class TemplateModeUI : ModeUI {
     {
 		GameController.instance.facMatsHandler.ReBakeFactionColorsDict();
 		World.CleanZonesContainer();
+		World.CleanZoneLinks();
 		World.ToggleWorldDisplay(true);
 		World.SetupAllZonesFromData();
 		World.LinkAllZonesFromData();

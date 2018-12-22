@@ -16,6 +16,10 @@ public class World : MonoBehaviour {
 
 	public ZoneLinker zoneLinkerScript;
 
+	public ZoneGrowOnHover zoneGrowScript;
+
+	public List<LinkLine> linkLines = new List<LinkLine>();
+
     void Awake()
     {
         instance = this;
@@ -33,10 +37,24 @@ public class World : MonoBehaviour {
 		instance.zonesContainer.gameObject.SetActive(active);
     }
 
+	/// <summary>
+	/// destroys all zone spots
+	/// </summary>
 	public static void CleanZonesContainer() {
 		for(int i = 0; i < instance.zonesContainer.childCount; i++) {
 			Destroy(instance.zonesContainer.GetChild(i).gameObject);
 		}
+	}
+
+	/// <summary>
+	/// destroys (pools) all zone links
+	/// </summary>
+	public static void CleanZoneLinks() {
+		foreach(LinkLine line in instance.linkLines) {
+			LinkLineRecycler.instance.PoolObj(line);
+		}
+
+		instance.linkLines.Clear();
 	}
 
 	public static void BeginNewZonePlacement() {
@@ -83,7 +101,58 @@ public class World : MonoBehaviour {
 	}
 
 	public static void LinkAllZonesFromData() {
-		Debug.Log("TODO Zone linking");
+		List<Zone> zones = GameController.instance.curData.zones;
+		Zone theLinkedZone = null;
+		foreach(Zone z in zones) {
+			foreach(int linkedZoneID in z.linkedZones) {
+				theLinkedZone = GameController.GetZoneByID(linkedZoneID);
+				if (GetLinkLineBetween(z, theLinkedZone)) {
+					continue;
+				}else {
+					PlaceZoneLink(z, theLinkedZone);
+				}
+			}
+		}
+	}
+
+	public static void PlaceZoneLink(Zone z1, Zone z2, bool alsoUpdateTheirLinkedList = false) {
+		LinkLine theLink = LinkLineRecycler.GetALine();
+		theLink.SetLink(z1.MyZoneSpot, z2.MyZoneSpot);
+		instance.linkLines.Add(theLink);
+		if (alsoUpdateTheirLinkedList) {
+			z1.linkedZones.Add(z2.ID);
+			z2.linkedZones.Add(z1.ID);
+		}
+	}
+
+	public static void PlaceZoneLink(ZoneSpot z1, ZoneSpot z2, bool alsoUpdateTheirLinkedList = false) {
+		LinkLine theLink = LinkLineRecycler.GetALine();
+		theLink.SetLink(z1, z2);
+		instance.linkLines.Add(theLink);
+		if (alsoUpdateTheirLinkedList) {
+			z1.data.linkedZones.Add(z2.data.ID);
+			z2.data.linkedZones.Add(z1.data.ID);
+		}
+	}
+
+	public static void RemoveZoneLink(Zone z1, Zone z2, bool alsoUpdateTheirLinkedList = false) {
+		LinkLine theLink = GetLinkLineBetween(z1, z2);
+		LinkLineRecycler.instance.PoolObj(theLink);
+		instance.linkLines.Remove(theLink);
+		if (alsoUpdateTheirLinkedList) {
+			z1.linkedZones.Remove(z2.ID);
+			z2.linkedZones.Remove(z1.ID);
+		}
+	}
+
+	public static LinkLine GetLinkLineBetween(Zone z1, Zone z2) {
+		foreach(LinkLine line in instance.linkLines) {
+			if(line.LinksZone(z1) && line.LinksZone(z2)) {
+				return line;
+			}
+		}
+
+		return null;
 	}
 
 	/// <summary>
