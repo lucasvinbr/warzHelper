@@ -18,7 +18,7 @@ public class World : MonoBehaviour {
 
 	public ZoneGrowOnHover zoneGrowScript;
 
-	public List<LinkLine> linkLines = new List<LinkLine>();
+	private List<LinkLine> linkLines = new List<LinkLine>();
 
     void Awake()
     {
@@ -135,6 +135,12 @@ public class World : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// destroys (pools) the link line between two zones, optionally updating both their linkedZones list
+	/// </summary>
+	/// <param name="z1"></param>
+	/// <param name="z2"></param>
+	/// <param name="alsoUpdateTheirLinkedList"></param>
 	public static void RemoveZoneLink(Zone z1, Zone z2, bool alsoUpdateTheirLinkedList = false) {
 		LinkLine theLink = GetLinkLineBetween(z1, z2);
 		LinkLineRecycler.instance.PoolObj(theLink);
@@ -172,6 +178,8 @@ public class World : MonoBehaviour {
     {
 		GameObject newSpot = Instantiate(instance.zonePrefab, targetZone.CoordsForWorld, Quaternion.identity);
 		newSpot.transform.parent = instance.zonesContainer;
-		newSpot.GetComponent<ZoneSpot>().data = targetZone;
+		ZoneSpot zsScript = newSpot.GetComponent<ZoneSpot>();
+		zsScript.data = targetZone;
+		zsScript.RefreshDataDisplay();
 	}
 }

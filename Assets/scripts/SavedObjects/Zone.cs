@@ -67,6 +67,9 @@ public class Zone {
 	/// </summary>
 	public Vector2 coords;
 
+	/// <summary>
+	/// coords for placing the zone in the world, using the saved y coord as z
+	/// </summary>
 	public Vector3 CoordsForWorld{
 		get{
 			return Vector3.right * coords.x + Vector3.forward * coords.y;
@@ -111,6 +114,7 @@ public class Zone {
 		this.name = name;
 		this.ownerFaction = -1;
 		troopsGarrisoned = new List<TroopNumberPair>();
+		linkedZones = new List<int>();
 		while (GameController.GetZoneByName(this.name) != null) {
 			this.name = name + " copy";
 		}

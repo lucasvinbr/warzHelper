@@ -171,20 +171,29 @@ public class GameController : MonoBehaviour {
 
     }
 
-
+	/// <summary>
+	/// removes the faction from the game data and sets all of the faction's owned zones to neutral
+	/// </summary>
+	/// <param name="targetFaction"></param>
 	public static void RemoveFaction(Faction targetFaction) {
 		foreach(Zone z in GetZonesOwnedByFaction(targetFaction)) {
 			z.ownerFaction = -1;
+			z.MyZoneSpot.RefreshDataDisplay();
 		}
 		instance.curData.factions.Remove(targetFaction);
 		GameInterface.factionDDownsAreStale = true;
-		//TODO set all zones controlled by this faction as neutral
-		
 	}
 
 	public static void RemoveZone(Zone targetZone) {
+		foreach (Zone z in instance.curData.zones) {
+			if (z.linkedZones.Contains(targetZone.ID)) {
+				World.RemoveZoneLink(z, targetZone, true);
+			}
+		}
+
 		instance.curData.zones.Remove(targetZone);
 		//TODO all zones should check their links
+		
 	}
 
 	public static void RemoveTroopType(TroopType targetTroop) {

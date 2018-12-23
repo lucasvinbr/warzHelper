@@ -37,4 +37,12 @@ public class ZoneGrowOnHover : MonoBehaviour {
 
     }
 
+
+	private void OnDisable() {
+		if (curHoveredZone) {
+			curHoveredZone.localScale = Vector3.one;
+			curHoveredZone = null;
+		}
+	}
+
 }

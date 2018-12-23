@@ -29,10 +29,15 @@ public class LinkLine : MonoBehaviour {
 
 	public void SetLink(ZoneSpot z1, ZoneSpot z2) {
 		GuardSetup();
+		
 		zonesLinked[0] = z1;
 		zonesLinked[1] = z2;
-		line.SetPosition(0, z1.transform.position + Vector3.up * LINE_Y_OFFSET);
-		line.SetPosition(1, z2.transform.position + Vector3.up * LINE_Y_OFFSET);
+		UpdatePositions();
+	}
+
+	public void UpdatePositions() {
+		line.SetPosition(0, zonesLinked[0].transform.position + Vector3.up * LINE_Y_OFFSET);
+		line.SetPosition(1, zonesLinked[1].transform.position + Vector3.up * LINE_Y_OFFSET);
 	}
 
 	/// <summary>

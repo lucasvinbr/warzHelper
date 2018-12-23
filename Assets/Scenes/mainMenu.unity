@@ -1884,7 +1884,6 @@ MonoBehaviour:
   zonePlacerScript: {fileID: 89978992}
   zoneLinkerScript: {fileID: 89978993}
   zoneGrowScript: {fileID: 89978995}
-  linkLines: []
 --- !u!4 &89978991
 Transform:
   m_ObjectHideFlags: 0
@@ -30974,6 +30973,7 @@ GameObject:
   - component: {fileID: 1269149288}
   - component: {fileID: 1269149287}
   - component: {fileID: 1269149291}
+  - component: {fileID: 1269149289}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -31035,6 +31035,20 @@ Behaviour:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1269149285}
   m_Enabled: 1
+--- !u!114 &1269149289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1269149285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ff4590a1f31d324394b198a3fd862ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minZoom: 10
+  maxZoom: 100
+  zoomSpeed: 10
 --- !u!4 &1269149290
 Transform:
   m_ObjectHideFlags: 0

@@ -22,11 +22,9 @@ public class ZonesPanel : ListContainerPanel<Zone> {
 	}
 
 	public void EditZoneLinks() {
-		GameInterface.instance.DisableAndStoreAllOpenOverlayPanels();
+		gameObject.SetActive(false);
 		TemplateModeUI templateUI = GameInterface.instance.templateOptionsPanel as TemplateModeUI;
 		templateUI.SetDisplayedLowerHUD(templateUI.zoneLinkingLowerHUD);
-		World.BeginZoneLinking(() => {
-			GameInterface.instance.RestoreOpenOverlayPanels();
-		});
+		World.BeginZoneLinking(null);
 	}
 }

@@ -9,6 +9,9 @@ public class TemplateModeUI : ModeUI {
 	public GameObject mainLowerHUD, zoneLinkingLowerHUD;
 
 	public override void ClearUI() {
+		if (World.instance.zoneLinkerScript.enabled) {
+			World.instance.zoneLinkerScript.DoneLinking();
+		}
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
 		World.ToggleWorldDisplay(false);

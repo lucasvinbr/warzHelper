@@ -88,6 +88,10 @@ public class EditZonePanel : EditDataPanel<Zone> {
 	public void CloseWithoutSaving() {
 		gameObject.SetActive(false);
 		dataBeingEdited.MyZoneSpot.transform.position = dataBeingEdited.CoordsForWorld;
+		foreach (int zoneID in dataBeingEdited.linkedZones) {
+			Zone linkedZone = GameController.GetZoneByID(zoneID);
+			World.GetLinkLineBetween(dataBeingEdited, linkedZone).UpdatePositions();
+		}
 		OnWindowIsClosing();
 	}
 
@@ -130,6 +134,10 @@ public class EditZonePanel : EditDataPanel<Zone> {
 			World.instance.zonePlacerScript.zoneBlueprint.position;
 			isDirty = true;
 			GameInterface.instance.RestoreOpenOverlayPanels();
+			foreach(int zoneID in dataBeingEdited.linkedZones) {
+				Zone linkedZone = GameController.GetZoneByID(zoneID);
+				World.GetLinkLineBetween(dataBeingEdited, linkedZone).UpdatePositions();
+			}
 		});
     }
 
