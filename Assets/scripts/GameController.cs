@@ -47,7 +47,7 @@ public class GameController : MonoBehaviour {
 
     public void StartNewGame(bool isTemplate)
     {
-        GameInterface.instance.textInputPanel.SetPanelInfo("Please provide a name for this game", "Confirm", () =>
+        GameInterface.instance.textInputPanel.SetPanelInfo("Please provide a name for this save", "Confirm", () =>
         {
             string gameName = GameInterface.instance.textInputPanel.theInputField.text;
             if (!PersistenceHandler.IsAValidFilename(gameName))
@@ -82,18 +82,17 @@ public class GameController : MonoBehaviour {
 					PersistenceHandler.CreateDirIfNotExists(PersistenceHandler.templatesDirectory);
                     PersistenceHandler.SaveToFile(curData, PersistenceHandler.templatesDirectory + gameName + ".xml");
                     Debug.Log("saved new template");
-                }
+					GameInterface.instance.SwitchInterface(GameInterface.InterfaceMode.template);
+				}
                 else
                 {
                     curData = new GameInfo(gameName);
-					PersistenceHandler.CreateDirIfNotExists(PersistenceHandler.gamesDirectory);
-					PersistenceHandler.SaveToFile(curData, PersistenceHandler.gamesDirectory + gameName + ".xml");
-                    Debug.Log("saved new game");
+					GameInterface.instance.OpenLoadTemplateForNewGame();
+
                 }
 
                 GameInterface.instance.textInputPanel.Close();
 
-				GameInterface.instance.SwitchInterface(isTemplate ? GameInterface.InterfaceMode.template : GameInterface.InterfaceMode.game);
 			}
 
 
@@ -101,16 +100,46 @@ public class GameController : MonoBehaviour {
         GameInterface.instance.textInputPanel.Open();
     }
 
-	public void LoadData(string gameName, bool isTemplate = false)
+	public void LoadDataAndStartGame(string gameName, bool isTemplate = false)
     {
 		string fileDir = (isTemplate ? PersistenceHandler.templatesDirectory : PersistenceHandler.gamesDirectory) + gameName + ".xml";
         curData = PersistenceHandler.LoadFromFile<TemplateInfo>(fileDir);
 		if(curData != null) {
-			Debug.Log("loaded game: " + curData.gameName);
+			Debug.Log("loaded game/template: " + curData.gameName);
 			GameInterface.instance.HideObject(GameInterface.instance.saveListPanel.gameObject);
 			GameInterface.instance.SwitchInterface(isTemplate ? GameInterface.InterfaceMode.template : GameInterface.InterfaceMode.game);
 		}
     }
+
+	/// <summary>
+	/// gets a template's data and uses it in the creation of a new game.
+	/// this method assumes the game has already been created and just needs the data import from
+	/// the template
+	/// </summary>
+	/// <param name="templateName"></param>
+	public void ImportTemplateDataAndStartGame(string templateName) {
+		string fileDir = PersistenceHandler.templatesDirectory + templateName + ".xml";
+		TemplateInfo loadedTemplate = PersistenceHandler.LoadFromFile<TemplateInfo>(fileDir);
+		if (curData != null) {
+			Debug.Log("loaded template for game: " + curData.gameName);
+			GameInterface.instance.HideObject(GameInterface.instance.saveListPanel.gameObject);
+		}
+		(curData as GameInfo).ImportDataFromTemplate(loadedTemplate);
+		PersistenceHandler.CreateDirIfNotExists(PersistenceHandler.gamesDirectory);
+		PersistenceHandler.SaveToFile(curData, PersistenceHandler.gamesDirectory + curData.gameName + ".xml");
+		Debug.Log("saved new game");
+		GameInterface.instance.SwitchInterface(GameInterface.InterfaceMode.game);
+	}
+
+	/// <summary>
+	/// runs a straightforward template load, nothing else
+	/// </summary>
+	/// <param name="gameName"></param>
+	/// <returns></returns>
+	public TemplateInfo TryLoadTemplate(string gameName) {
+		string fileDir = PersistenceHandler.templatesDirectory + gameName + ".xml";
+		return PersistenceHandler.LoadFromFile<TemplateInfo>(fileDir);
+	}
 
     public void SaveGame()
     {
@@ -171,12 +200,14 @@ public class GameController : MonoBehaviour {
 
     }
 
+
+	#region game data removal
 	/// <summary>
 	/// removes the faction from the game data and sets all of the faction's owned zones to neutral
 	/// </summary>
 	/// <param name="targetFaction"></param>
 	public static void RemoveFaction(Faction targetFaction) {
-		foreach(Zone z in GetZonesOwnedByFaction(targetFaction)) {
+		foreach(Zone z in targetFaction.OwnedZones) {
 			z.ownerFaction = -1;
 			z.MyZoneSpot.RefreshDataDisplay();
 		}
@@ -191,9 +222,7 @@ public class GameController : MonoBehaviour {
 			}
 		}
 
-		instance.curData.zones.Remove(targetZone);
-		//TODO all zones should check their links
-		
+		instance.curData.zones.Remove(targetZone);		
 	}
 
 	public static void RemoveTroopType(TroopType targetTroop) {
@@ -209,6 +238,8 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	#endregion
+
 	#region game data getters
 
 	public static int GetUnusedFactionID() {
@@ -223,6 +254,15 @@ public class GameController : MonoBehaviour {
 	public static int GetUnusedZoneID() {
 		int freeID = 0;
 		while (GetZoneByID(freeID) != null) {
+			freeID++;
+		}
+
+		return freeID;
+	}
+
+	public static int GetUnusedCmderID() {
+		int freeID = 0;
+		while (GetCmderByID(freeID) != null) {
 			freeID++;
 		}
 
@@ -255,6 +295,17 @@ public class GameController : MonoBehaviour {
 		for (int i = 0; i < zoneList.Count; i++) {
 			if (zoneList[i].ID == zoneID) {
 				return zoneList[i];
+			}
+		}
+
+		return null;
+	}
+
+	public static Commander GetCmderByID(int cmderID) {
+		List<Commander> cmderList = instance.curData.deployedCommanders;
+		for (int i = 0; i < cmderList.Count; i++) {
+			if (cmderList[i].ID == cmderID) {
+				return cmderList[i];
 			}
 		}
 
@@ -346,14 +397,33 @@ public class GameController : MonoBehaviour {
 		return -1;
 	}
 
-	public static List<Zone> GetZonesOwnedByFaction(Faction fac) {
-		List<Zone> returnedList = new List<Zone>();
-		foreach(Zone z in instance.curData.zones) {
-			if(z.ownerFaction == fac.ID) {
-				returnedList.Add(z);
+	/// <summary>
+	/// returns the faction which should be next in turn order.
+	/// if there is no faction with higher TP, returns the first fac in the order
+	/// </summary>
+	/// <param name="turnPriotity"></param>
+	/// <returns></returns>
+	public static Faction GetNextFactionInTurnOrder(int turnPriotity) {
+		Faction returnedFac = null;
+
+		foreach(Faction f in instance.curData.factions) {
+			if(f.turnPriority > turnPriotity) {
+				if(returnedFac != null) {
+					if(returnedFac.turnPriority > f.turnPriority) {
+						returnedFac = f;
+					}
+				}
+				else {
+					returnedFac = f;
+				}
 			}
 		}
-		return returnedList;
+
+		if(returnedFac == null) {
+			returnedFac = GetNextFactionInTurnOrder(-99999999);
+		}
+
+		return returnedFac;
 	}
 
 	/// <summary>
@@ -394,6 +464,8 @@ public class GameController : MonoBehaviour {
 
 	}
 
+	#endregion
+
 	public static bool AreZonesLinked(Zone z1, Zone z2) {
 		foreach(int i in z1.linkedZones) {
 			if(GetZoneByID(i) == z2) {
@@ -410,7 +482,40 @@ public class GameController : MonoBehaviour {
 		return false;
 	}
 
-	#endregion
+	/// <summary>
+	/// gets the zone spots from the provided zones
+	/// </summary>
+	/// <param name="zones"></param>
+	/// <returns></returns>
+	public List<ZoneSpot> ZonesToZoneSpots(List<Zone> zones) {
+		List<ZoneSpot> returnedList = new List<ZoneSpot>();
+
+		foreach(Zone z in zones) {
+			returnedList.Add(z.MyZoneSpot);
+		}
+
+		return returnedList;
+	}
+
+	/// <summary>
+	/// eliminates turn priority conflicts due to the same turn priority value
+	/// being assigned to two or more factions
+	/// </summary>
+	public static void MakeFactionTurnPrioritiesUnique() {
+		List<Faction> facList = instance.curData.factions;
+		facList.Sort(SortByTurnPriority);
+		int curComparedTP = facList[0].turnPriority;
+		for(int i = 1; i < facList.Count; i++) {
+			if(facList[i].turnPriority <= curComparedTP) {
+				curComparedTP++;
+				facList[i].turnPriority = curComparedTP;
+			}
+		}
+	}
+
+	public static int SortByTurnPriority(Faction x, Faction y) {
+		return x.turnPriority.CompareTo(y.turnPriority);
+	}
 
 	/// <summary>
 	/// returns true if curData exists; shows a modal warning and returns false otherwise

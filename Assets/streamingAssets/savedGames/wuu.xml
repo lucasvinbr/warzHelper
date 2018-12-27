@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TemplateInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="GameInfo">
+  <gameName>wuu</gameName>
+  <isATemplate>false</isATemplate>
+  <rules>
+    <autoResolveBattleDieSides>6</autoResolveBattleDieSides>
+    <baseCommanderPointAwardOnTurnStart>50</baseCommanderPointAwardOnTurnStart>
+    <baseZonePointAwardOnTurnStart>50</baseZonePointAwardOnTurnStart>
+    <baseMaxUnitsUnderOneCommander>60</baseMaxUnitsUnderOneCommander>
+    <baseMaxUnitsInOneGarrison>90</baseMaxUnitsInOneGarrison>
+    <baseMaxCommandersPerFaction>5</baseMaxCommandersPerFaction>
+    <boardDimensions>
+      <x>20</x>
+      <y>100</y>
+    </boardDimensions>
+    <boardTexturePath />
+  </rules>
+  <factions>
+    <Faction>
+      <ID>0</ID>
+      <name>New Faction</name>
+      <extraInfo />
+      <isPlayer>false</isPlayer>
+      <color>
+        <r>0.6184792</r>
+        <g>0.593948245</g>
+        <b>0.7397496</b>
+        <a>1</a>
+      </color>
+      <turnPriority>0</turnPriority>
+      <multCommanderPointAwardOnTurnStart>1</multCommanderPointAwardOnTurnStart>
+      <multZonePointAwardOnTurnStart>1</multZonePointAwardOnTurnStart>
+      <multMaxUnitsUnderOneCommander>1</multMaxUnitsUnderOneCommander>
+      <multMaxUnitsInOneGarrison>1</multMaxUnitsInOneGarrison>
+      <extraMaxCommanders>0</extraMaxCommanders>
+      <maxGarrisonedTroopTier>2</maxGarrisonedTroopTier>
+      <troopLine>
+        <int>1</int>
+        <int>2</int>
+        <int>3</int>
+      </troopLine>
+    </Faction>
+    <Faction>
+      <ID>1</ID>
+      <name>Faktionnen</name>
+      <extraInfo />
+      <isPlayer>false</isPlayer>
+      <color>
+        <r>0.7486254</r>
+        <g>1</g>
+        <b>1</b>
+        <a>1</a>
+      </color>
+      <turnPriority>0</turnPriority>
+      <multCommanderPointAwardOnTurnStart>1</multCommanderPointAwardOnTurnStart>
+      <multZonePointAwardOnTurnStart>1</multZonePointAwardOnTurnStart>
+      <multMaxUnitsUnderOneCommander>1</multMaxUnitsUnderOneCommander>
+      <multMaxUnitsInOneGarrison>1</multMaxUnitsInOneGarrison>
+      <extraMaxCommanders>0</extraMaxCommanders>
+      <maxGarrisonedTroopTier>2</maxGarrisonedTroopTier>
+      <troopLine>
+        <int>0</int>
+        <int>4</int>
+      </troopLine>
+    </Faction>
+  </factions>
+  <zones>
+    <Zone>
+      <ID>0</ID>
+      <name>zoneman</name>
+      <extraInfo>entetext you wish spoken heri</extraInfo>
+      <ownerFaction>0</ownerFaction>
+      <pictureFilePath />
+      <linkedZones>
+        <int>2</int>
+        <int>1</int>
+        <int>3</int>
+      </linkedZones>
+      <multTrainingPoints>1</multTrainingPoints>
+      <multRecruitmentPoints>1.4</multRecruitmentPoints>
+      <multMaxUnitsInGarrison>1</multMaxUnitsInGarrison>
+      <pointsGivenAtGameStart>90</pointsGivenAtGameStart>
+      <coords>
+        <x>-1.691229</x>
+        <y>0.2624279</y>
+      </coords>
+      <pointsToSpend>0</pointsToSpend>
+      <troopsGarrisoned />
+    </Zone>
+    <Zone>
+      <ID>2</ID>
+      <name>São Felix o Eremita Foda vei, mto fodaaaa</name>
+      <extraInfo />
+      <ownerFaction>0</ownerFaction>
+      <pictureFilePath />
+      <linkedZones>
+        <int>0</int>
+        <int>1</int>
+        <int>3</int>
+      </linkedZones>
+      <multTrainingPoints>1</multTrainingPoints>
+      <multRecruitmentPoints>1</multRecruitmentPoints>
+      <multMaxUnitsInGarrison>1</multMaxUnitsInGarrison>
+      <pointsGivenAtGameStart>90</pointsGivenAtGameStart>
+      <coords>
+        <x>-3.79518247</x>
+        <y>-6.533417</y>
+      </coords>
+      <pointsToSpend>0</pointsToSpend>
+      <troopsGarrisoned />
+    </Zone>
+    <Zone>
+      <ID>3</ID>
+      <name>Neutralle</name>
+      <extraInfo />
+      <ownerFaction>1</ownerFaction>
+      <pictureFilePath />
+      <linkedZones>
+        <int>1</int>
+        <int>0</int>
+        <int>2</int>
+      </linkedZones>
+      <multTrainingPoints>1</multTrainingPoints>
+      <multRecruitmentPoints>1</multRecruitmentPoints>
+      <multMaxUnitsInGarrison>1</multMaxUnitsInGarrison>
+      <pointsGivenAtGameStart>900</pointsGivenAtGameStart>
+      <coords>
+        <x>3.219837</x>
+        <y>-8.980681</y>
+      </coords>
+      <pointsToSpend>0</pointsToSpend>
+      <troopsGarrisoned />
+    </Zone>
+    <Zone>
+      <ID>1</ID>
+      <name>ggg</name>
+      <extraInfo />
+      <ownerFaction>-1</ownerFaction>
+      <pictureFilePath />
+      <linkedZones>
+        <int>2</int>
+        <int>3</int>
+        <int>0</int>
+      </linkedZones>
+      <multTrainingPoints>1</multTrainingPoints>
+      <multRecruitmentPoints>1</multRecruitmentPoints>
+      <multMaxUnitsInGarrison>1</multMaxUnitsInGarrison>
+      <pointsGivenAtGameStart>0</pointsGivenAtGameStart>
+      <coords>
+        <x>6.823234</x>
+        <y>-2.62432384</y>
+      </coords>
+      <pointsToSpend>0</pointsToSpend>
+      <troopsGarrisoned />
+    </Zone>
+  </zones>
+  <troopTypes>
+    <TroopType>
+      <ID>1</ID>
+      <name>New Factionist Recruit</name>
+      <autoResolvePower>1</autoResolvePower>
+      <pointCost>2</pointCost>
+      <extraInfo />
+    </TroopType>
+    <TroopType>
+      <ID>2</ID>
+      <name>New Factionist Soldier</name>
+      <autoResolvePower>1.5</autoResolvePower>
+      <pointCost>2</pointCost>
+      <extraInfo />
+    </TroopType>
+    <TroopType>
+      <ID>3</ID>
+      <name>New Factionist Elite</name>
+      <autoResolvePower>3</autoResolvePower>
+      <pointCost>2</pointCost>
+      <extraInfo />
+    </TroopType>
+    <TroopType>
+      <ID>0</ID>
+      <name>Faktion Rekrut</name>
+      <autoResolvePower>0.8</autoResolvePower>
+      <pointCost>1</pointCost>
+      <extraInfo />
+    </TroopType>
+    <TroopType>
+      <ID>4</ID>
+      <name>Faktion Kampfer</name>
+      <autoResolvePower>1.1</autoResolvePower>
+      <pointCost>1</pointCost>
+      <extraInfo />
+    </TroopType>
+  </troopTypes>
+  <deployedCommanders />
+  <lastTurnPriority>-1</lastTurnPriority>
+  <elapsedTurns>0</elapsedTurns>
+</TemplateInfo>

@@ -30,4 +30,8 @@ public class TabToggleGroup : MonoBehaviour {
 			theT.onValueChanged.Invoke(theT.isOn); //run it, just to make sure only one tab's contents are accessible
 		}
 	}
+
+	public void ToggleTabIndex(int tabIndex) {
+		theToggleTabHeaders[tabIndex].isOn = true;
+	}
 }

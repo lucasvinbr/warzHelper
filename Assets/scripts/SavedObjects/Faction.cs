@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 
 public class Faction
@@ -66,16 +67,6 @@ public class Faction
 	public int extraMaxCommanders = 0;
 
 	/// <summary>
-	/// when a new commander is created, it will automatically receive, and spend, this many points on recruitment
-	/// </summary>
-	public int newCommanderRecruitmentPoints;
-
-	/// <summary>
-	/// when a new commander is created, it will automatically receive, and spend, this many points on training
-	/// </summary>
-	public int newCommanderTrainingPoints;
-
-	/// <summary>
 	/// if set to a number that's greater than or equal to 0,
 	/// this will restrict the auto training that occurs in full garrisons:
 	/// troops won't upgrade past this specified index of the TroopTree list
@@ -100,4 +91,45 @@ public class Faction
 	}
 
 	public Faction() {}
+
+	[XmlIgnore]
+	public List<Zone> OwnedZones
+	{
+		get
+		{
+			List<Zone> returnedList = new List<Zone>();
+			foreach (Zone z in GameController.instance.curData.zones) {
+				if (z.ownerFaction == ID) {
+					returnedList.Add(z);
+				}
+			}
+			return returnedList;
+		}
+	}
+	[XmlIgnore]
+	public List<Commander> OwnedCommanders
+	{
+		get
+		{
+			List<Commander> returnedList = new List<Commander>();
+			foreach (Commander c in GameController.instance.curData.deployedCommanders) {
+				if (c.ownerFaction == ID) {
+					returnedList.Add(c);
+				}
+			}
+			return returnedList;
+		}
+	}
+
+	[XmlIgnore]
+	/// <summary>
+	/// considers the base max defined in the rules and this faction's extra max
+	/// </summary>
+	public int MaxCmders
+	{
+		get
+		{
+			return extraMaxCommanders + GameController.instance.curData.rules.baseMaxCommandersPerFaction;
+		}
+	}
 }

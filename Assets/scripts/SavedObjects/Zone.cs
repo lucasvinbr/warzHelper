@@ -67,6 +67,8 @@ public class Zone {
 	/// </summary>
 	public Vector2 coords;
 
+	public int pointsToSpend = 0;
+
 	/// <summary>
 	/// coords for placing the zone in the world, using the saved y coord as z
 	/// </summary>
@@ -121,5 +123,27 @@ public class Zone {
 		GameController.instance.curData.zones.Add(this);
 	}
 
+
+	/// <summary>
+	/// gets points according to our owner faction and our own factors
+	/// </summary>
+	public void GetPointAwardPoints() {
+
+	}
+
+	/// <summary>
+	/// if we're not neutral, uses the pointsToSpend to add more troops to the garrison
+	/// and upgrade them
+	/// </summary>
+	public void SpendPoints(bool useGraphicFX = false) {
+		if(ownerFaction >= 0 && pointsToSpend > 0) {
+			if (useGraphicFX) {
+
+				WorldFXManager.instance.EmitParticle(WorldFXManager.instance.bolsterParticle, MyZoneSpot.transform.position,
+					GameController.GetFactionByID(ownerFaction).color);
+			}
+		}
+		//TODO spend points haha
+	}
 	
 }

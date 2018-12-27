@@ -15,6 +15,8 @@ public class ZoneSpot : MonoBehaviour {
 
 	public Renderer spotRenderer;
 
+	public const float CMDER_OFFSET = 0.5f;
+
     void Start()
     {
 		RefreshDataDisplay();
@@ -57,5 +59,10 @@ public class ZoneSpot : MonoBehaviour {
 			gameObject.name = data.name;
         }
     }
+
+	public Vector3 GetGoodSpotForCommander() {
+		//TODO change this spot when more than 1 commander is here
+		return transform.position + Vector3.back * CMDER_OFFSET;
+	}
 
 }

@@ -18,7 +18,11 @@ public class World : MonoBehaviour {
 
 	public ZoneGrowOnHover zoneGrowScript;
 
+	public CommanderPlacer cmderPlacerScript;
+
 	private List<LinkLine> linkLines = new List<LinkLine>();
+
+	private List<Cmder3d> spawnedCmders = new List<Cmder3d>();
 
     void Awake()
     {
@@ -57,6 +61,14 @@ public class World : MonoBehaviour {
 		instance.linkLines.Clear();
 	}
 
+	public static void CleanCmders() {
+		foreach (Cmder3d cmder in instance.spawnedCmders) {
+			Cmder3dRecycler.instance.PoolObj(cmder);
+		}
+
+		instance.spawnedCmders.Clear();
+	}
+
 	public static void BeginNewZonePlacement() {
 		instance.zonePlacerScript.StartNewZonePlacement();
 	}
@@ -67,6 +79,10 @@ public class World : MonoBehaviour {
 
 	public static void BeginZoneLinking(UnityAction actionOnDoneLinking) {
 		instance.zoneLinkerScript.StartZoneLinking(actionOnDoneLinking);
+	}
+
+	public static void BeginNewCmderPlacement(UnityAction actionOnPlaced, List<ZoneSpot> allowedSpots) {
+		instance.cmderPlacerScript.StartNewPlacement(actionOnPlaced, allowedSpots);
 	}
 
     public static void CreateNewZoneAtPoint(Vector3 point, bool autoOpenEditMenu = true)
@@ -83,6 +99,14 @@ public class World : MonoBehaviour {
             GameInterface.instance.EditZone(newZone, true);
         } 
     }
+
+	public static void CreateNewCmderAtZone(Zone targetZone, Faction ownerFac) {
+		Commander newCmder = new Commander(ownerFac.ID, targetZone.ID);
+		Cmder3d cmd3d = Cmder3dRecycler.GetACmderObj();
+		cmd3d.transform.position = targetZone.MyZoneSpot.GetGoodSpotForCommander();
+		cmd3d.data = newCmder;
+		cmd3d.RefreshDataDisplay();
+	}
 
 	public static ZoneSpot GetZoneSpotByZoneName(string zoneName) {
 		Transform theZoneTransform = instance.zonesContainer.Find(zoneName);
@@ -165,7 +189,7 @@ public class World : MonoBehaviour {
 	/// makes all zoneSpots use the respective faction's colors
 	/// </summary>
 	public static void RefreshZoneSpotsOwnedByFaction(Faction fac) {
-		foreach(Zone z in GameController.GetZonesOwnedByFaction(fac)) {
+		foreach(Zone z in fac.OwnedZones) {
 			z.MyZoneSpot.RefreshDataDisplay();
 		}
 	}

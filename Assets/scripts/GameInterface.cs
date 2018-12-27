@@ -107,8 +107,20 @@ public class GameInterface : MonoBehaviour {
         saveListPanel.OpenUp(!templateMode, "Select one of the saved entries", UIStartLoadGame);
     }
 
+	/// <summary>
+	/// opens the "load template" list panel; once an option is picked, imports the loaded entry's data into
+	///  the gameController's curData (assuming we're making a new Game)
+	/// </summary>
+	public void OpenLoadTemplateForNewGame() {
+		saveListPanel.OpenUp(false, "Select one of the saved templates for this game", UITemplateToGame);
+	}
+
 	public void UIStartLoadGame() {
-		GameController.instance.LoadData(saveListPanel.PickedEntry.gameNameTxt.text, !saveListPanel.inGameMode);
+		GameController.instance.LoadDataAndStartGame(saveListPanel.PickedEntry.gameNameTxt.text, !saveListPanel.inGameMode);
+	}
+
+	public void UITemplateToGame() {
+		GameController.instance.ImportTemplateDataAndStartGame(saveListPanel.PickedEntry.gameNameTxt.text);
 	}
 
     /// <summary>
