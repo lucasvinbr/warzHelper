@@ -41,7 +41,7 @@ public class EditRulesBoardPanel : EditDataPanel<Rules> {
 		dataBeingEdited.baseMaxCommandersPerFaction = int.Parse(maxCmdersPerFactionInput.text);
 		dataBeingEdited.baseMaxUnitsInOneGarrison = int.Parse(maxGarrUnitsInput.text);
 		dataBeingEdited.baseMaxUnitsUnderOneCommander = int.Parse(maxCmderUnitsInput.text);
-		World.SetGroundSizeAccordingToRules();
+		World.SetupBoardDetails();
 		gameObject.SetActive(false);
 		OnWindowIsClosing();
 	}

@@ -11,6 +11,7 @@ public class NewCmderPhaseMan : GamePhaseManager {
 	public override void OnPhaseStart() {
 		//check if it's possible for the player faction to place a new cmder
 		//(if the limit hasn't been reached and the faction has a zone without a commander in it)
+		skipBtn.interactable = true;
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
 		if(factionCmders.Count < playerFac.MaxCmders) {
@@ -34,7 +35,7 @@ public class NewCmderPhaseMan : GamePhaseManager {
 				if(availableZones.Count > 0) {
 					infoTxt.text = "Select an unoccupied zone you own to place a new commander in it";
 					World.BeginNewCmderPlacement
-						(DonePlacing, GameController.instance.ZonesToZoneSpots(availableZones));
+						(DonePlacing, GameController.ZonesToZoneSpots(availableZones));
 				}
 				else {
 					infoTxt.text = "All owned zones are already occupied!";

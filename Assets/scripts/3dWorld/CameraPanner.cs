@@ -8,6 +8,12 @@ public class CameraPanner : MonoBehaviour {
 
     private Vector3 curPos;
 
+	public static CameraPanner instance;
+
+	private void Awake() {
+		instance = this;	
+	}
+
 	// Use this for initialization
 	void Start () {
         theGround = World.instance.ground;
@@ -33,5 +39,13 @@ public class CameraPanner : MonoBehaviour {
 
             transform.Translate(Vector3.right * inputX + Vector3.up * inputY);
         }
+	}
+
+	/// <summary>
+	/// instantly centralizes the camera on the spot, disregarding the board size
+	/// </summary>
+	/// <param name="spot"></param>
+	public void JumpToSpot(Vector3 spot) {
+		transform.position = new Vector3(spot.x, transform.position.y, spot.z);
 	}
 }

@@ -266,7 +266,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		GameInterface.instance.editFactionPanel.isDirty = true;
 	}
 
-	public override GameObject AddEntry(TroopType entryData) {
+	public override ListPanelEntry<TroopType> AddEntry(TroopType entryData) {
 		GameObject newEntry = Instantiate(entryPrefab);
 		newEntry.transform.SetParent(listContainer, false);
 		FactionTroopListEntry entryScript = newEntry.GetComponent<FactionTroopListEntry>();
@@ -275,7 +275,7 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		entryScript.selectEntryBtn.onClick.AddListener(()=>SelectTierEntry(entryScript));
 
 		newEntry.transform.SetSiblingIndex(listContainer.childCount - 2);
-		return newEntry;
+		return entryScript;
 	}
 
 	/// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class ZonePlacer : MonoBehaviour {
 
@@ -42,6 +43,10 @@ public class ZonePlacer : MonoBehaviour {
 
     void Update()
     {
+		if (EventSystem.current.IsPointerOverGameObject()) {
+			return;
+		}
+
         if(Physics.Raycast( cam.ScreenPointToRay(Input.mousePosition), out hit, 100, 1 << 0))
         {
             zoneBlueprint.position = hit.point;

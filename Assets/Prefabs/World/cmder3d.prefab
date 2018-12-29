@@ -20,7 +20,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4796397482375942}
   - component: {fileID: 114983890776220518}
-  m_Layer: 0
+  - component: {fileID: 136895972803642080}
+  m_Layer: 9
   m_Name: cmder3d
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,7 +38,7 @@ GameObject:
   - component: {fileID: 4594687919139072}
   - component: {fileID: 33772375138040406}
   - component: {fileID: 23925684664873416}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: cmderMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,3 +126,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cmderRenderer: {fileID: 23925684664873416}
+--- !u!136 &136895972803642080
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1159902051484118}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.23
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.47, z: 0}

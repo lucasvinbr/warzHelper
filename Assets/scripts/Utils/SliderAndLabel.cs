@@ -10,6 +10,14 @@ public class SliderAndLabel : MonoBehaviour {
     public Text theLabel;
 	public bool addRefreshLabelListener = true;
 
+	public enum LabelTextFormat {
+		noFormatting,
+		floatNumber,
+		percentage
+	}
+
+	public LabelTextFormat textFormat = LabelTextFormat.floatNumber;
+
 	// Use this for initialization
 	void Start () {
 		if (addRefreshLabelListener) {
@@ -28,6 +36,17 @@ public class SliderAndLabel : MonoBehaviour {
     }
 
 	public void RefreshLabelText() {
-		theLabel.text = theSlider.value.ToString("0.00");
+		switch (textFormat) {
+			case LabelTextFormat.floatNumber:
+				theLabel.text = theSlider.value.ToString("0.00");
+				break;
+			case LabelTextFormat.percentage:
+				theLabel.text = theSlider.value.ToString("0.00%");
+				break;
+			default:
+				theLabel.text = theSlider.value.ToString();
+				break;
+		}
+		
 	}
 }

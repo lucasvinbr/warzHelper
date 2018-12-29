@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class ZoneLinker : MonoBehaviour {
 
@@ -37,6 +38,9 @@ public class ZoneLinker : MonoBehaviour {
 
     void Update()
     {
+		if (EventSystem.current.IsPointerOverGameObject()) {
+			return;
+		}
 
 		if (Input.GetButtonDown("Select")) {
 			if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out hit, 100, 1 << 8)) {
@@ -69,5 +73,10 @@ public class ZoneLinker : MonoBehaviour {
 			}
 		}
     }
+
+	private void OnDisable() {
+		curSelectedSpot = null;
+		zoneHighlight.gameObject.SetActive(false);
+	}
 
 }

@@ -8,6 +8,8 @@ public class GameInfo : TemplateInfo {
 
     public int elapsedTurns = 0;
 
+	public GameModeHandler.TurnPhase curTurnPhase = GameModeHandler.TurnPhase.newCmder;
+
     public GameInfo(string name) : base(name)
     {
 		this.isATemplate = false;

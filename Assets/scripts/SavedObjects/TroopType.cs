@@ -62,6 +62,8 @@ public class TroopType {
 	public TroopType() {
 
 	}
+
+	
 }
 
 /// <summary>
@@ -70,6 +72,16 @@ public class TroopType {
 public struct TroopNumberPair {
 	public int troopTypeID;
 	public int troopAmount;
+
+	public TroopNumberPair(int TTID, int amount) {
+		this.troopTypeID = TTID;
+		this.troopAmount = amount;
+	}
+
+	public static int CompareTroopNumberPairsByAutocalcPower(TroopNumberPair x, TroopNumberPair y) {
+		return GameController.GetTroopTypeByID(x.troopTypeID).
+			autoResolvePower.CompareTo(GameController.GetTroopTypeByID(y.troopTypeID).autoResolvePower);
+	}
 }
 
 

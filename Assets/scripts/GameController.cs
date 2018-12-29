@@ -225,6 +225,11 @@ public class GameController : MonoBehaviour {
 		instance.curData.zones.Remove(targetZone);		
 	}
 
+	public static void RemoveCommander(Commander targetCmder) {
+		World.RemoveCmder3d(targetCmder.MeIn3d);
+		instance.curData.deployedCommanders.Remove(targetCmder);
+	}
+
 	public static void RemoveTroopType(TroopType targetTroop) {
 		instance.curData.troopTypes.Remove(targetTroop);
 		GameInterface.troopDDownsAreStale = true;
@@ -426,6 +431,48 @@ public class GameController : MonoBehaviour {
 		return returnedFac;
 	}
 
+	public static List<Commander> GetCommandersOfFactionInZone(Zone targetZone, Faction targetFac) {
+		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
+		foreach (Commander cmder in targetFac.OwnedCommanders) {
+			if (cmder.zoneIAmIn == targetZone.ID) {
+				friendlyCommandersInTheZone.Add(cmder);
+			}
+		}
+
+		return friendlyCommandersInTheZone;
+	}
+
+	public static List<Commander> GetCommandersInZone(Zone targetZone) {
+		List<Commander> cmdersInZone = new List<Commander>();
+		foreach (Commander cmder in instance.curData.deployedCommanders) {
+			if (cmder.zoneIAmIn == targetZone.ID) {
+				cmdersInZone.Add(cmder);
+			}
+		}
+
+		return cmdersInZone;
+	}
+
+	/// <summary>
+	/// returns the combined troops of all forces from the target faction in the zone,
+	/// both from the zone's garrison and from any commanders in the zone
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFac"></param>
+	/// <returns></returns>
+	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFaction(Zone targetZone, Faction targetFac) {
+		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
+		if (targetZone.ownerFaction == targetFac.ID) {
+			returnedList.AddRange(targetZone.troopsContained);
+		}
+
+		foreach(Commander cmder in GetCommandersOfFactionInZone(targetZone, targetFac)) {
+			returnedList = cmder.GetCombinedTroops(returnedList);
+		}
+
+		return returnedList;
+	}
+
 	/// <summary>
 	/// returns the product of the baseZonePointAward, the owner faction's multPointAward for zones
 	/// and the zoneMult (multTrainingPoints or multRecruitPoints, for example)
@@ -464,6 +511,26 @@ public class GameController : MonoBehaviour {
 
 	}
 
+	public static int GetArmyAmountFromTroopList(List<TroopNumberPair> troopList) {
+		int total = 0;
+		for (int i = 0; i < troopList.Count; i++) {
+			total += troopList[i].troopAmount;
+		}
+		return total;
+	}
+
+	public static float GetArmyAutocalcPowerFromTroopList(List<TroopNumberPair> troopList) {
+		float total = 0;
+
+		for (int i = 0; i < troopList.Count; i++) {
+			total +=
+				GetTroopTypeByID(troopList[i].troopTypeID).autoResolvePower *
+				troopList[i].troopAmount;
+		}
+
+		return total;
+	}
+
 	#endregion
 
 	public static bool AreZonesLinked(Zone z1, Zone z2) {
@@ -482,16 +549,52 @@ public class GameController : MonoBehaviour {
 		return false;
 	}
 
+	public static int IndexOfTroopInTroopList(List<TroopNumberPair> troopList, int troopID) {
+
+		for (int i = 0; i < troopList.Count; i++) {
+			if(troopList[i].troopTypeID == troopID) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
 	/// <summary>
 	/// gets the zone spots from the provided zones
 	/// </summary>
 	/// <param name="zones"></param>
 	/// <returns></returns>
-	public List<ZoneSpot> ZonesToZoneSpots(List<Zone> zones) {
+	public static List<ZoneSpot> ZonesToZoneSpots(List<Zone> zones) {
 		List<ZoneSpot> returnedList = new List<ZoneSpot>();
 
 		foreach(Zone z in zones) {
 			returnedList.Add(z.MyZoneSpot);
+		}
+
+		return returnedList;
+	}
+
+	/// <summary>
+	/// gets the commander 3ds from the provided Commanders
+	/// </summary>
+	/// <param name="cmders"></param>
+	/// <returns></returns>
+	public static List<Cmder3d> CmdersToCmder3ds(List<Commander> cmders) {
+		List<Cmder3d> returnedList = new List<Cmder3d>();
+
+		foreach (Commander c in cmders) {
+			returnedList.Add(c.MeIn3d);
+		}
+
+		return returnedList;
+	}
+
+	public static List<TroopContainer> CmdersToTroopContainers(List<Commander> cmders) {
+		List<TroopContainer> returnedList = new List<TroopContainer>();
+
+		foreach (Commander c in cmders) {
+			returnedList.Add(c);
 		}
 
 		return returnedList;

@@ -17,6 +17,7 @@ public class TemplateModeUI : ModeUI {
 		World.ToggleWorldDisplay(false);
 		tempSaveOptionsPanel.gameObject.SetActive(false);
 		GameController.instance.facMatsHandler.PurgeFactionColorsDict();
+		TexLoader.PurgeTexDict();
 	}
 
 	public override void InitializeUI()
@@ -27,7 +28,7 @@ public class TemplateModeUI : ModeUI {
 		World.ToggleWorldDisplay(true);
 		World.SetupAllZonesFromData();
 		World.LinkAllZonesFromData();
-		World.SetGroundSizeAccordingToRules();
+		World.SetupBoardDetails();
 		SetDisplayedLowerHUD(mainLowerHUD);
     }
 

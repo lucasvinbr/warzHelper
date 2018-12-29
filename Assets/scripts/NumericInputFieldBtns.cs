@@ -102,4 +102,32 @@ public class NumericInputFieldBtns : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// sets the field's value to the minimum set in this script
+	/// </summary>
+	public void MinimizeField() {
+		if (targetField) {
+			if (targetField.contentType == InputField.ContentType.IntegerNumber) {
+				targetField.text = minValue.ToString();
+			}
+			else {
+				targetField.text = minValue.ToString(CultureInfo.InvariantCulture);
+			}
+		}
+	}
+
+	/// <summary>
+	/// sets the field's value to the maximum set in this script
+	/// </summary>
+	public void MaximizeField() {
+		if (targetField) {
+			if (targetField.contentType == InputField.ContentType.IntegerNumber) {
+				targetField.text = maxValue.ToString();
+			}
+			else {
+				targetField.text = maxValue.ToString(CultureInfo.InvariantCulture);
+			}
+		}
+	}
+
 }

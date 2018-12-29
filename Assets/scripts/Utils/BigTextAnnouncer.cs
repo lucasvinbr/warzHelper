@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using TMPro;
 
 public class BigTextAnnouncer : MonoBehaviour {
 
-    public Text theTxt;
+    public TMP_Text theTxt;
 	public float growAndShrinkTime = 0.35f;
-	public bool announcing = true;
 
 	public enum AnnouncementState {
 		inactive,
@@ -19,11 +19,11 @@ public class BigTextAnnouncer : MonoBehaviour {
 
 	public AnnouncementState curState = AnnouncementState.inactive;
 
-	private float elapsedStateTime = 0f;
+	protected float elapsedStateTime = 0f;
 
-	private float desiredStayTime;
+	protected float desiredStayTime;
 
-	public void DoBigAnnouncement(string announceContent, Color txtColor, float stayTime = 1.25f) {
+	public void DoAnnouncement(string announceContent, Color txtColor, float stayTime = 1.25f) {
 		theTxt.text = announceContent;
 		theTxt.color = txtColor;
 		desiredStayTime = stayTime;

@@ -35,18 +35,25 @@ public class GameModeHandler : ModeUI {
 	public override void ClearUI() {
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
+		World.CleanCmders();
 		World.ToggleWorldDisplay(false);
+		World.instance.garrDescOnHoverScript.enabled = false;
+		GameInterface.instance.DisableAndStoreAllOpenOverlayPanels();
 		GameController.instance.facMatsHandler.PurgeFactionColorsDict();
+		TexLoader.PurgeTexDict();
 	}
 
 	public override void InitializeUI() {
 		GameController.instance.facMatsHandler.ReBakeFactionColorsDict();
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
+		World.CleanCmders();
 		World.ToggleWorldDisplay(true);
 		World.SetupAllZonesFromData();
 		World.LinkAllZonesFromData();
-		World.SetGroundSizeAccordingToRules();
+		World.SetupAllCommandersFromData();
+		World.instance.garrDescOnHoverScript.enabled = true;
+		World.SetupBoardDetails();
 		GameController.MakeFactionTurnPrioritiesUnique();
 		//give initial points to zones if this is a new game
 		GameInfo data = GameController.instance.curData as GameInfo;
@@ -54,25 +61,26 @@ public class GameModeHandler : ModeUI {
 			AddInitialPointsToZones();
 		}
 
-		StartNewTurn();
+		StartNewTurn(data.curTurnPhase);
 		
 	}
 
 	public void AddInitialPointsToZones() {
 		foreach(Zone z in GameController.instance.curData.zones) {
 			z.pointsToSpend = z.pointsGivenAtGameStart;
-			z.SpendPoints(false);
+			z.SpendPoints(false, true);
 		}
 	}
 
-	public void StartNewTurn() {
+	public void StartNewTurn(TurnPhase startingPhase = TurnPhase.newCmder) {
 		//find out which faction turn it is now
 		GameInfo data = GameController.instance.curData as GameInfo;
 		curPlayingFaction = GameController.GetNextFactionInTurnOrder(data.lastTurnPriority);
-		bigAnnouncer.DoBigAnnouncement(curPlayingFaction.name + "\nTurn", curPlayingFaction.color);
+		bigAnnouncer.DoAnnouncement(curPlayingFaction.name + "\nTurn", curPlayingFaction.color);
 		whoseTurnTxt.text = curPlayingFaction.name;
 		whoseTurnTxt.color = curPlayingFaction.color;
-		curPhase = TurnPhase.newCmder;
+		curPhase = startingPhase;
+		data.curTurnPhase = curPhase;
 		StartRespectivePhaseMan();
 	}
 
@@ -84,6 +92,8 @@ public class GameModeHandler : ModeUI {
 	public void GoToNextTurnPhase() {
 		if(curPhase != TurnPhase.postBattle) {
 			curPhase++;
+			GameInfo data = GameController.instance.curData as GameInfo;
+			data.curTurnPhase = curPhase;
 			StartRespectivePhaseMan();
 		}else {
 			TurnFinished();
@@ -95,6 +105,7 @@ public class GameModeHandler : ModeUI {
 		GameInfo data = GameController.instance.curData as GameInfo;
 		data.lastTurnPriority = curPlayingFaction.turnPriority;
 		data.elapsedTurns++;
+		//TODO victory check
 		StartNewTurn();
 	}
 }

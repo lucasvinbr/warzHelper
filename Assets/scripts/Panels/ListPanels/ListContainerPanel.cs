@@ -12,15 +12,16 @@ public class ListContainerPanel<T> : GenericOverlayPanel {
 
     public GameObject entryPrefab, listIsEmptyObject;
 
-    public virtual GameObject AddEntry(T entryData)
+    public virtual ListPanelEntry<T> AddEntry(T entryData)
     {
         GameObject newEntry = Instantiate(entryPrefab);
         newEntry.transform.SetParent(listContainer, false);
-        newEntry.GetComponent<ListPanelEntry<T>>().SetContent(entryData);
+		ListPanelEntry<T> entryScript = newEntry.GetComponent<ListPanelEntry<T>>();
+		entryScript.SetContent(entryData);
 
         if(listIsEmptyObject) listIsEmptyObject.SetActive(false);
 
-		return newEntry;
+		return entryScript;
     }
 
 	public virtual void FillEntries() {

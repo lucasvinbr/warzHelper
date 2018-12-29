@@ -61,8 +61,10 @@ public class ZoneSpot : MonoBehaviour {
     }
 
 	public Vector3 GetGoodSpotForCommander() {
-		//TODO change this spot when more than 1 commander is here
-		return transform.position + Vector3.back * CMDER_OFFSET;
+		int cmderCount = GameController.GetCommandersInZone(data).Count;
+		return transform.position + new Vector3((CMDER_OFFSET / 2) * (cmderCount % 2 == 1 ? -1 : 1),
+			CMDER_OFFSET * (cmderCount / 4),
+			CMDER_OFFSET * (cmderCount % 4 <= 1 ? 1 : -1));
 	}
 
 }

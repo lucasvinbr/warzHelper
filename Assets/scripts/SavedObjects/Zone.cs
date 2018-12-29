@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using UnityEngine;
 
-public class Zone {
+public class Zone : TroopContainer {
 
 	/// <summary>
 	/// the zone's unique ID
@@ -20,11 +21,6 @@ public class Zone {
 	/// any text the player might want to add about the zone
 	/// </summary>
 	public string extraInfo;
-
-	/// <summary>
-	/// ID of the faction that currently owns this zone. a negative number probably means this zone is neutral
-	/// </summary>
-	public int ownerFaction;
 
 	/// <summary>
 	/// file path of this zone's picture, shown in the zone description screen and the battle screen
@@ -72,23 +68,24 @@ public class Zone {
 	/// <summary>
 	/// coords for placing the zone in the world, using the saved y coord as z
 	/// </summary>
-	public Vector3 CoordsForWorld{
-		get{
+	public Vector3 CoordsForWorld
+	{
+		get
+		{
 			return Vector3.right * coords.x + Vector3.forward * coords.y;
 		}
 	}
 
-	public List<TroopNumberPair> troopsGarrisoned;
-
-	public int TotalTroopsInGarrison
+	/// <summary>
+	/// calculated taking in account the zone's faction and factors
+	/// </summary>
+	public int MaxTroopsInGarrison
 	{
 		get
 		{
-			int total = 0;
-			for(int i = 0; i < troopsGarrisoned.Count; i++) {
-				total += troopsGarrisoned[i].troopAmount;
-			}
-			return total;
+			return Mathf.RoundToInt(GameController.GetFactionByID(ownerFaction).multMaxUnitsInOneGarrison * 
+				multMaxUnitsInGarrison * 
+				GameController.instance.curData.rules.baseMaxUnitsInOneGarrison);
 		}
 	}
 
@@ -115,7 +112,7 @@ public class Zone {
 		this.ID = GameController.GetUnusedZoneID();
 		this.name = name;
 		this.ownerFaction = -1;
-		troopsGarrisoned = new List<TroopNumberPair>();
+		troopsContained = new List<TroopNumberPair>();
 		linkedZones = new List<int>();
 		while (GameController.GetZoneByName(this.name) != null) {
 			this.name = name + " copy";
@@ -128,22 +125,89 @@ public class Zone {
 	/// gets points according to our owner faction and our own factors
 	/// </summary>
 	public void GetPointAwardPoints() {
+		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
+		int basePoints = GameController.instance.curData.rules.baseZonePointAwardOnTurnStart;
 
+		pointsToSpend += Mathf.RoundToInt(basePoints * ownerFac.multZonePointAwardOnTurnStart);
 	}
 
 	/// <summary>
 	/// if we're not neutral, uses the pointsToSpend to add more troops to the garrison
 	/// and upgrade them
 	/// </summary>
-	public void SpendPoints(bool useGraphicFX = false) {
+	public void SpendPoints(bool useGraphicFX = false, bool ignoreGarrisonTierLimit = false) {
 		if(ownerFaction >= 0 && pointsToSpend > 0) {
-			if (useGraphicFX) {
+			bool hasRecruited = false, hasTrained = false;
+			Faction ownerFac = GameController.GetFactionByID(ownerFaction);
+			if(TotalTroopsContained < MaxTroopsInGarrison && multRecruitmentPoints > 0) {
+				//recruitment!
+				if(ownerFac.troopLine.Count > 0) {
+					TroopType baseFactionTroop = GameController.GetTroopTypeByID(ownerFac.troopLine[0]);
+					int troopRecruitmentCostHere = 
+						Mathf.RoundToInt(baseFactionTroop.pointCost / multRecruitmentPoints);
+					int recruitableTroopsAmount = 0;
+					//this troop can be so cheap and the zone so good that the troop ends up with cost 0 after rounding
+					if (troopRecruitmentCostHere == 0) {
+						recruitableTroopsAmount = MaxTroopsInGarrison - TotalTroopsContained;
+					}
+					else {
+						recruitableTroopsAmount = Mathf.Min(pointsToSpend / troopRecruitmentCostHere,
+							MaxTroopsInGarrison - TotalTroopsContained);
+					}
+					AddTroop(baseFactionTroop.ID, recruitableTroopsAmount);
+					pointsToSpend -= troopRecruitmentCostHere * recruitableTroopsAmount;
+					hasRecruited = true;
+				}
+				
+			}
 
-				WorldFXManager.instance.EmitParticle(WorldFXManager.instance.bolsterParticle, MyZoneSpot.transform.position,
+			//if we still have points left... training time
+			if(pointsToSpend > 0 && multTrainingPoints > 0) {
+				int trainableTroops = 0;
+				int troopTrainingCostHere = 0;
+				int troopIndexInGarrison = -1;
+				int tierLimit = ignoreGarrisonTierLimit ? ownerFac.troopLine.Count - 1 : ownerFac.maxGarrisonedTroopTier - 1;
+				TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
+				for(int i = 0; i < tierLimit; i++) {
+					
+					troopIndexInGarrison = IndexOfTroopInContainer(ownerFac.troopLine[i]);
+					if(troopIndexInGarrison >= 0) {
+						curTTBeingTrained = GameController.GetTroopTypeByID(ownerFac.troopLine[i]);
+						curTTUpgradeTo = GameController.GetTroopTypeByID(ownerFac.troopLine[i + 1]);
+						troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / multRecruitmentPoints);
+						if (troopTrainingCostHere == 0) {
+							trainableTroops = troopsContained[troopIndexInGarrison].troopAmount;
+						}
+						else {
+							trainableTroops = Mathf.Min(pointsToSpend / troopTrainingCostHere,
+								troopsContained[troopIndexInGarrison].troopAmount);
+						}
+						if(trainableTroops > 0) {
+							RemoveTroop(curTTBeingTrained.ID, trainableTroops);
+							AddTroop(curTTUpgradeTo.ID, trainableTroops);
+							pointsToSpend -= trainableTroops * troopTrainingCostHere;
+							hasTrained = true;
+						}
+					}
+				}
+			}
+
+			troopsContained.Sort(TroopNumberPair.CompareTroopNumberPairsByAutocalcPower);
+
+			if (useGraphicFX) {
+				if (hasRecruited) {
+					WorldFXManager.instance.EmitParticle(WorldFXManager.instance.recruitParticle, MyZoneSpot.transform.position,
 					GameController.GetFactionByID(ownerFaction).color);
+				}
+
+				if (hasTrained) {
+					WorldFXManager.instance.EmitParticle(WorldFXManager.instance.bolsterParticle, MyZoneSpot.transform.position,
+					GameController.GetFactionByID(ownerFaction).color);
+				}
+				
 			}
 		}
-		//TODO spend points haha
 	}
+
 	
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// script that exists just as a small feedback to users when hovering zones.
@@ -14,6 +15,9 @@ public class ZoneGrowOnHover : MonoBehaviour {
 
 	private Transform curHoveredZone;
 
+	public List<ZoneSpot> zoneWhitelist;
+
+
     void Start()
     {
         cam = Camera.main;
@@ -21,9 +25,19 @@ public class ZoneGrowOnHover : MonoBehaviour {
 
     void Update()
     {
+		if (EventSystem.current.IsPointerOverGameObject()) {
+			return;
+		}
 		//zones' colliders are in the "zone" layer (num. 8)
 		//hovered zones should grow a little
 		if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out hit, 100, 1 << 8)) {
+			if(zoneWhitelist != null) {
+				ZoneSpot hitSpotScript = hit.transform.GetComponent<ZoneSpot>();
+				if (!zoneWhitelist.Contains(hitSpotScript)) {
+					return;
+				}
+			}
+			
 			if (!curHoveredZone) {
 				curHoveredZone = hit.transform;
 				curHoveredZone.localScale = Vector3.one * 1.25f;
@@ -39,6 +53,7 @@ public class ZoneGrowOnHover : MonoBehaviour {
 
 
 	private void OnDisable() {
+		zoneWhitelist = null;
 		if (curHoveredZone) {
 			curHoveredZone.localScale = Vector3.one;
 			curHoveredZone = null;
