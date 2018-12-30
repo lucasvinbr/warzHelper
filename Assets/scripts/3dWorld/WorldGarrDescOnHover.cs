@@ -36,7 +36,9 @@ public class WorldGarrDescOnHover : MonoBehaviour {
 				curHoveredObj = hit.transform;
 				ZoneSpot spotScript = curHoveredObj.GetComponent<ZoneSpot>();
 				if (spotScript) {
-					LayoutToolTip.Instance.ShowTooltipForZone(spotScript.data, Input.mousePosition);
+					LayoutToolTip.Instance.ShowTooltipForZone
+						(spotScript.data, Input.mousePosition, 
+						GameInterface.instance.curInterfaceMode == GameInterface.InterfaceMode.game);
 				}else {
 					Cmder3d cmderScript = curHoveredObj.GetComponent<Cmder3d>();
 					if (cmderScript) {
@@ -56,7 +58,7 @@ public class WorldGarrDescOnHover : MonoBehaviour {
 
 	private void OnDisable() {
 		curHoveredObj = null;
-		LayoutToolTip.Instance.HideTooltip();
+		LayoutToolTip.Instance?.HideTooltip();
 	}
 
 }

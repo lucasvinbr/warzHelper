@@ -76,12 +76,20 @@ public class GameModeHandler : ModeUI {
 		//find out which faction turn it is now
 		GameInfo data = GameController.instance.curData as GameInfo;
 		curPlayingFaction = GameController.GetNextFactionInTurnOrder(data.lastTurnPriority);
-		bigAnnouncer.DoAnnouncement(curPlayingFaction.name + "\nTurn", curPlayingFaction.color);
-		whoseTurnTxt.text = curPlayingFaction.name;
-		whoseTurnTxt.color = curPlayingFaction.color;
-		curPhase = startingPhase;
-		data.curTurnPhase = curPhase;
-		StartRespectivePhaseMan();
+		if (GameController.IsFactionStillInGame(curPlayingFaction)) {
+			bigAnnouncer.DoAnnouncement(curPlayingFaction.name + "\nTurn", curPlayingFaction.color);
+			whoseTurnTxt.text = curPlayingFaction.name;
+			whoseTurnTxt.color = curPlayingFaction.color;
+			curPhase = startingPhase;
+			data.curTurnPhase = curPhase;
+			StartRespectivePhaseMan();
+		}
+		else{
+			data.lastTurnPriority = curPlayingFaction.turnPriority;
+			StartNewTurn();
+			//TODO victory check, no factions capable of doing anything check
+		}
+		
 	}
 
 	public void StartRespectivePhaseMan() {

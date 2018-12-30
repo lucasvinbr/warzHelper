@@ -18,6 +18,8 @@ public class World : MonoBehaviour {
 
 	public ZoneGrowOnHover zoneGrowScript;
 
+	public ZoneEditOnClick zoneEditOnClickScript;
+
 	public CommanderPlacer cmderPlacerScript;
 
 	public WorldGarrDescOnHover garrDescOnHoverScript;

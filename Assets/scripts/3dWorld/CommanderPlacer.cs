@@ -24,6 +24,7 @@ public class CommanderPlacer : MonoBehaviour {
 
     void OnDisable()
     {
+		actionOnSpotSelect = null;
         cmderBlueprint.gameObject.SetActive(false);
     }
 
@@ -62,7 +63,6 @@ public class CommanderPlacer : MonoBehaviour {
 				World.CreateNewCmderAtZone(curHoveredValidZone.data, GameModeHandler.instance.curPlayingFaction);
                 actionOnSpotSelect();
                 enabled = false;
-                actionOnSpotSelect = null;
             }
         }
     }

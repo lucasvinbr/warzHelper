@@ -15,6 +15,8 @@ public class TemplateModeUI : ModeUI {
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
 		World.ToggleWorldDisplay(false);
+		World.instance.zoneEditOnClickScript.enabled = false;
+		World.instance.garrDescOnHoverScript.enabled = false;
 		tempSaveOptionsPanel.gameObject.SetActive(false);
 		GameController.instance.facMatsHandler.PurgeFactionColorsDict();
 		TexLoader.PurgeTexDict();
@@ -30,7 +32,9 @@ public class TemplateModeUI : ModeUI {
 		World.LinkAllZonesFromData();
 		World.SetupBoardDetails();
 		SetDisplayedLowerHUD(mainLowerHUD);
-    }
+		World.instance.zoneEditOnClickScript.enabled = true;
+		World.instance.garrDescOnHoverScript.enabled = true;
+	}
 
 
 }

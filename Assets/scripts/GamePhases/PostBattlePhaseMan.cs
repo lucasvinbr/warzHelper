@@ -86,7 +86,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 	/// </summary>
 	/// <returns></returns>
 	public IEnumerator GoToNextConflict() {
-		CameraPanner.instance.JumpToSpot(conflictZones[0].MyZoneSpot.transform.position);
+		CameraPanner.instance.TweenToSpot(conflictZones[0].MyZoneSpot.transform.position);
 		yield return new WaitForSeconds(0.35f);
 		SolveConflictsAt(conflictZones[0]);
 	}

@@ -617,7 +617,22 @@ public class GameController : MonoBehaviour {
 	}
 
 	public static int SortByTurnPriority(Faction x, Faction y) {
-		return x.turnPriority.CompareTo(y.turnPriority);
+		int comparison = x.turnPriority.CompareTo(y.turnPriority);
+		//if it's equal, randomize it
+		if (comparison == 0) comparison = Random.Range(0, 2) == 1 ? -1 : 1;
+
+		return comparison;
+	}
+
+	/// <summary>
+	/// checks if it's worth to give the faction a turn.
+	/// Factions without any commanders or zones just can't do anything,
+	/// so no need to give them a turn
+	/// </summary>
+	/// <param name="fac"></param>
+	/// <returns></returns>
+	public static bool IsFactionStillInGame(Faction fac) {
+		return fac.OwnedCommanders.Count > 0 || fac.OwnedZones.Count > 0;
 	}
 
 	/// <summary>

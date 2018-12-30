@@ -33,6 +33,7 @@ public class NewCmderPhaseMan : GamePhaseManager {
 
 				//after removing occupied zones, if there are any left, proceed
 				if(availableZones.Count > 0) {
+					CameraPanner.instance.TweenToSpot(availableZones[0].MyZoneSpot.transform.position);
 					infoTxt.text = "Select an unoccupied zone you own to place a new commander in it";
 					World.BeginNewCmderPlacement
 						(DonePlacing, GameController.ZonesToZoneSpots(availableZones));
@@ -64,7 +65,6 @@ public class NewCmderPhaseMan : GamePhaseManager {
 	public override IEnumerator ProceedToNextPhaseRoutine() {
 		skipBtn.interactable = false;
 		yield return base.ProceedToNextPhaseRoutine();
-		infoTxt.text = "Setting initial zone data...";
 	}
 
 

@@ -60,7 +60,7 @@ public class BattlePhaseMan : GamePhaseManager {
 	/// </summary>
 	/// <returns></returns>
 	public IEnumerator GoToNextBattle() {
-		CameraPanner.instance.JumpToSpot(battleZones[0].MyZoneSpot.transform.position);
+		CameraPanner.instance.TweenToSpot(battleZones[0].MyZoneSpot.transform.position);
 		yield return new WaitForSeconds(0.35f);
 		OpenBattleResolutionPanelForZone(battleZones[0]);
 	}

@@ -142,7 +142,6 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 	/// </summary>
 	/// <param name="remainingPercent"></param>
 	public void SetPostBattleArmyData(float remainingPercent) {
-		Debug.Log("set remaining to " + remainingPercent);
 		float lossPercent = 1.0f - remainingPercent;
 		int initialTroopAmount = 0;
 		foreach (TroopNumberPair tnp in sideArmy) {
@@ -164,8 +163,6 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 
 	public void RemoveTroopByPercentageInAllConts(int troopID, int initialTotalTroopAmount,
 		float lossPercent, int knownRemainingTroops = -1) {
-		Debug.Log("remove this soldier " + GameController.GetTroopTypeByID(troopID).name);
-		Debug.Log("losspercent " + lossPercent);
 		int troopIndexInCurContainer = -1;
 		int totalRemovedTroops = 0;
 		int removedTroopsFromCurContainer = 0;
@@ -180,10 +177,9 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 			}
 		}
 
-		Debug.Log("total removed troops: " + totalRemovedTroops);
 		if(knownRemainingTroops >= 0 &&
 			(initialTotalTroopAmount - totalRemovedTroops) != knownRemainingTroops) {
-			//rounding caused some error
+			//rounding caused some error.. does this really happen?
 			Debug.LogWarning("rounding error in loss calculation : known remaining is " + 
 				knownRemainingTroops + ", actual remaining is " + 
 				(initialTotalTroopAmount - totalRemovedTroops));
@@ -199,7 +195,6 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 	/// <returns></returns>
 	public IEnumerator DepletePowerBarAccordingToPower(float initialPower, float curPower) {
 		float elapsedTime = 0, initialFillAmount = factionPowerBarContent.fillAmount;
-		Debug.Log("init power: " + initialPower + ", curPOwer: " + curPower);
 		depletingBar = true;
 		//prevent any changes while transition is running
 		bPanel.resolutionBtnsGroup.interactable = false;

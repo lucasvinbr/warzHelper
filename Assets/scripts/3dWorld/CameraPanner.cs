@@ -10,6 +10,10 @@ public class CameraPanner : MonoBehaviour {
 
 	public static CameraPanner instance;
 
+	private Vector3 startingTweenPos, targetTweenPos;
+	private float elapsedTweenTime, tweenDuration;
+	private bool tweening = false;
+
 	private void Awake() {
 		instance = this;	
 	}
@@ -47,5 +51,31 @@ public class CameraPanner : MonoBehaviour {
 	/// <param name="spot"></param>
 	public void JumpToSpot(Vector3 spot) {
 		transform.position = new Vector3(spot.x, transform.position.y, spot.z);
+	}
+
+	/// <summary>
+	/// moves to target position over time
+	/// </summary>
+	/// <param name="spot"></param>
+	/// <param name="tweenDuration"></param>
+	public void TweenToSpot(Vector3 spot, float tweenDuration = 0.35f) {
+		elapsedTweenTime = 0;
+		startingTweenPos = transform.position;
+		targetTweenPos = new Vector3(spot.x, transform.position.y, spot.z); ;
+		this.tweenDuration = tweenDuration;
+		if (!tweening) {
+			StartCoroutine(TweenRoutine());
+		}
+	}
+
+	IEnumerator TweenRoutine() {
+		tweening = true;
+		while (elapsedTweenTime < tweenDuration) {
+			transform.position = Vector3.Lerp
+				(startingTweenPos, targetTweenPos, elapsedTweenTime / tweenDuration);
+			elapsedTweenTime += Time.deltaTime;
+			yield return null;
+		}
+		tweening = false;
 	}
 }

@@ -22,6 +22,7 @@ public class ZoneLinker : MonoBehaviour {
 
 
 	public void StartZoneLinking(UnityAction actionOnConfirmPlace) {
+		World.instance.zoneEditOnClickScript.enabled = false;
 		this.enabled = true;
 		actionOnDoneLinking += actionOnConfirmPlace;
 		World.instance.zoneGrowScript.enabled = true;
@@ -31,7 +32,7 @@ public class ZoneLinker : MonoBehaviour {
 		actionOnDoneLinking?.Invoke();
 		enabled = false;
 		World.instance.zoneGrowScript.enabled = false;
-		actionOnDoneLinking = null;
+		World.instance.zoneEditOnClickScript.enabled = true;
 		TemplateModeUI templateUI = GameInterface.instance.templateOptionsPanel as TemplateModeUI;
 		templateUI.SetDisplayedLowerHUD(templateUI.mainLowerHUD);
 	}
@@ -77,6 +78,7 @@ public class ZoneLinker : MonoBehaviour {
 	private void OnDisable() {
 		curSelectedSpot = null;
 		zoneHighlight.gameObject.SetActive(false);
+		actionOnDoneLinking = null;
 	}
 
 }

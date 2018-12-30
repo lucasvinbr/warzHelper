@@ -18,7 +18,7 @@ public abstract class GamePhaseManager : MonoBehaviour {
 	/// </summary>
 	/// <returns></returns>
 	public virtual IEnumerator ProceedToNextPhaseRoutine() {
-		yield return new WaitForSeconds(1.35f);
+		yield return new WaitForSeconds(0.7f);
 		GameModeHandler.instance.GoToNextTurnPhase();
 	}
 }

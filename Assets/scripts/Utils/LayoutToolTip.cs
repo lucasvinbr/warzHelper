@@ -155,42 +155,69 @@ public class LayoutToolTip : MonoBehaviour
 		originalPivot = newPivot;
 	}
 
-	public void ShowTooltipForZone(Zone targetZone, Vector3 basePos, bool refreshCanvasesBeforeGetSize = false) {
+	public void ShowTooltipForZone(Zone targetZone, Vector3 basePos, bool showGarrInfo = true, bool refreshCanvasesBeforeGetSize = false) {
 		baseTooltipPos = basePos;
 		Faction ownerFaction = GameController.GetFactionByID(targetZone.ownerFaction);
 		if(ownerFaction != null) {
 			AddTooltipTitleEntry(targetZone.name, ownerFaction.color, 70);
-			List<Commander> cmdersInZone = GameController.GetCommandersOfFactionInZone(targetZone, ownerFaction);
-			if(cmdersInZone.Count > 0) {
-				AddTooltipTitleEntry("Commanders: " + cmdersInZone.Count.ToString(), ownerFaction.color, 60);
-			}
-			
 			AddTooltipTitleEntry("(" + ownerFaction.name + ")", ownerFaction.color);
-			AddTooltipTitleEntry("Troops:", Color.white, 40);
-			foreach (TroopNumberPair tnp in
-				GameController.GetCombinedTroopsInZoneFromFaction(targetZone, ownerFaction)) {
+			AddTooltipTitleEntry("Garrison: " + targetZone.TotalTroopsContained + "/"
+				+ targetZone.MaxTroopsInGarrison, Color.white, 55);
+			foreach (TroopNumberPair tnp in targetZone.troopsContained) {
 				AddTooltipTroopEntry(GameController.GetTroopTypeByID(tnp.troopTypeID).name,
 					tnp.troopAmount.ToString());
 			}
+			List<Commander> cmdersInZone = GameController.GetCommandersOfFactionInZone(targetZone, ownerFaction);
+			if(cmdersInZone.Count > 0) {
+				List<TroopNumberPair> totalArmy =
+					GameController.GetCombinedTroopsInZoneFromFaction(targetZone, ownerFaction);
+				AddTooltipTitleEntry("Commanders: " + cmdersInZone.Count.ToString(), ownerFaction.color, 60);
+				AddTooltipTitleEntry("Combined Army: " + 
+					GameController.GetArmyAmountFromTroopList(totalArmy), Color.white, 50);
+				foreach (TroopNumberPair tnp in	totalArmy) {
+					AddTooltipTroopEntry(GameController.GetTroopTypeByID(tnp.troopTypeID).name,
+						tnp.troopAmount.ToString());
+				}
+			}
+			
 		}
 		else {
 			AddTooltipTitleEntry(targetZone.name, Color.white, 70);
 			AddTooltipTitleEntry("(" + Rules.NO_FACTION_NAME + ")", Color.white);
 		}
-			
+
+		AddTooltipInfoEntry(targetZone.multRecruitmentPoints.ToString("0%"),
+			targetZone.multTrainingPoints.ToString("0%"));
 		ContextualTooltipUpdate(refreshCanvasesBeforeGetSize);
 	}
 
 	public void ShowTooltipForCmder(Commander targetCmder, Vector3 basePos, bool refreshCanvasesBeforeGetSize = false) {
 		baseTooltipPos = basePos;
 		Faction ownerFaction = GameController.GetFactionByID(targetCmder.ownerFaction);
-		AddTooltipTitleEntry("Commander", ownerFaction.color, 60);
+		AddTooltipTitleEntry("Commander", ownerFaction.color, 50);
 		AddTooltipTitleEntry("(" + ownerFaction.name + ")", ownerFaction.color);
-		AddTooltipTitleEntry("Troops:", Color.white, 40);
+		AddTooltipTitleEntry("Troops: " + targetCmder.TotalTroopsContained + "/" + targetCmder.MaxTroopsCommanded, Color.white);
 		foreach (TroopNumberPair tnp in
 			targetCmder.troopsContained) {
 			AddTooltipTroopEntry(GameController.GetTroopTypeByID(tnp.troopTypeID).name,
 				tnp.troopAmount.ToString());
+		}
+
+		List<Commander> cmdersInZone = 
+			GameController.GetCommandersOfFactionInZone(
+				GameController.GetZoneByID(targetCmder.zoneIAmIn), ownerFaction);
+		if (cmdersInZone.Count > 1) {
+			List<TroopNumberPair> totalCmderArmy = new List<TroopNumberPair>();
+			foreach (Commander c in cmdersInZone) {
+				totalCmderArmy = c.GetCombinedTroops(totalCmderArmy);
+			}
+			
+			AddTooltipTitleEntry("Combined Cmd. Army: " +
+				GameController.GetArmyAmountFromTroopList(totalCmderArmy), Color.white, 50);
+			foreach (TroopNumberPair tnp in totalCmderArmy) {
+				AddTooltipTroopEntry(GameController.GetTroopTypeByID(tnp.troopTypeID).name,
+					tnp.troopAmount.ToString());
+			}
 		}
 
 		ContextualTooltipUpdate(refreshCanvasesBeforeGetSize);
@@ -215,6 +242,14 @@ public class LayoutToolTip : MonoBehaviour
 
 	public void AddTooltipTroopEntry(string leftText, string rightText) {
 		GameObject newEntry = Instantiate(baseTroopEntry, mainLayoutContentParent);
+		newEntry.SetActive(true);
+		LayoutTooltipTwoTextEntry entryScript = newEntry.GetComponent<LayoutTooltipTwoTextEntry>();
+		entryScript.leftTxt.text = leftText;
+		entryScript.rightTxt.text = rightText;
+	}
+
+	public void AddTooltipInfoEntry(string leftText, string rightText) {
+		GameObject newEntry = Instantiate(baseInfoEntry, mainLayoutContentParent);
 		newEntry.SetActive(true);
 		LayoutTooltipTwoTextEntry entryScript = newEntry.GetComponent<LayoutTooltipTwoTextEntry>();
 		entryScript.leftTxt.text = leftText;

@@ -26,6 +26,7 @@ public class ZonePlacer : MonoBehaviour {
     void OnDisable()
     {
         zoneBlueprint.gameObject.SetActive(false);
+		actionOnSpotSelect = null;
     }
 
 	/// <summary>
@@ -38,6 +39,7 @@ public class ZonePlacer : MonoBehaviour {
 
 	public void StartCustomPlacement(UnityAction actionOnConfirmPlace) {
 		this.enabled = true;
+		World.instance.zoneEditOnClickScript.enabled = false;
 		actionOnSpotSelect += actionOnConfirmPlace;
 	}
 
@@ -59,7 +61,7 @@ public class ZonePlacer : MonoBehaviour {
             {
                 actionOnSpotSelect();
                 enabled = false;
-                actionOnSpotSelect = null;
+				World.instance.zoneEditOnClickScript.enabled = true;
             }
         }
     }

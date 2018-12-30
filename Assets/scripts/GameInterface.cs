@@ -25,6 +25,8 @@ public class GameInterface : MonoBehaviour {
 
 	private ModeUI curModeUI;
 
+	public InterfaceMode curInterfaceMode = InterfaceMode.start;
+
     public Color positiveUIColor, negativeUIColor, selectedUIElementColor, deselectedUIElementColor;
 
 	public ZonesPanel zonesPanel;
@@ -151,6 +153,7 @@ public class GameInterface : MonoBehaviour {
                 break;
         }
 		curModeUI.InitializeUI();
+		curInterfaceMode = desiredMode;
 	}
 
 	public void ReturnToMenu() {

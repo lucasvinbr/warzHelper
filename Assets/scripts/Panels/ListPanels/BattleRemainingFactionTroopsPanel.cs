@@ -16,7 +16,7 @@ public class BattleRemainingFactionTroopsPanel : ListContainerPanel<TroopNumberP
 	}
 
 	public void MaxAllEntries() {
-		for (int i = 0; i < listContainer.childCount - 1; i++) {
+		for (int i = 0; i < listContainer.childCount; i++) {
 			Transform entry = listContainer.GetChild(i);
 			BattleResolutionRemainingTroopListEntry entryScript =
 				entry.GetComponent<BattleResolutionRemainingTroopListEntry>();
@@ -27,7 +27,7 @@ public class BattleRemainingFactionTroopsPanel : ListContainerPanel<TroopNumberP
 	}
 
 	public void EmptyAllEntries() {
-		for (int i = 0; i < listContainer.childCount - 1; i++) {
+		for (int i = 0; i < listContainer.childCount; i++) {
 			Transform entry = listContainer.GetChild(i);
 			BattleResolutionRemainingTroopListEntry entryScript =
 				entry.GetComponent<BattleResolutionRemainingTroopListEntry>();

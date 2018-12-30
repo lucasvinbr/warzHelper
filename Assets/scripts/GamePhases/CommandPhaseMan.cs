@@ -37,7 +37,7 @@ public class CommandPhaseMan : GamePhaseManager {
 	}
 
 	public void SelectCmder(Commander cmder) {
-		CameraPanner.instance.JumpToSpot(cmder.MeIn3d.transform.position);
+		CameraPanner.instance.TweenToSpot(cmder.MeIn3d.transform.position);
 		worldCommandScript.SelectCmder(cmder.MeIn3d);
 	}
 
@@ -61,8 +61,11 @@ public class CommandPhaseMan : GamePhaseManager {
 	/// goes to the next idle cmder in the commandable commanders list.
 	/// must be called before removing the active commander from the list
 	/// </summary>
-	public void GoToNextIdleCmder(Commander curActiveCmder) {
+	public void GoToNextIdleCmder(Commander curActiveCmder, bool jumpToActiveIfOnlyOne = false) {
 		if(commandableCommanders.Count <= 1) {
+			if (jumpToActiveIfOnlyOne) {
+				CameraPanner.instance.TweenToSpot(worldCommandScript.curSelectedCmder.transform.position);
+			}
 			return;
 		}
 		int curCmderIndex = commandableCommanders.IndexOf(curActiveCmder);
@@ -74,8 +77,13 @@ public class CommandPhaseMan : GamePhaseManager {
 		SelectCmder(commandableCommanders[desiredCmderIndex]);
 	}
 
+	/// <summary>
+	/// used by the UI btn
+	/// </summary>
 	public void GoToNextIdleCmder() {
-		GoToNextIdleCmder(worldCommandScript.curSelectedCmder.data);
+		if (worldCommandScript.curSelectedCmder) {
+			GoToNextIdleCmder(worldCommandScript.curSelectedCmder.data, true);
+		}
 	}
 
 	/// <summary>
