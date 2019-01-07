@@ -33,7 +33,7 @@ public class ZoneLinker : MonoBehaviour {
 		enabled = false;
 		World.instance.zoneGrowScript.enabled = false;
 		World.instance.zoneEditOnClickScript.enabled = true;
-		TemplateModeUI templateUI = GameInterface.instance.templateOptionsPanel as TemplateModeUI;
+		TemplateModeUI templateUI = GameInterface.instance.templateModeUI as TemplateModeUI;
 		templateUI.SetDisplayedLowerHUD(templateUI.mainLowerHUD);
 	}
 

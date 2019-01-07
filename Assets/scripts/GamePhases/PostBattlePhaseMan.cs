@@ -40,7 +40,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 			StartCoroutine(GoToNextConflict());
 		}else {
 			infoTxt.text = "End of Turn!";
-			OnPhaseEnd();
+			OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
 		}
 	}
 
@@ -87,16 +87,20 @@ public class PostBattlePhaseMan : GamePhaseManager {
 	/// <returns></returns>
 	public IEnumerator GoToNextConflict() {
 		CameraPanner.instance.TweenToSpot(conflictZones[0].MyZoneSpot.transform.position);
-		yield return new WaitForSeconds(0.35f);
+		yield return WaitWhileNoOverlays(0.35f);
 		SolveConflictsAt(conflictZones[0]);
 	}
 
-	public override IEnumerator ProceedToNextPhaseRoutine() {
+	public override IEnumerator ProceedToNextPhaseRoutine(bool noWait = false) {
 		//wait for all commanders to actually "die"
 		while (commandersBeingDeleted.Count > 0) yield return null;
-
-		yield return new WaitForSeconds(0.8f); //some extra wait, since it's the turn's end
-		yield return base.ProceedToNextPhaseRoutine();
+		if (noWait) {
+			yield return null;
+		}else {
+			yield return WaitWhileNoOverlays(0.8f); //some extra wait, since it's the turn's end
+		}
+		
+		yield return base.ProceedToNextPhaseRoutine(noWait);
 	}
 
 	IEnumerator KillCommanderRoutine(Commander cmder) {

@@ -32,7 +32,7 @@ public class BattlePhaseMan : GamePhaseManager {
 		
 		if(battleZones.Count == 0) {
 			infoTxt.text = "No battles to resolve!";
-			OnPhaseEnd();
+			OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
 		}else {
 			StartCoroutine(GoToNextBattle());
 		}
@@ -61,7 +61,7 @@ public class BattlePhaseMan : GamePhaseManager {
 	/// <returns></returns>
 	public IEnumerator GoToNextBattle() {
 		CameraPanner.instance.TweenToSpot(battleZones[0].MyZoneSpot.transform.position);
-		yield return new WaitForSeconds(0.35f);
+		yield return WaitWhileNoOverlays(0.35f);
 		OpenBattleResolutionPanelForZone(battleZones[0]);
 	}
 

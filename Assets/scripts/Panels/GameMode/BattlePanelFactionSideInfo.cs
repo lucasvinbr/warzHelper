@@ -32,6 +32,11 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 
 	public const float BAR_DEPLETION_TIME = 0.8f, SIDE_DEFEATED_FADE_TIME = 1.0f, SIDE_DEFEATED_NOTIFY_DELAY = 1.0f;
 
+	/// <summary>
+	/// if this army is defeated, it will award this amount of points to the other side
+	/// </summary>
+	public int pointsAwardedToVictor = 0;
+
 	public override void SetContent(Faction theContent)
     {
         base.SetContent(theContent);
@@ -60,6 +65,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		ourContainers.Clear();
 		ourContainers.AddRange(containers);
 		sideArmy.Clear();
+		pointsAwardedToVictor = 0;
 		int armyNumbers = 0;
 		int armyCmders = 0;
 		float armyPower = 0;
@@ -120,20 +126,22 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 	}
 
 	/// <summary>
-	/// distributes losses among troop containers and calls the power bar depletion routine
+	/// distributes losses among troop containers and calls the power bar depletion routine.
 	/// </summary>
 	/// <param name="remainingArmy"></param>
 	public void SetPostBattleArmyData(List<TroopNumberPair> remainingArmy) {
 		float lossPercent = 0;
 		int initialTroopAmount = 0;
+		int powerLost = 0;
 		foreach(TroopNumberPair tnp in remainingArmy) {
 			initialTroopAmount = sideArmy[GameController.IndexOfTroopInTroopList
 				(sideArmy, tnp.troopTypeID)].troopAmount;
 			lossPercent = 1.0f - ((float) tnp.troopAmount / initialTroopAmount);
-			RemoveTroopByPercentageInAllConts(tnp.troopTypeID, initialTroopAmount,
+			powerLost += RemoveTroopByPercentageInAllConts(tnp.troopTypeID, initialTroopAmount,
 				lossPercent, tnp.troopAmount);
 		}
 
+		pointsAwardedToVictor += powerLost;
 		UpdatePostBattleArmy();
 	}
 
@@ -144,13 +152,15 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 	public void SetPostBattleArmyData(float remainingPercent) {
 		float lossPercent = 1.0f - remainingPercent;
 		int initialTroopAmount = 0;
+		int powerLost = 0;
 		foreach (TroopNumberPair tnp in sideArmy) {
 			initialTroopAmount = sideArmy[GameController.IndexOfTroopInTroopList
 				(sideArmy, tnp.troopTypeID)].troopAmount;
-			RemoveTroopByPercentageInAllConts(tnp.troopTypeID, initialTroopAmount,
+			powerLost += RemoveTroopByPercentageInAllConts(tnp.troopTypeID, initialTroopAmount,
 				lossPercent);
 		}
 
+		pointsAwardedToVictor += powerLost;
 		UpdatePostBattleArmy();
 	}
 
@@ -161,11 +171,21 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		//TODO autocalc!
 	}
 
-	public void RemoveTroopByPercentageInAllConts(int troopID, int initialTotalTroopAmount,
+	/// <summary>
+	/// returns the total autocalc power lost
+	/// </summary>
+	/// <param name="troopID"></param>
+	/// <param name="initialTotalTroopAmount"></param>
+	/// <param name="lossPercent"></param>
+	/// <param name="knownRemainingTroops"></param>
+	/// <returns></returns>
+	public int RemoveTroopByPercentageInAllConts(int troopID, int initialTotalTroopAmount,
 		float lossPercent, int knownRemainingTroops = -1) {
 		int troopIndexInCurContainer = -1;
 		int totalRemovedTroops = 0;
 		int removedTroopsFromCurContainer = 0;
+		float powerLostPerTroop = GameController.GetTroopTypeByID(troopID).autoResolvePower;
+		int totalPowerLost = 0;
 		TroopNumberPair affectedPair;
 		foreach (TroopContainer tContainer in ourContainers) {
 			troopIndexInCurContainer = tContainer.IndexOfTroopInContainer(troopID);
@@ -173,6 +193,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 				affectedPair = tContainer.troopsContained[troopIndexInCurContainer];
 				removedTroopsFromCurContainer = Mathf.RoundToInt(affectedPair.troopAmount * lossPercent);
 				tContainer.RemoveTroop(troopID, removedTroopsFromCurContainer);
+				totalPowerLost += Mathf.RoundToInt(powerLostPerTroop * removedTroopsFromCurContainer);
 				totalRemovedTroops += removedTroopsFromCurContainer;
 			}
 		}
@@ -184,6 +205,16 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 				knownRemainingTroops + ", actual remaining is " + 
 				(initialTotalTroopAmount - totalRemovedTroops));
 
+		}
+
+		return totalPowerLost;
+	}
+
+	public void SharePointsBetweenConts(int points) {
+		int pointsForEach = points / ourContainers.Count;
+		foreach (TroopContainer tContainer in ourContainers) {
+			tContainer.pointsToSpend += pointsForEach;
+			tContainer.TrainTroops();
 		}
 	}
 
@@ -219,11 +250,13 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 			//this side's been defeated! the battle's resolved then
 			//notify the panel
 			yield return new WaitForSeconds(SIDE_DEFEATED_NOTIFY_DELAY);
-			bPanel.OnBattleResolved();
+			bPanel.OnBattleResolved(this);
 		}
 
 		depletingBar = false;
 		bPanel.OnOneSideDoneAnimating();
 		
 	}
+
+	
 }

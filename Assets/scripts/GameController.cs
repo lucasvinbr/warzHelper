@@ -460,14 +460,39 @@ public class GameController : MonoBehaviour {
 	/// <param name="targetZone"></param>
 	/// <param name="targetFac"></param>
 	/// <returns></returns>
-	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFaction(Zone targetZone, Faction targetFac) {
+	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFaction(Zone targetZone,
+		Faction targetFac, bool onlyCommanderArmies = false) {
 		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
-		if (targetZone.ownerFaction == targetFac.ID) {
+		if (targetZone.ownerFaction == targetFac.ID && !onlyCommanderArmies) {
 			returnedList.AddRange(targetZone.troopsContained);
 		}
 
 		foreach(Commander cmder in GetCommandersOfFactionInZone(targetZone, targetFac)) {
 			returnedList = cmder.GetCombinedTroops(returnedList);
+		}
+
+		return returnedList;
+	}
+
+	/// <summary>
+	/// just like GetCombinedTroopsInZoneFromFaction, 
+	/// but considering everything that is NOT from the target faction
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFac"></param>
+	/// <param name="onlyCommanderArmies"></param>
+	/// <returns></returns>
+	public static List<TroopNumberPair> GetCombinedTroopsInZoneNotFromFaction(Zone targetZone,
+		Faction targetFac, bool onlyCommanderArmies = false) {
+		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
+		if (targetZone.ownerFaction != targetFac.ID && !onlyCommanderArmies) {
+			returnedList.AddRange(targetZone.troopsContained);
+		}
+
+		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
+			if(cmder.ownerFaction != targetFac.ID) {
+				returnedList = cmder.GetCombinedTroops(returnedList);
+			}
 		}
 
 		return returnedList;
@@ -530,6 +555,7 @@ public class GameController : MonoBehaviour {
 
 		return total;
 	}
+
 
 	#endregion
 

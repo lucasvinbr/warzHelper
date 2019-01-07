@@ -81,7 +81,12 @@ public class BattlePanel : GrowingOverlayPanel {
 		}
 	}
 
-	public void OnBattleResolved() {
+	public void OnBattleResolved(BattlePanelFactionSideInfo loserSide) {
+		if(loserSide == attackerSide) {
+			defenderSide.SharePointsBetweenConts(loserSide.pointsAwardedToVictor);
+		}else {
+			attackerSide.SharePointsBetweenConts(loserSide.pointsAwardedToVictor);
+		}
 		Shrink(TellPhaseManAboutResolution);
 	}
 

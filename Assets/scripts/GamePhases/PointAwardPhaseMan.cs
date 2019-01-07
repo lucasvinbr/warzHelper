@@ -22,12 +22,18 @@ public class PointAwardPhaseMan : GamePhaseManager {
 			z.SpendPoints(true); //zones that actually do something with their points will emit some effects
 		}
 
-		OnPhaseEnd();
+		OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
 	}
 
-	public override IEnumerator ProceedToNextPhaseRoutine() {
-		yield return new WaitForSeconds(0.8f); //some extra wait, since we've got effects
-		yield return base.ProceedToNextPhaseRoutine();
+	public override IEnumerator ProceedToNextPhaseRoutine(bool noWait = false) {
+		if (noWait) {
+			yield return null;
+		}
+		else {
+			yield return WaitWhileNoOverlays(0.8f); //some extra wait, since we've got effects
+		}
+		
+		yield return base.ProceedToNextPhaseRoutine(noWait);
 	}
 
 }

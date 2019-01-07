@@ -67,9 +67,5 @@ public class CommanderPlacer : MonoBehaviour {
         }
     }
 
-    void OnNewZoneConfirmPlacement()
-    {
-        World.CreateNewZoneAtPoint(cmderBlueprint.position);
-    }
 
 }

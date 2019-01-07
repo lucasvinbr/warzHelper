@@ -21,7 +21,7 @@ public class GameInterface : MonoBehaviour {
 
     public SaveListPanel saveListPanel;
 
-    public ModeUI startOptionsPanel, templateOptionsPanel, gameOptionsPanel;
+    public ModeUI startOptionsPanel, templateModeUI, gameModeUI;
 
 	private ModeUI curModeUI;
 
@@ -34,6 +34,8 @@ public class GameInterface : MonoBehaviour {
 	public FactionsPanel factionsPanel;
 
 	public TroopsPanel troopsPanel;
+
+	public GameOptionsPanel gameOpsPanel;
 
 	public List<GenericOverlayPanel> overlayPanelsCurrentlyOpen = new List<GenericOverlayPanel>();
 
@@ -134,22 +136,22 @@ public class GameInterface : MonoBehaviour {
         switch (desiredMode)
         {
             case InterfaceMode.start:
-                templateOptionsPanel.gameObject.SetActive(false);
-                gameOptionsPanel.gameObject.SetActive(false);
+                templateModeUI.gameObject.SetActive(false);
+                gameModeUI.gameObject.SetActive(false);
                 startOptionsPanel.gameObject.SetActive(true);
 				curModeUI = startOptionsPanel;
                 break;
             case InterfaceMode.game:
-                templateOptionsPanel.gameObject.SetActive(false);
-                gameOptionsPanel.gameObject.SetActive(true);
+                templateModeUI.gameObject.SetActive(false);
+                gameModeUI.gameObject.SetActive(true);
                 startOptionsPanel.gameObject.SetActive(false);
-				curModeUI = gameOptionsPanel;
+				curModeUI = gameModeUI;
                 break;
             case InterfaceMode.template:
-                templateOptionsPanel.gameObject.SetActive(true);
-                gameOptionsPanel.gameObject.SetActive(false);
+                templateModeUI.gameObject.SetActive(true);
+                gameModeUI.gameObject.SetActive(false);
                 startOptionsPanel.gameObject.SetActive(false);
-				curModeUI = templateOptionsPanel;
+				curModeUI = templateModeUI;
                 break;
         }
 		curModeUI.InitializeUI();

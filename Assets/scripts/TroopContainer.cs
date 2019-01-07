@@ -11,6 +11,9 @@ public abstract class TroopContainer {
 	/// </summary>
 	public int ownerFaction;
 
+	public int pointsToSpend = 0;
+
+
 	/// <summary>
 	/// sum of the amounts of all troops contained in this container
 	/// </summary>
@@ -120,4 +123,9 @@ public abstract class TroopContainer {
 
 		return returnedList;
 	}
+
+	/// <summary>
+	/// function used when receiving points for victories
+	/// </summary>
+	public abstract void TrainTroops();
 }

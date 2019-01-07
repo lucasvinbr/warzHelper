@@ -9,7 +9,6 @@ public class Commander : TroopContainer {
 
 	public int zoneIAmIn;
 
-	public int pointsToSpend = 0;
 
 	public int MaxTroopsCommanded
 	{
@@ -57,10 +56,10 @@ public class Commander : TroopContainer {
 	/// true if at least 1 troop was upgraded
 	/// </summary>
 	/// <returns></returns>
-	public bool TrainTroops() {
+	public bool TrainTroops(out bool hasTrained) {
 		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
 		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
-		bool hasTrained = false;
+		hasTrained = false;
 		if (pointsToSpend > 0 && curZone.multTrainingPoints > 0) {
 			int trainableTroops = 0;
 			int troopTrainingCostHere = 0;
@@ -133,6 +132,47 @@ public class Commander : TroopContainer {
 		}
 
 		return false;
+	}
+
+	public override void TrainTroops() {
+		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
+		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
+		bool hasTrained = false;
+		if (pointsToSpend > 0 && curZone.multTrainingPoints > 0) {
+			int trainableTroops = 0;
+			int troopTrainingCostHere = 0;
+			int troopIndexInGarrison = -1;
+			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
+			for (int i = 0; i < ownerFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
+
+				troopIndexInGarrison = IndexOfTroopInContainer(ownerFac.troopLine[i]);
+				if (troopIndexInGarrison >= 0) {
+					curTTBeingTrained = GameController.GetTroopTypeByID(ownerFac.troopLine[i]);
+					curTTUpgradeTo = GameController.GetTroopTypeByID(ownerFac.troopLine[i + 1]);
+					troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / curZone.multTrainingPoints);
+					if (troopTrainingCostHere == 0) {
+						trainableTroops = troopsContained[troopIndexInGarrison].troopAmount;
+					}
+					else {
+						trainableTroops = Mathf.Min(pointsToSpend / troopTrainingCostHere,
+							troopsContained[troopIndexInGarrison].troopAmount);
+					}
+					if (trainableTroops > 0) {
+						RemoveTroop(curTTBeingTrained.ID, trainableTroops);
+						AddTroop(curTTUpgradeTo.ID, trainableTroops);
+						pointsToSpend -= trainableTroops * troopTrainingCostHere;
+						hasTrained = true;
+					}
+				}
+			}
+
+			if (hasTrained) {
+				WorldFXManager.instance.EmitParticle(WorldFXManager.instance.bolsterParticle, MeIn3d.transform.position,
+					GameController.GetFactionByID(ownerFaction).color);
+				troopsContained.Sort(TroopNumberPair.CompareTroopNumberPairsByAutocalcPower);
+			}
+		}
+
 	}
 
 }

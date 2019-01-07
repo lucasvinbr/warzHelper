@@ -10,6 +10,8 @@ public class GameInfo : TemplateInfo {
 
 	public GameModeHandler.TurnPhase curTurnPhase = GameModeHandler.TurnPhase.newCmder;
 
+	public bool fastAiTurns = true;
+
     public GameInfo(string name) : base(name)
     {
 		this.isATemplate = false;

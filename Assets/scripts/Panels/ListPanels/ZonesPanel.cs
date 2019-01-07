@@ -23,7 +23,7 @@ public class ZonesPanel : ListContainerPanel<Zone> {
 
 	public void EditZoneLinks() {
 		gameObject.SetActive(false);
-		TemplateModeUI templateUI = GameInterface.instance.templateOptionsPanel as TemplateModeUI;
+		TemplateModeUI templateUI = GameInterface.instance.templateModeUI as TemplateModeUI;
 		templateUI.SetDisplayedLowerHUD(templateUI.zoneLinkingLowerHUD);
 		World.BeginZoneLinking(null);
 	}

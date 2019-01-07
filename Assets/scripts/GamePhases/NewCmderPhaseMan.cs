@@ -11,7 +11,7 @@ public class NewCmderPhaseMan : GamePhaseManager {
 	public override void OnPhaseStart() {
 		//check if it's possible for the player faction to place a new cmder
 		//(if the limit hasn't been reached and the faction has a zone without a commander in it)
-		skipBtn.interactable = true;
+		
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
 		if(factionCmders.Count < playerFac.MaxCmders) {
@@ -26,29 +26,37 @@ public class NewCmderPhaseMan : GamePhaseManager {
 							break;
 						}
 					}
-					if (zoneIsOccupied) {
+
+					if (zoneIsOccupied || availableZones[i].multRecruitmentPoints <= 0) {
 						availableZones.RemoveAt(i);
 					}
 				}
 
 				//after removing occupied zones, if there are any left, proceed
 				if(availableZones.Count > 0) {
-					CameraPanner.instance.TweenToSpot(availableZones[0].MyZoneSpot.transform.position);
-					infoTxt.text = "Select an unoccupied zone you own to place a new commander in it";
-					World.BeginNewCmderPlacement
-						(DonePlacing, GameController.ZonesToZoneSpots(availableZones));
+					if (playerFac.isPlayer) {
+						CameraPanner.instance.TweenToSpot(availableZones[0].MyZoneSpot.transform.position);
+						infoTxt.text = "Select an unoccupied zone you own to place a new commander in it";
+						World.BeginNewCmderPlacement
+							(DonePlacing, GameController.ZonesToZoneSpots(availableZones));
+						skipBtn.interactable = true;
+					}
+					else {
+						AiPlayer.AiNewCmderPhase(playerFac, availableZones);
+						OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+					}
 				}
 				else {
 					infoTxt.text = "All owned zones are already occupied!";
-					OnPhaseEnd();
+					OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
 				}
 			}else {
 				infoTxt.text = "You have no owned zones to place a commander in!";
-				OnPhaseEnd();
+				OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
 			}
 		}else {
 			infoTxt.text = "The faction's commander limit has been reached!";
-			OnPhaseEnd();
+			OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
 		}
 	}
 
@@ -62,9 +70,9 @@ public class NewCmderPhaseMan : GamePhaseManager {
 		OnPhaseEnd();
 	}
 
-	public override IEnumerator ProceedToNextPhaseRoutine() {
+	public override IEnumerator ProceedToNextPhaseRoutine(bool noWait = false) {
 		skipBtn.interactable = false;
-		yield return base.ProceedToNextPhaseRoutine();
+		yield return base.ProceedToNextPhaseRoutine(noWait);
 	}
 
 

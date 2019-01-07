@@ -63,7 +63,6 @@ public class Zone : TroopContainer {
 	/// </summary>
 	public Vector2 coords;
 
-	public int pointsToSpend = 0;
 
 	/// <summary>
 	/// coords for placing the zone in the world, using the saved y coord as z
@@ -209,5 +208,46 @@ public class Zone : TroopContainer {
 		}
 	}
 
-	
+	/// <summary>
+	/// this version here is only used when receiving points for a victory
+	/// </summary>
+	public override void TrainTroops() {
+		if (pointsToSpend > 0 && multTrainingPoints > 0) {
+			bool hasTrained = false;
+			int trainableTroops = 0;
+			int troopTrainingCostHere = 0;
+			int troopIndexInGarrison = -1;
+			Faction ownerFac = GameController.GetFactionByID(ownerFaction);
+			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
+			for (int i = 0; i < ownerFac.maxGarrisonedTroopTier - 1; i++) {
+
+				troopIndexInGarrison = IndexOfTroopInContainer(ownerFac.troopLine[i]);
+				if (troopIndexInGarrison >= 0) {
+					curTTBeingTrained = GameController.GetTroopTypeByID(ownerFac.troopLine[i]);
+					curTTUpgradeTo = GameController.GetTroopTypeByID(ownerFac.troopLine[i + 1]);
+					troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / multRecruitmentPoints);
+					if (troopTrainingCostHere == 0) {
+						trainableTroops = troopsContained[troopIndexInGarrison].troopAmount;
+					}
+					else {
+						trainableTroops = Mathf.Min(pointsToSpend / troopTrainingCostHere,
+							troopsContained[troopIndexInGarrison].troopAmount);
+					}
+					if (trainableTroops > 0) {
+						RemoveTroop(curTTBeingTrained.ID, trainableTroops);
+						AddTroop(curTTUpgradeTo.ID, trainableTroops);
+						pointsToSpend -= trainableTroops * troopTrainingCostHere;
+						hasTrained = true;
+					}
+				}
+			}
+
+			if (hasTrained) {
+				WorldFXManager.instance.EmitParticle(WorldFXManager.instance.bolsterParticle, MyZoneSpot.transform.position,
+				GameController.GetFactionByID(ownerFaction).color);
+			}
+		}
+	}
+
+
 }

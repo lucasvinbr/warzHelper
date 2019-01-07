@@ -28,6 +28,13 @@ public class GameModeHandler : ModeUI {
 
 	public Text whoseTurnTxt;
 
+	public GameObject turnPhasesContentsBox;
+
+	/// <summary>
+	/// if true, the turn should be less noticeable as a whole
+	/// </summary>
+	public bool currentTurnIsFast = false;
+
 	private void Awake() {
 		instance = this;
 	}
@@ -59,11 +66,23 @@ public class GameModeHandler : ModeUI {
 		GameInfo data = GameController.instance.curData as GameInfo;
 		if (data.elapsedTurns == 0) {
 			AddInitialPointsToZones();
+			GameInterface.instance.gameOpsPanel.gameObject.SetActive(true);
+			GameInterface.instance.gameOpsPanel.GoToAIPanel();
 		}
 
-		StartNewTurn(data.curTurnPhase);
+		StartCoroutine(StartTurnAfterPanelsClose(data.curTurnPhase));
 		
 	}
+
+	IEnumerator StartTurnAfterPanelsClose(TurnPhase startingPhase) {
+		while(GameInterface.openedPanelsOverlayLevel > 0) {
+			yield return null;
+		}
+
+		StartNewTurn(startingPhase);
+	}
+
+
 
 	public void AddInitialPointsToZones() {
 		foreach(Zone z in GameController.instance.curData.zones) {
@@ -76,13 +95,17 @@ public class GameModeHandler : ModeUI {
 		//find out which faction turn it is now
 		GameInfo data = GameController.instance.curData as GameInfo;
 		curPlayingFaction = GameController.GetNextFactionInTurnOrder(data.lastTurnPriority);
+		
 		if (GameController.IsFactionStillInGame(curPlayingFaction)) {
-			bigAnnouncer.DoAnnouncement(curPlayingFaction.name + "\nTurn", curPlayingFaction.color);
+			currentTurnIsFast = (!curPlayingFaction.isPlayer && data.fastAiTurns);
+			if(!currentTurnIsFast)
+				bigAnnouncer.DoAnnouncement(curPlayingFaction.name + "\nTurn", curPlayingFaction.color);
 			whoseTurnTxt.text = curPlayingFaction.name;
 			whoseTurnTxt.color = curPlayingFaction.color;
 			curPhase = startingPhase;
 			data.curTurnPhase = curPhase;
 			StartRespectivePhaseMan();
+			turnPhasesContentsBox.SetActive(curPlayingFaction.isPlayer);
 		}
 		else{
 			data.lastTurnPriority = curPlayingFaction.turnPriority;

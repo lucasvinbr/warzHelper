@@ -25,12 +25,19 @@ public class CommandPhaseMan : GamePhaseManager {
 			}
 		}
 		if(commandableCommanders.Count > 0) {
-			worldCommandScript.enabled = true;
-			worldCommandScript.allowedCmders3d = GameController.CmdersToCmder3ds(commandableCommanders);
-			SelectCmder(commandableCommanders[0]);
+			if (playerFac.isPlayer) {
+				worldCommandScript.enabled = true;
+				worldCommandScript.allowedCmders3d = GameController.CmdersToCmder3ds(commandableCommanders);
+				SelectCmder(commandableCommanders[0]);
+			}else {
+				AiPlayer.AiCommandPhase(playerFac, commandableCommanders, this);
+				OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+			}
 		}else {
-			SmallTextAnnouncer.instance.DoAnnouncement("No active commanders found!", Color.white);
-			OnPhaseEnd();
+			bool fastEnd = (GameModeHandler.instance.currentTurnIsFast);
+			if(!fastEnd)
+				SmallTextAnnouncer.instance.DoAnnouncement("No active commanders found!", Color.white);
+			OnPhaseEnd(fastEnd);
 		}
 		
 		
@@ -112,7 +119,8 @@ public class CommandPhaseMan : GamePhaseManager {
 
 	public void TrainingBtnPressed() {
 		Commander curCmder = worldCommandScript.curSelectedCmder.data;
-		if (curCmder.TrainTroops()) {
+		bool hasTrained = false;
+		if (curCmder.TrainTroops(out hasTrained)) {
 			CmderHasActed(curCmder);
 		}
 		else {
@@ -121,20 +129,20 @@ public class CommandPhaseMan : GamePhaseManager {
 
 	}
 
-	public void MoveCommander(Cmder3d movingCmder3d, ZoneSpot destinationZone) {
+	public void MoveCommander(Cmder3d movingCmder3d, ZoneSpot destinationZone, bool runHasActed = true) {
 		movingCmder3d.data.zoneIAmIn = destinationZone.data.ID;
 		StartCoroutine(TweenCommanderToSpot(movingCmder3d, destinationZone.GetGoodSpotForCommander()));
-		CmderHasActed(movingCmder3d.data);
+		if(runHasActed) CmderHasActed(movingCmder3d.data);
 	}
 
 	public void SkipBtnPressed() {
 		CmderHasActed(worldCommandScript.curSelectedCmder.data);
 	}
 
-	public override void OnPhaseEnd() {
+	public override void OnPhaseEnd(bool noWait = false) {
 		worldCommandScript.enabled = false;
 		selectedCmderBtnsGroup.interactable = false;
-		base.OnPhaseEnd();
+		base.OnPhaseEnd(noWait);
 	}
 
 
