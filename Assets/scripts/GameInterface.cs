@@ -21,6 +21,8 @@ public class GameInterface : MonoBehaviour {
 
     public SaveListPanel saveListPanel;
 
+	public ExportOptionsPanel exportOpsPanel;
+
     public ModeUI startOptionsPanel, templateModeUI, gameModeUI;
 
 	private ModeUI curModeUI;
@@ -185,6 +187,17 @@ public class GameInterface : MonoBehaviour {
 		}
 
 		overlayPanelsOpenBeforeClear.Clear();
+	}
+
+	/// <summary>
+	/// from https://answers.unity.com/questions/1144378/copy-to-clipboard-with-a-button-unity-53-solution.html
+	/// </summary>
+	/// <param name="s"></param>
+	public static void CopyToClipboard(string s) {
+		TextEditor te = new TextEditor();
+		te.text = s;
+		te.SelectAll();
+		te.Copy();
 	}
 
 

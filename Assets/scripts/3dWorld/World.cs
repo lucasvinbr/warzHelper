@@ -161,10 +161,26 @@ public class World : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// places all commanders stored in the current game data
+	/// </summary>
 	public static void SetupAllCommandersFromData() {
+		Dictionary<Zone, int> placedCmdersInEachZone = new Dictionary<Zone, int>();
+		foreach(Zone z in GameController.instance.curData.zones) {
+			placedCmdersInEachZone.Add(z, 0);
+		}
 		List<Commander> cmders = GameController.instance.curData.deployedCommanders;
+		Cmder3d cmd3d = null;
+		Zone curZone = null;
 		for (int i = 0; i < cmders.Count; i++) {
-			PlaceCommander(cmders[i]);
+			cmd3d = Cmder3dRecycler.GetACmderObj();
+			curZone = GameController.GetZoneByID(cmders[i].zoneIAmIn);
+			cmd3d.transform.position = 
+				curZone.MyZoneSpot.GetGoodSpotForCommander(placedCmdersInEachZone[curZone]);
+			cmd3d.data = cmders[i];
+			cmd3d.RefreshDataDisplay();
+			instance.spawnedCmders.Add(cmd3d);
+			placedCmdersInEachZone[curZone]++;
 		}
 	}
 
@@ -234,18 +250,6 @@ public class World : MonoBehaviour {
 		ZoneSpot zsScript = newSpot.GetComponent<ZoneSpot>();
 		zsScript.data = targetZone;
 		zsScript.RefreshDataDisplay();
-	}
-
-	/// <summary>
-	/// places a commander in its saved zone (commander placement should happen after zone placement)
-	/// </summary>
-	/// <param name="targetCmder"></param>
-	public static void PlaceCommander(Commander targetCmder) {
-		Cmder3d cmd3d = Cmder3dRecycler.GetACmderObj();
-		cmd3d.transform.position = GameController.GetZoneByID(targetCmder.zoneIAmIn).MyZoneSpot.GetGoodSpotForCommander();
-		cmd3d.data = targetCmder;
-		cmd3d.RefreshDataDisplay();
-		instance.spawnedCmders.Add(cmd3d);
 	}
 
 	public static void RemoveCmder3d(Cmder3d target3d) {

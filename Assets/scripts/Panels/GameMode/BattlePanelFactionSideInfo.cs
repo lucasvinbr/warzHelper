@@ -211,7 +211,11 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 	}
 
 	public void SharePointsBetweenConts(int points) {
-		int pointsForEach = points / ourContainers.Count;
+		//divide between the containers...
+		//also consider the power lost since the beginning of the battle
+		//so that if only a few survive, they won't get tons of points
+		int pointsForEach = Mathf.RoundToInt((points / ourContainers.Count) *
+			(curArmyPower / initialArmyPower));
 		foreach (TroopContainer tContainer in ourContainers) {
 			tContainer.pointsToSpend += pointsForEach;
 			tContainer.TrainTroops();

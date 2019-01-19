@@ -23,6 +23,7 @@ public class BattlePhaseMan : GamePhaseManager {
 			if(!battleZones.Contains(zoneCmderIsIn) &&
 				zoneCmderIsIn.ownerFaction != playerFac.ID) {
 				if(zoneCmderIsIn.ownerFaction >= 0 && 
+					cmder.TotalAutocalcPower > 0 &&
 					GameController.GetCombinedTroopsInZoneFromFaction
 					(zoneCmderIsIn, GameController.GetFactionByID(zoneCmderIsIn.ownerFaction)).Count > 0) {
 					battleZones.Add(zoneCmderIsIn);

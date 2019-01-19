@@ -15,6 +15,14 @@ public class AiPlayer {
 	/// </summary>
 	public const float minMoveScoreThreshold = 0.25f, maxMoveScoreThreshold = 0.5f;
 
+	/// <summary>
+	/// how much should a situation where there is no room for new commanders, 
+	/// but more commanders can still be placed,
+	/// make a commander more likely to leave a zone/not go to the only empty zone left?
+	/// the resulting value gets closer to this the further we are from the max cmder count
+	/// </summary>
+	public const float maxMakeRoomScoreBonus = 0.6f;
+
 	public static void AiNewCmderPhase(Faction curFac, List<Zone> availableZones) {
 		if(availableZones.Count == 1) {
 			//not much thinking needed for the AI in this case
@@ -51,8 +59,16 @@ public class AiPlayer {
 	public static void AiCommandPhase(Faction ourFac, List<Commander> commandableCmders,
 		CommandPhaseMan phaseScript) {
 		Zone zoneCmderIsIn = null, moveDestZone = null, scoreCheckZone = null;
+
+		List<Commander> ourCmders = ourFac.OwnedCommanders;
+
+		List<Zone> emptyNewCmderZones = GameController.GetZonesForNewCmdersOfFaction(ourFac);
+
+		//how close to our max cmders?
+		float factionCmderAmountRatio = ourCmders.Count / (float) ourFac.MaxCmders;
 		float recruitChance, topMoveScore, scoreCheckScore;
 		bool hasActed = false;
+
 		for (int i = commandableCmders.Count - 1; i >= 0; i--) {
 			zoneCmderIsIn = GameController.GetZoneByID(commandableCmders[i].zoneIAmIn);
 
@@ -63,15 +79,24 @@ public class AiPlayer {
 			//if no zone beats this score, we stay
 			topMoveScore = GetZoneDangerScore(zoneCmderIsIn, ourFac);
 
+			if(factionCmderAmountRatio < 0.8f && emptyNewCmderZones.Count == 0) {
+				//if our territories are full of cmders, make it more likely to move around
+				topMoveScore *= factionCmderAmountRatio;
+				recruitChance *= factionCmderAmountRatio;
+			}
+
 			foreach(int nearbyZoneID in zoneCmderIsIn.linkedZones) {
 				scoreCheckZone = GameController.GetZoneByID(nearbyZoneID);
-				scoreCheckScore = GetZoneDangerScore(scoreCheckZone, ourFac);
-				if (scoreCheckZone.ownerFaction != ourFac.ID) {
-					//less danger, better if it's not our zone
-					scoreCheckScore = 1 - scoreCheckScore;
+
+				scoreCheckScore = GetZoneMoveScore(scoreCheckZone, ourFac);
+
+				if(factionCmderAmountRatio < 0.8f && emptyNewCmderZones.Count == 1 &&
+					emptyNewCmderZones[0] == scoreCheckZone) {
+					//better not move to this spot, it's the only place for a new cmder
+					scoreCheckScore *= factionCmderAmountRatio;
 				}
 
-				if(scoreCheckScore > topMoveScore) {
+				if (scoreCheckScore > topMoveScore) {
 					topMoveScore = scoreCheckScore;
 					moveDestZone = scoreCheckZone;
 				}
@@ -151,6 +176,29 @@ public class AiPlayer {
 
 		return Mathf.Max(0, (potentialEnemyPower - potentialAlliedPower) /
 			Mathf.Max(1, potentialEnemyPower));
+	}
+
+	/// <summary>
+	/// uses the danger score and some extra info to get a "should I move there" score
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="ourFac"></param>
+	/// <returns></returns>
+	public static float GetZoneMoveScore(Zone targetZone, Faction ourFac) {
+		float finalScore = GetZoneDangerScore(targetZone, ourFac);
+
+		//if the zone is hostile, the less danger the better
+		if(targetZone.ownerFaction != ourFac.ID) {
+			finalScore = 1 - finalScore;
+		}
+
+		//we should add score if friendly commanders are already there,
+		//in order to make bigger armies
+		foreach(Commander cmd in GameController.GetCommandersOfFactionInZone(targetZone, ourFac)) {
+			finalScore *= 1.1f;
+		}
+
+		return finalScore;
 	}
 
 	/// <summary>

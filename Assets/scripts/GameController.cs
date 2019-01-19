@@ -499,6 +499,33 @@ public class GameController : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// basically joins two troop lists and returns the result
+	/// </summary>
+	/// <param name="theOtherContainerTroops"></param>
+	/// <returns></returns>
+	public static List<TroopNumberPair> GetCombinedTroopsFromTwoLists(List<TroopNumberPair> xList, List<TroopNumberPair> yList) {
+		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
+
+		returnedList.AddRange(xList);
+
+		int testedTroopIndex = -1;
+		TroopNumberPair checkedTNP;
+		foreach (TroopNumberPair tnp in yList) {
+			testedTroopIndex = IndexOfTroopInTroopList(xList, tnp.troopTypeID);
+			if (testedTroopIndex >= 0) {
+				checkedTNP = returnedList[testedTroopIndex];
+				checkedTNP.troopAmount += tnp.troopAmount;
+				returnedList[testedTroopIndex] = checkedTNP;
+			}
+			else {
+				returnedList.Add(tnp);
+			}
+		}
+
+		return returnedList;
+	}
+
+	/// <summary>
 	/// returns the product of the baseZonePointAward, the owner faction's multPointAward for zones
 	/// and the zoneMult (multTrainingPoints or multRecruitPoints, for example)
 	/// </summary>
@@ -534,6 +561,35 @@ public class GameController : MonoBehaviour {
 			return Mathf.RoundToInt(instance.curData.rules.baseMaxUnitsInOneGarrison * zoneMult);
 		}
 
+	}
+
+	/// <summary>
+	/// returns a list with all zones owned by the faction that don't already have a commander in them
+	/// and have a recruitment point multiplier greater than 0
+	/// </summary>
+	/// <param name="fac"></param>
+	/// <returns></returns>
+	public static List<Zone> GetZonesForNewCmdersOfFaction(Faction fac) {
+		List<Zone> availableZones = fac.OwnedZones;
+		if (availableZones.Count > 0) {
+			bool zoneIsOccupied = false;
+			List<Commander> factionCmders = fac.OwnedCommanders;
+			for (int i = availableZones.Count - 1; i >= 0; i--) {
+				zoneIsOccupied = false;
+				foreach (Commander cmd in factionCmders) {
+					if (cmd.zoneIAmIn == availableZones[i].ID) {
+						zoneIsOccupied = true;
+						break;
+					}
+				}
+
+				if (zoneIsOccupied || availableZones[i].multRecruitmentPoints <= 0) {
+					availableZones.RemoveAt(i);
+				}
+			}
+		}
+
+		return availableZones;
 	}
 
 	public static int GetArmyAmountFromTroopList(List<TroopNumberPair> troopList) {
@@ -575,6 +631,12 @@ public class GameController : MonoBehaviour {
 		return false;
 	}
 
+	/// <summary>
+	/// returns -1 if it can't find that ID
+	/// </summary>
+	/// <param name="troopList"></param>
+	/// <param name="troopID"></param>
+	/// <returns></returns>
 	public static int IndexOfTroopInTroopList(List<TroopNumberPair> troopList, int troopID) {
 
 		for (int i = 0; i < troopList.Count; i++) {
@@ -624,6 +686,23 @@ public class GameController : MonoBehaviour {
 		}
 
 		return returnedList;
+	}
+
+	/// <summary>
+	/// converts the troop number pairs to their serializable equivalents, using troop names instead of IDs.
+	/// should be used in order to make JSONs
+	/// </summary>
+	/// <param name="troopList"></param>
+	/// <returns></returns>
+	public static SerializableTroopList TroopListToSerializableTroopList(List<TroopNumberPair> troopList) {
+		SerializableTroopList exportedList = new SerializableTroopList();
+
+		foreach (TroopNumberPair tnp in troopList) {
+			exportedList.troops.Add(new SerializedTroop
+				(GetTroopTypeByID(tnp.troopTypeID).name, tnp.troopAmount));
+		}
+
+		return exportedList;
 	}
 
 	/// <summary>

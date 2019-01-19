@@ -84,5 +84,25 @@ public struct TroopNumberPair {
 	}
 }
 
+[System.Serializable]
+public class SerializableTroopList {
+	public List<SerializedTroop> troops;
+
+	public SerializableTroopList() {
+		troops = new List<SerializedTroop>();
+	}
+}
+
+[System.Serializable]
+public class SerializedTroop {
+	public string name;
+	public int amount;
+
+	public SerializedTroop(string name, int amount) {
+		this.name = name;
+		this.amount = amount;
+	}
+}
+
 
 

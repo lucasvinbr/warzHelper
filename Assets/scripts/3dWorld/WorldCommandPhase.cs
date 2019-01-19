@@ -102,7 +102,7 @@ public class WorldCommandPhase : MonoBehaviour {
 	}
 
 	public void DeselectCmder() {
-		cmderHighlight.gameObject.SetActive(false);
+		if(cmderHighlight) cmderHighlight.gameObject.SetActive(false);
 		curSelectedCmder = null;
 	}
 

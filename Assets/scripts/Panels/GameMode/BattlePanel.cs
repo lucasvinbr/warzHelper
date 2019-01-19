@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 /// <summary>
 /// the battle panel!
@@ -16,7 +17,7 @@ public class BattlePanel : GrowingOverlayPanel {
 	//script for left side and right faction sides
 	public BattlePanelFactionSideInfo attackerSide, defenderSide;
 
-	public GameObject mainResolutionOptionsBox, manualResolutionOptionsBox;
+	public GameObject mainResolutionOptionsBox, manualResolutionOptionsBox, impExpResolutionOptionsBox;
 
 	public BattleResolutionPercentagePanel percentageResolutionPanel;
 
@@ -96,7 +97,52 @@ public class BattlePanel : GrowingOverlayPanel {
 
 	public void ResetUI() {
 		manualResolutionOptionsBox.SetActive(false);
+		impExpResolutionOptionsBox.SetActive(false);
 		mainResolutionOptionsBox.SetActive(true);
 		resolutionBtnsGroup.interactable = true;
+	}
+
+	public void OpenExportOps() {
+
+		List<KeyValuePair<string, UnityAction>> exportOptions =
+			new List<KeyValuePair<string, UnityAction>>();
+
+		GameInterface GI = GameInterface.instance;
+
+		//add export options now...
+
+		//JSON basic "all troops together" export!
+		exportOptions.Add(new KeyValuePair<string, UnityAction>("Export to JSON (all troops in a simple list - don't use if both sides use the same troop type)", () => {
+			SerializableTroopList exportedList = GameController.TroopListToSerializableTroopList
+				(GameController.GetCombinedTroopsFromTwoLists
+				(attackerSide.sideArmy, defenderSide.sideArmy));
+			string JSONContent = JsonUtility.ToJson(exportedList);
+			Debug.Log(JSONContent);
+			GI.textInputPanel.SetPanelInfo("JSON Export Result", "", JSONContent, "Copy to Clipboard", () => {
+
+				GameInterface.CopyToClipboard(GI.textInputPanel.theInputField.text);
+
+			});
+			GI.textInputPanel.Open();
+			GI.exportOpsPanel.gameObject.SetActive(false);
+		}));
+
+
+		//when done preparing options, open the export ops panel
+		GI.exportOpsPanel.Open("Remaining Armies: Export Options", exportOptions);
+	}
+
+	public void OpenImportOps() {
+		List<KeyValuePair<string, UnityAction>> importOptions =
+			new List<KeyValuePair<string, UnityAction>>();
+
+		GameInterface GI = GameInterface.instance;
+
+
+		//TODO some import options
+
+
+		//when done preparing options, open the import ops panel
+		GI.exportOpsPanel.Open("Remaining Armies: Import Options", importOptions);
 	}
 }
