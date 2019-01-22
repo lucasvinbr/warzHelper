@@ -1,4 +1,4 @@
-﻿// PersistenceHandler
+// PersistenceHandler
 
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,40 @@ using UnityEngine;
 /// </summary>
 public class PersistenceHandler
 {
+
+    public static string gamesDirectory
+    {
+        get
+        {
+            return Application.streamingAssetsPath + "/savedGames/";
+        }
+    }
+
+    public static string templatesDirectory
+    {
+        get
+        {
+            return Application.streamingAssetsPath + "/savedTemplates/";
+        }
+    }
+
+    public static bool IsAValidFilename(string theName)
+    {
+        if (string.IsNullOrEmpty(theName)) return false;
+
+        if (theName.Contains("?") || theName.Contains(":") || theName.Contains("/") || theName.Contains("\\") ||
+            theName.Contains("\"") || theName.Contains("<") || theName.Contains(">") || theName.Contains(".") ||
+            theName.Contains("*") || theName.Contains("|")) return false;
+
+        return true;
+    }
+
+	public static void CreateDirIfNotExists(string path) {
+		if (!Directory.Exists(path)) {
+			Directory.CreateDirectory(path);
+		}
+	}
+
     /// <summary>
     /// does a LoadFromFile on each file found in the directory;
     /// returns the successfully loaded data
@@ -52,12 +86,27 @@ public class PersistenceHandler
 
             if (File.Exists(fileName))
             {
-                FileStream readStream = new FileStream(fileName, FileMode.Open);
-                T loadedData = (T)serializer.Deserialize(readStream);
-                readStream.Close();
-                return loadedData;
-            }
-            else return default(T);
+                using (FileStream readStream = new FileStream(fileName, FileMode.Open))
+                {
+                    try
+                    {
+                        T loadedData = (T)serializer.Deserialize(readStream);
+                        readStream.Close();
+                        return loadedData;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("an error occurred when trying to read file " + fileName + " as a xml! error: " + e.ToString());
+                        readStream.Close();
+                        return default(T);
+                    }
+
+                }
+			}
+			else {
+				Debug.LogWarning(fileName + " load: file does not seem to exist");
+				return default(T);
+			}
         }
         catch (Exception e)
         {
@@ -83,33 +132,20 @@ public class PersistenceHandler
         }
     }
 
-    public static void SaveToFile<T>(T dataToSave, string fileName, bool notifyMsg = true, string subDirectory = null)
+    public static void SaveToFile<T>(T dataToSave, string filePath, bool notifyMsg = true)
     {
         try
         {
             XmlSerializer serializer = new XmlSerializer(typeof(T));
 
-            string filePath = Application.streamingAssetsPath + fileName + ".xml";
-
-            if (subDirectory != null)
+            using (StreamWriter writer = new StreamWriter(filePath))
             {
-                if (!Directory.Exists(Application.streamingAssetsPath + "/" + subDirectory + "/"))
+                serializer.Serialize(writer, dataToSave);
+                writer.Close();
+                if (notifyMsg)
                 {
-                    Directory.CreateDirectory(Application.streamingAssetsPath + "/" + subDirectory + "/");
+                    Debug.Log("saved at: " + filePath);
                 }
-
-                filePath = Application.streamingAssetsPath + "/" + subDirectory + "/" + fileName + ".xml";
-            }
-            
-
-            
-
-            StreamWriter writer = new StreamWriter(filePath);
-            serializer.Serialize(writer, dataToSave);
-            writer.Close();
-            if (notifyMsg)
-            {
-                Debug.LogError("saved at: " + filePath);
             }
         }
         catch (Exception e)
@@ -117,6 +153,18 @@ public class PersistenceHandler
             Debug.LogError("an error occurred while trying to save game data! error: " + e.ToString());
         }
 
+    }
+
+    public static void DeleteFile(string filePath)
+    {
+        try
+        {
+            File.Delete(filePath);
+            Debug.Log("deleted file at " + filePath);
+        }catch(Exception e)
+        {
+            Debug.LogError("an error occurred while trying to delete data! error: " + e.ToString());
+        }
     }
 }
 
