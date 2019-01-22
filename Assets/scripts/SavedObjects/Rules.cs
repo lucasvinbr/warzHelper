@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Rules {
 	/// <summary>
-	/// the maximum multiplier applied to the sum of all troops' autoResolvePower during autocalc battles
+	/// the maximum multiplier applied to the sum of all troops' autoResolvePower during autocalc battles.
 	/// it might help a losing faction win some battles, but may make troop training lose relevance if too high
 	/// </summary>
-	public int autoResolveBattleDieSides = 6;
+	public float autoResolveBattleDieSides = 6;
 
 	/// <summary>
 	/// the points each commander receives at the beginning of their faction's turn

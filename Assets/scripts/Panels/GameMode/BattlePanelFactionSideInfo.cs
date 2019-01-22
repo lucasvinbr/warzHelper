@@ -28,6 +28,8 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 
 	public float curArmyPower;
 
+	public int curArmyNumbers = 0;
+
 	public bool depletingBar = false;
 
 	public const float BAR_DEPLETION_TIME = 0.8f, SIDE_DEFEATED_FADE_TIME = 1.0f, SIDE_DEFEATED_NOTIFY_DELAY = 1.0f;
@@ -101,13 +103,20 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		}
 
 		factionForcesDescTxt.text = forceDescription;
+		curArmyNumbers = armyNumbers;
 		factionTroopNumbersTxt.text = armyNumbers.ToString() + " Troops";
 		factionAutocalcPowerTxt.text = "Power: " + armyPower.ToString(CultureInfo.InvariantCulture);
 		initialArmyPower = armyPower;
-
+		curArmyPower = armyPower;
 	}
 
-	public void UpdatePostBattleArmy() { 
+	/// <summary>
+	/// updates the army's data and display.
+	/// the bar routine is optional unless the side's power is 0;
+	/// it will always run in that case
+	/// </summary>
+	/// <param name="startDepletePowerBarRoutine"></param>
+	public void UpdatePostBattleArmy(bool startDepletePowerBarRoutine = true) { 
 		sideArmy.Clear();
 		int armyNumbers = 0;
 		float armyPower = 0;
@@ -121,15 +130,17 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		factionTroopNumbersTxt.text = armyNumbers.ToString() + " Troops";
 		factionAutocalcPowerTxt.text = "Power: " + armyPower.ToString(CultureInfo.InvariantCulture);
 
+		curArmyNumbers = armyNumbers;
 		curArmyPower = armyPower;
-		StartCoroutine(DepletePowerBarAccordingToPower(initialArmyPower, curArmyPower));
+		if(startDepletePowerBarRoutine || curArmyPower <= 0)
+			StartCoroutine(DepletePowerBarAccordingToPower(initialArmyPower, curArmyPower));
 	}
 
 	/// <summary>
-	/// distributes losses among troop containers and calls the power bar depletion routine.
+	/// distributes losses among troop containers and optionally calls the power bar depletion routine
 	/// </summary>
 	/// <param name="remainingArmy"></param>
-	public void SetPostBattleArmyData(List<TroopNumberPair> remainingArmy) {
+	public void SetPostBattleArmyData_RemainingArmy(List<TroopNumberPair> remainingArmy, bool depleteBarRoutine = true) {
 		float lossPercent = 0;
 		int initialTroopAmount = 0;
 		int powerLost = 0;
@@ -142,37 +153,41 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		}
 
 		pointsAwardedToVictor += powerLost;
-		UpdatePostBattleArmy();
+		UpdatePostBattleArmy(depleteBarRoutine);
 	}
 
 	/// <summary>
-	/// distributes losses among troop containers and calls the power bar depletion routine
+	/// distributes losses among troop containers and optionally calls the power bar depletion routine
 	/// </summary>
 	/// <param name="remainingPercent"></param>
-	public void SetPostBattleArmyData(float remainingPercent) {
-		float lossPercent = 1.0f - remainingPercent;
+	public void SetPostBattleArmyData_RemainingPercent(float remainingPercent, bool depleteBarRoutine = true) {
+		float lossPercent = Mathf.Clamp(1.0f - remainingPercent, 0.0f, 1.0f);
 		int initialTroopAmount = 0;
-		int powerLost = 0;
+		int pointAward = 0;
 		foreach (TroopNumberPair tnp in sideArmy) {
 			initialTroopAmount = sideArmy[GameController.IndexOfTroopInTroopList
 				(sideArmy, tnp.troopTypeID)].troopAmount;
-			powerLost += RemoveTroopByPercentageInAllConts(tnp.troopTypeID, initialTroopAmount,
+			pointAward += RemoveTroopByPercentageInAllConts(tnp.troopTypeID, initialTroopAmount,
 				lossPercent);
 		}
 
-		pointsAwardedToVictor += powerLost;
-		UpdatePostBattleArmy();
+		pointsAwardedToVictor += pointAward;
+		UpdatePostBattleArmy(depleteBarRoutine);
 	}
 
 	/// <summary>
-	/// autocalc resolution of army data
+	/// converts the power lost to a percentage of troops lost,
+	/// then runs the "set post battle data" according to that percentage.
+	/// Also optionally calls the power bar depletion routine
 	/// </summary>
-	public void SetPostBattleArmyData() {
-		//TODO autocalc!
+	public void SetPostBattleArmyData_PowerLost(float powerLost, bool depleteBarRoutine = true) {
+		float remainingPercentage = Mathf.Max(0.0f, (curArmyPower - powerLost) / curArmyPower);
+
+		SetPostBattleArmyData_RemainingPercent(remainingPercentage, depleteBarRoutine);
 	}
 
 	/// <summary>
-	/// returns the total autocalc power lost
+	/// returns the points awarded to the other side for our losses
 	/// </summary>
 	/// <param name="troopID"></param>
 	/// <param name="initialTotalTroopAmount"></param>
@@ -185,7 +200,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		int totalRemovedTroops = 0;
 		int removedTroopsFromCurContainer = 0;
 		float powerLostPerTroop = GameController.GetTroopTypeByID(troopID).autoResolvePower;
-		int totalPowerLost = 0;
+		int pointAward = 0;
 		TroopNumberPair affectedPair;
 		foreach (TroopContainer tContainer in ourContainers) {
 			troopIndexInCurContainer = tContainer.IndexOfTroopInContainer(troopID);
@@ -193,7 +208,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 				affectedPair = tContainer.troopsContained[troopIndexInCurContainer];
 				removedTroopsFromCurContainer = Mathf.RoundToInt(affectedPair.troopAmount * lossPercent);
 				tContainer.RemoveTroop(troopID, removedTroopsFromCurContainer);
-				totalPowerLost += Mathf.RoundToInt(powerLostPerTroop * removedTroopsFromCurContainer);
+				pointAward += Mathf.RoundToInt(powerLostPerTroop * removedTroopsFromCurContainer);
 				totalRemovedTroops += removedTroopsFromCurContainer;
 			}
 		}
@@ -207,7 +222,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 
 		}
 
-		return totalPowerLost;
+		return pointAward;
 	}
 
 	public void SharePointsBetweenConts(int points) {

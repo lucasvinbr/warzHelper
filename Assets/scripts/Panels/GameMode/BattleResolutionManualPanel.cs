@@ -26,8 +26,8 @@ public class BattleResolutionManualPanel : GenericOverlayPanel {
 	}
 
 	public void OnConfirm() {
-		bPanel.attackerSide.SetPostBattleArmyData(attackerPanel.BakeIntoArmy());
-		bPanel.defenderSide.SetPostBattleArmyData(defenderPanel.BakeIntoArmy());
+		bPanel.attackerSide.SetPostBattleArmyData_RemainingArmy(attackerPanel.BakeIntoArmy());
+		bPanel.defenderSide.SetPostBattleArmyData_RemainingArmy(defenderPanel.BakeIntoArmy());
 	}
 
 }

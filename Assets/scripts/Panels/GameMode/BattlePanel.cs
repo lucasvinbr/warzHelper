@@ -68,8 +68,63 @@ public class BattlePanel : GrowingOverlayPanel {
 		manualPanel.SetupAndOpen(attackerSide.sideArmy, defenderSide.sideArmy);
 	}
 
+	/// <summary>
+	/// multiple mini-battles are made between randomized samples of each side's army
+	/// </summary>
 	public void AutocalcResolution() {
-		//TODO autocalc!
+		int sampleSize;
+
+		int attackerSampleSize, defenderSampleSize;
+
+		float armyNumbersProportion;
+
+		float attackerAutoPower, defenderAutoPower;
+
+		bool shouldAnimateBars = false;
+
+		while(attackerSide.curArmyPower > 0 && defenderSide.curArmyPower > 0) {
+			sampleSize = Mathf.Min(attackerSide.curArmyNumbers, defenderSide.curArmyNumbers, 20);
+
+			attackerSampleSize = sampleSize;
+			defenderSampleSize = sampleSize;
+
+			armyNumbersProportion = (float)attackerSide.curArmyNumbers / defenderSide.curArmyNumbers;
+			//Debug.Log("army num proportion: " + armyNumbersProportion);
+			//the size with a bigger army gets a bigger sample
+			if (armyNumbersProportion > 1.0f) {
+				attackerSampleSize = Mathf.RoundToInt(sampleSize * armyNumbersProportion);
+			}
+			else {
+				defenderSampleSize = Mathf.RoundToInt(sampleSize / armyNumbersProportion);
+			}
+
+			//Debug.Log("attacker sSize: " + attackerSampleSize);
+			//Debug.Log("defender sSize: " + defenderSampleSize);
+
+			attackerAutoPower = GameController.
+				GetRandomBattleAutocalcPower(attackerSide.sideArmy, attackerSampleSize);
+			defenderAutoPower = GameController.
+				GetRandomBattleAutocalcPower(defenderSide.sideArmy, defenderSampleSize);
+
+			//Debug.Log("attacker auto power: " + attackerAutoPower);
+			//Debug.Log("defender auto power: " + defenderAutoPower);
+
+			//who wins the mini-battle should lose less power
+			if(attackerAutoPower > defenderAutoPower) {
+				defenderAutoPower /= 3;
+			}else {
+				attackerAutoPower /= 3;
+			}
+
+			//animate the power bars if the conflict is over
+			shouldAnimateBars = attackerAutoPower >= defenderSide.curArmyPower ||
+				defenderAutoPower >= attackerSide.curArmyPower;
+
+			defenderSide.SetPostBattleArmyData_PowerLost(attackerAutoPower, shouldAnimateBars);
+			attackerSide.SetPostBattleArmyData_PowerLost(defenderAutoPower, shouldAnimateBars);
+
+		}
+		
 	}
 
 	/// <summary>

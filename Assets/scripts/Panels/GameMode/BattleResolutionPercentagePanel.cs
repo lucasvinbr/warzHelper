@@ -26,8 +26,8 @@ public class BattleResolutionPercentagePanel : GenericOverlayPanel {
 	}
 
 	public void OnConfirmPercentages() {
-		bPanel.attackerSide.SetPostBattleArmyData(attackerBox.sliderGroup.theSlider.value);
-		bPanel.defenderSide.SetPostBattleArmyData(defenderBox.sliderGroup.theSlider.value);
+		bPanel.attackerSide.SetPostBattleArmyData_RemainingPercent(attackerBox.sliderGroup.theSlider.value);
+		bPanel.defenderSide.SetPostBattleArmyData_RemainingPercent(defenderBox.sliderGroup.theSlider.value);
 	}
 
 }

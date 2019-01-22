@@ -104,7 +104,7 @@ public class AiPlayer {
 
 			hasActed = false;
 
-			Debug.Log("rec chance: " + recruitChance + " topMove: " + topMoveScore);
+			//Debug.Log("rec chance: " + recruitChance + " topMove: " + topMoveScore);
 
 			if(recruitChance > topMoveScore) {
 				hasActed = commandableCmders[i].RecruitTroops();
@@ -172,7 +172,7 @@ public class AiPlayer {
 					GetRandomTroopInfluenceFactor();
 			}
 		}
-		Debug.Log("pot enemy: " + potentialEnemyPower + " pot ally: " + potentialAlliedPower);
+		//Debug.Log("pot enemy: " + potentialEnemyPower + " pot ally: " + potentialAlliedPower);
 
 		return Mathf.Max(0, (potentialEnemyPower - potentialAlliedPower) /
 			Mathf.Max(1, potentialEnemyPower));

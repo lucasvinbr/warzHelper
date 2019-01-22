@@ -613,6 +613,58 @@ public class GameController : MonoBehaviour {
 	}
 
 
+	/// <summary>
+	/// from the provided army, gets random members until the target size is reached.
+	/// returns the base army if the sample is of the same size or bigger
+	/// </summary>
+	/// <param name="baseArmy"></param>
+	/// <returns></returns>
+	public static List<TroopNumberPair> GetRandomSampleArmyFromArmy(List<TroopNumberPair> baseArmy, int sampleSize) {
+		if(sampleSize > 0 && GetArmyAmountFromTroopList(baseArmy) > sampleSize) {
+			List<TroopNumberPair> returnedSample = new List<TroopNumberPair>();
+			int addedTroops = 0;
+			int randomTroopID = -1, randomTroopIndex;
+			TroopNumberPair randomTNP;
+
+			while(addedTroops < sampleSize) {
+				//get random troop, add to returned sample.
+				//let the same troop be picked any number of times,
+				//no matter how many of them there are in the base army,
+				//for that extra (bad) luck factor
+				randomTroopID = baseArmy[Random.Range(0, baseArmy.Count)].troopTypeID;
+				randomTroopIndex = IndexOfTroopInTroopList(returnedSample, randomTroopID);
+				if(randomTroopIndex < 0) {
+					returnedSample.Add(new TroopNumberPair(randomTroopID, 1));
+				}else {
+					randomTNP = returnedSample[randomTroopIndex];
+					randomTNP.troopAmount++;
+					returnedSample[randomTroopIndex] = randomTNP;
+				}
+
+				addedTroops++;
+			}
+
+
+			return returnedSample;
+		}else {
+			return baseArmy;
+		}
+	}
+
+	/// <summary>
+	/// gets a sample from the base army and,
+	/// using the autoResolveBattleDieSides from the rules,
+	/// gets a random power considering that sample's base power
+	/// </summary>
+	/// <returns></returns>
+	public static float GetRandomBattleAutocalcPower(List<TroopNumberPair> baseArmy, int sampleSizeLimit = -1) {
+		List<TroopNumberPair> sampleArmy = GetRandomSampleArmyFromArmy(baseArmy, sampleSizeLimit);
+
+		return GetArmyAutocalcPowerFromTroopList(sampleArmy) * 
+			Random.Range(1.0f, instance.curData.rules.autoResolveBattleDieSides);
+
+	}
+
 	#endregion
 
 	public static bool AreZonesLinked(Zone z1, Zone z2) {
