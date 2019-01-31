@@ -15,6 +15,8 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 	public override void OnPhaseStart() {
 		//only zones with our commanders should have something happening 
+		conflictZones.Clear();
+		commandersBeingDeleted.Clear();
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
 		infoTxt.text = "The effects of any battles(commanders disappearing, zones being taken), happen now";

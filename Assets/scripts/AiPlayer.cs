@@ -9,7 +9,7 @@ public class AiPlayer {
 	/// how big is the influence of troops that aren't right on the spot, but can get to it quickly, in the AI's
 	/// decisions?
 	/// </summary>
-	public const float minNearbyTroopsInfluenceFactor = 0.3f, maxNearbyTroopsInfluenceFactor = 0.4f;
+	public const float minNearbyTroopsInfluenceFactor = 0.2f, maxNearbyTroopsInfluenceFactor = 0.4f;
 	/// <summary>
 	/// how big should the "move to zone" score be before we actually decide to move?
 	/// </summary>
@@ -21,7 +21,19 @@ public class AiPlayer {
 	/// make a commander more likely to leave a zone/not go to the only empty zone left?
 	/// the resulting value gets closer to this the further we are from the max cmder count
 	/// </summary>
-	public const float maxMakeRoomScoreBonus = 0.6f;
+	public const float maxMakeRoomScoreBonus = 0.5f;
+
+	/// <summary>
+	/// how much should the presence of a friendly commander in a potential move target zone
+	/// make it more likely for more cmders to go to that zone as well?
+	/// </summary>
+	public const float friendlyCmderPresenceBonusMult = 1.15f;
+
+	/// <summary>
+	/// if the ratio of spawned cmders / max cmders is below this value,
+	/// the AI should try to make room for new cmders
+	/// </summary>
+	public const float shouldGetMoreCmdersThreshold = 0.75f;
 
 	public static void AiNewCmderPhase(Faction curFac, List<Zone> availableZones) {
 		if(availableZones.Count == 1) {
@@ -79,7 +91,8 @@ public class AiPlayer {
 			//if no zone beats this score, we stay
 			topMoveScore = GetZoneDangerScore(zoneCmderIsIn, ourFac);
 
-			if(factionCmderAmountRatio < 0.8f && emptyNewCmderZones.Count == 0) {
+			if(factionCmderAmountRatio < shouldGetMoreCmdersThreshold &&
+				emptyNewCmderZones.Count == 0) {
 				//if our territories are full of cmders, make it more likely to move around
 				topMoveScore *= factionCmderAmountRatio;
 				recruitChance *= factionCmderAmountRatio;
@@ -90,10 +103,17 @@ public class AiPlayer {
 
 				scoreCheckScore = GetZoneMoveScore(scoreCheckZone, ourFac);
 
-				if(factionCmderAmountRatio < 0.8f && emptyNewCmderZones.Count == 1 &&
+
+
+				if(factionCmderAmountRatio < shouldGetMoreCmdersThreshold && emptyNewCmderZones.Count <= 1) {
+					if (emptyNewCmderZones.Count == 1 &&
 					emptyNewCmderZones[0] == scoreCheckZone) {
-					//better not move to this spot, it's the only place for a new cmder
-					scoreCheckScore *= factionCmderAmountRatio;
+						//better not move to this spot, it's the only place for a new cmder
+						scoreCheckScore *= factionCmderAmountRatio;
+					}else {
+						//make it more likely to move to this spot then
+						scoreCheckScore += Mathf.Lerp(0.0f, maxMakeRoomScoreBonus, (1 - factionCmderAmountRatio));
+					}
 				}
 
 				if (scoreCheckScore > topMoveScore) {
@@ -195,7 +215,7 @@ public class AiPlayer {
 		//we should add score if friendly commanders are already there,
 		//in order to make bigger armies
 		foreach(Commander cmd in GameController.GetCommandersOfFactionInZone(targetZone, ourFac)) {
-			finalScore *= 1.1f;
+			finalScore *= friendlyCmderPresenceBonusMult;
 		}
 
 		return finalScore;

@@ -10,6 +10,13 @@ public class Rules {
 	public float autoResolveBattleDieSides = 6;
 
 	/// <summary>
+	/// when a battle is won, the victor gets bonus points according to the autocalc power of 
+	/// the defeated troops. This value multiplies the received points 
+	/// (use 0 to disable post-battle point awards)
+	/// </summary>
+	public float battleVictorPointAwardFactor = 0.4f;
+
+	/// <summary>
 	/// the points each commander receives at the beginning of their faction's turn
 	/// </summary>
 	public int baseCommanderPointAwardOnTurnStart = 50;

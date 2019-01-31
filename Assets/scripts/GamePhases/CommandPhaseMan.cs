@@ -15,6 +15,7 @@ public class CommandPhaseMan : GamePhaseManager {
 
 	public override void OnPhaseStart() {
 		//check if we've got any cmder to actually command
+		commandableCommanders.Clear();
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
 		foreach(Commander cmder in factionCmders) {
@@ -26,8 +27,8 @@ public class CommandPhaseMan : GamePhaseManager {
 		}
 		if(commandableCommanders.Count > 0) {
 			if (playerFac.isPlayer) {
-				worldCommandScript.enabled = true;
 				worldCommandScript.allowedCmders3d = GameController.CmdersToCmder3ds(commandableCommanders);
+				worldCommandScript.enabled = true;
 				SelectCmder(commandableCommanders[0]);
 			}else {
 				AiPlayer.AiCommandPhase(playerFac, commandableCommanders, this);
@@ -131,6 +132,7 @@ public class CommandPhaseMan : GamePhaseManager {
 
 	public void MoveCommander(Cmder3d movingCmder3d, ZoneSpot destinationZone, bool runHasActed = true) {
 		movingCmder3d.data.zoneIAmIn = destinationZone.data.ID;
+		movingCmder3d.data.pointsToSpend = 0;
 		StartCoroutine(TweenCommanderToSpot(movingCmder3d, destinationZone.GetGoodSpotForCommander()));
 		if(runHasActed) CmderHasActed(movingCmder3d.data);
 	}

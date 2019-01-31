@@ -152,7 +152,8 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 				lossPercent, tnp.troopAmount);
 		}
 
-		pointsAwardedToVictor += powerLost;
+		pointsAwardedToVictor += Mathf.RoundToInt(powerLost *
+			GameController.instance.curData.rules.battleVictorPointAwardFactor);
 		UpdatePostBattleArmy(depleteBarRoutine);
 	}
 
@@ -171,7 +172,8 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 				lossPercent);
 		}
 
-		pointsAwardedToVictor += pointAward;
+		pointsAwardedToVictor += Mathf.RoundToInt(pointAward * 
+			GameController.instance.curData.rules.battleVictorPointAwardFactor);
 		UpdatePostBattleArmy(depleteBarRoutine);
 	}
 
@@ -187,7 +189,8 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 	}
 
 	/// <summary>
-	/// returns the points awarded to the other side for our losses
+	/// returns the points awarded to the other side for our losses 
+	/// (The lost troop's autocalc power is converted to points for the victor)
 	/// </summary>
 	/// <param name="troopID"></param>
 	/// <param name="initialTotalTroopAmount"></param>
