@@ -57,6 +57,9 @@ public class PostBattlePhaseMan : GamePhaseManager {
 			}else {
 				if(c.ownerFaction != confZone.ownerFaction && !zoneWasTaken) {
 					confZone.ownerFaction = c.ownerFaction;
+					//clear the points to avoid "insta-max-garrison"
+					//when taking a zone that was piling points up
+					confZone.pointsToSpend = 0; 
 					confZone.MyZoneSpot.RefreshDataDisplay();
 					zoneWasTaken = true;
 				}

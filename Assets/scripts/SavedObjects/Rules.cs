@@ -10,7 +10,7 @@ public class Rules {
 	public float autoResolveBattleDieSides = 6;
 
 	/// <summary>
-	/// when a battle is won, the victor gets bonus points according to the autocalc power of 
+	/// when a battle is won, the victor gets bonus points according to the point cost of 
 	/// the defeated troops. This value multiplies the received points 
 	/// (use 0 to disable post-battle point awards)
 	/// </summary>

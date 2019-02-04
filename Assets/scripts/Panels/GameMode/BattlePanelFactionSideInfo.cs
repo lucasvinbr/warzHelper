@@ -143,16 +143,16 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 	public void SetPostBattleArmyData_RemainingArmy(List<TroopNumberPair> remainingArmy, bool depleteBarRoutine = true) {
 		float lossPercent = 0;
 		int initialTroopAmount = 0;
-		int powerLost = 0;
+		int pointsLost = 0;
 		foreach(TroopNumberPair tnp in remainingArmy) {
 			initialTroopAmount = sideArmy[GameController.IndexOfTroopInTroopList
 				(sideArmy, tnp.troopTypeID)].troopAmount;
 			lossPercent = 1.0f - ((float) tnp.troopAmount / initialTroopAmount);
-			powerLost += RemoveTroopByPercentageInAllConts(tnp.troopTypeID, initialTroopAmount,
+			pointsLost += RemoveTroopByPercentageInAllConts(tnp.troopTypeID, initialTroopAmount,
 				lossPercent, tnp.troopAmount);
 		}
 
-		pointsAwardedToVictor += Mathf.RoundToInt(powerLost *
+		pointsAwardedToVictor += Mathf.RoundToInt(pointsLost *
 			GameController.instance.curData.rules.battleVictorPointAwardFactor);
 		UpdatePostBattleArmy(depleteBarRoutine);
 	}
@@ -190,7 +190,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 
 	/// <summary>
 	/// returns the points awarded to the other side for our losses 
-	/// (The lost troop's autocalc power is converted to points for the victor)
+	/// (The lost troop's point cost is converted to points for the victor)
 	/// </summary>
 	/// <param name="troopID"></param>
 	/// <param name="initialTotalTroopAmount"></param>
@@ -202,7 +202,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		int troopIndexInCurContainer = -1;
 		int totalRemovedTroops = 0;
 		int removedTroopsFromCurContainer = 0;
-		float powerLostPerTroop = GameController.GetTroopTypeByID(troopID).autoResolvePower;
+		int pointLostPerTroop = GameController.GetTroopTypeByID(troopID).pointCost;
 		int pointAward = 0;
 		TroopNumberPair affectedPair;
 		foreach (TroopContainer tContainer in ourContainers) {
@@ -211,32 +211,92 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 				affectedPair = tContainer.troopsContained[troopIndexInCurContainer];
 				removedTroopsFromCurContainer = Mathf.RoundToInt(affectedPair.troopAmount * lossPercent);
 				tContainer.RemoveTroop(troopID, removedTroopsFromCurContainer);
-				pointAward += Mathf.RoundToInt(powerLostPerTroop * removedTroopsFromCurContainer);
+				pointAward += pointLostPerTroop * removedTroopsFromCurContainer;
 				totalRemovedTroops += removedTroopsFromCurContainer;
 			}
 		}
 
 		if(knownRemainingTroops >= 0 &&
 			(initialTotalTroopAmount - totalRemovedTroops) != knownRemainingTroops) {
-			//rounding caused some error.. does this really happen?
-			Debug.LogWarning("rounding error in loss calculation : known remaining is " + 
-				knownRemainingTroops + ", actual remaining is " + 
-				(initialTotalTroopAmount - totalRemovedTroops));
-
+			//rounding caused some error!
+			//adjust manually
+			pointAward += AdjustTroopAmountInConts(troopID,
+				knownRemainingTroops - (initialTotalTroopAmount - totalRemovedTroops));
 		}
 
 		return pointAward;
 	}
 
-	public void SharePointsBetweenConts(int points) {
+	/// <summary>
+	/// adds (or removes) troops to any of the containers, returning the points awarded in the process
+	/// (adding troops results in a negative number).
+	/// Should be used to correct rounding errors when using RemoveTroopByPercentageInAllConts
+	/// (that method is better for setting remaining troops because it balances losses between the conts)
+	/// </summary>
+	/// <param name="troopID"></param>
+	/// <param name="amountToAdd"></param>
+	/// <returns></returns>
+	public int AdjustTroopAmountInConts(int troopID, int amountToAdd) {
+		int troopIndexInCurContainer = -1;
+		int adjustmentMade = 0;
+		int pointsPerTroop = GameController.GetTroopTypeByID(troopID).pointCost;
+		int pointAward = 0;
+		TroopNumberPair affectedPair;
+		while (adjustmentMade != amountToAdd) {
+			troopIndexInCurContainer = -1;
+			foreach (TroopContainer tContainer in ourContainers) {
+				troopIndexInCurContainer = tContainer.IndexOfTroopInContainer(troopID);
+				if (troopIndexInCurContainer >= 0) {
+					affectedPair = tContainer.troopsContained[troopIndexInCurContainer];
+					if (amountToAdd > 0) {
+						tContainer.AddTroop(troopID, 1);
+						pointAward -= pointsPerTroop;
+						adjustmentMade += 1;
+					}
+					else {
+						tContainer.RemoveTroop(troopID, 1);
+						pointAward += pointsPerTroop;
+						adjustmentMade -= 1;
+					}
+					break;
+				}
+			}
+
+			//if we couldn't find this troop type in any cont....
+			if(troopIndexInCurContainer < 0) {
+				if(amountToAdd > 0) {
+					//then just add one to any container
+					ourContainers[0].AddTroop(troopID, 1);
+					pointAward -= pointsPerTroop;
+					adjustmentMade += 1;
+				}else {
+					//abort, there's no one to remove anymore
+					Debug.LogWarning("troop adjustment: attempted to remove more troops than possible");
+					break;
+				}
+			}
+		}
+
+		return pointAward;
+	}
+
+	/// <summary>
+	/// gives the points to this side's containers;
+	/// all points are immediately used to train troops...
+	/// and any remaining points can be removed, optionally
+	/// </summary>
+	/// <param name="points"></param>
+	public void SharePointsBetweenConts(int points, bool setPointsToZeroAfterTraining = true) {
 		//divide between the containers...
 		//also consider the power lost since the beginning of the battle
 		//so that if only a few survive, they won't get tons of points
 		int pointsForEach = Mathf.RoundToInt((points / ourContainers.Count) *
 			(curArmyPower / initialArmyPower));
+		Debug.Log("points awarded for each cont: " + pointsForEach);
 		foreach (TroopContainer tContainer in ourContainers) {
 			tContainer.pointsToSpend += pointsForEach;
 			tContainer.TrainTroops();
+			if (setPointsToZeroAfterTraining) tContainer.pointsToSpend = 0;
 		}
 	}
 

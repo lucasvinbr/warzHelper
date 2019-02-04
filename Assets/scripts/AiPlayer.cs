@@ -103,18 +103,24 @@ public class AiPlayer {
 
 				scoreCheckScore = GetZoneMoveScore(scoreCheckZone, ourFac);
 
-
-
-				if(factionCmderAmountRatio < shouldGetMoreCmdersThreshold && emptyNewCmderZones.Count <= 1) {
-					if (emptyNewCmderZones.Count == 1 &&
-					emptyNewCmderZones[0] == scoreCheckZone) {
-						//better not move to this spot, it's the only place for a new cmder
+				//if we're low on commanders,
+				//we should try to be more selective in our attacks...
+				//make room for new cmders by stacking existing cmders in a friendly zone and stuff
+				if(factionCmderAmountRatio < shouldGetMoreCmdersThreshold) {
+					if (scoreCheckZone.ownerFaction != ourFac.ID) {
 						scoreCheckScore *= factionCmderAmountRatio;
 					}else {
-						//make it more likely to move to this spot then
-						scoreCheckScore += Mathf.Lerp(0.0f, maxMakeRoomScoreBonus, (1 - factionCmderAmountRatio));
+						if (emptyNewCmderZones.Count == 1 &&
+							emptyNewCmderZones[0] == scoreCheckZone) {
+							//better not move to this spot, it's the only place for a new cmder
+							scoreCheckScore *= factionCmderAmountRatio;
+						}
+						else {
+							//make it more likely to move to this spot then
+							scoreCheckScore += Mathf.Lerp(0.0f, maxMakeRoomScoreBonus, (1 - factionCmderAmountRatio));
+						}
 					}
-				}
+				} 
 
 				if (scoreCheckScore > topMoveScore) {
 					topMoveScore = scoreCheckScore;
