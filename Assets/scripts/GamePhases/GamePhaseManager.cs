@@ -46,4 +46,11 @@ public abstract class GamePhaseManager : MonoBehaviour {
 			yield return null;
 		}
 	}
+
+	/// <summary>
+	/// stops all coroutines... and maybe does something else if overridden
+	/// </summary>
+	public virtual void InterruptPhase() {
+		StopAllCoroutines();
+	}
 }

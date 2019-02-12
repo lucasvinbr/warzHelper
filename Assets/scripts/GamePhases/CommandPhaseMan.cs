@@ -131,8 +131,11 @@ public class CommandPhaseMan : GamePhaseManager {
 	}
 
 	public void MoveCommander(Cmder3d movingCmder3d, ZoneSpot destinationZone, bool runHasActed = true) {
+		Zone ourOldZone = GameController.GetZoneByID(movingCmder3d.data.zoneIAmIn);
 		movingCmder3d.data.zoneIAmIn = destinationZone.data.ID;
 		movingCmder3d.data.pointsToSpend = 0;
+		//reset other cmders' positions after departing
+		World.TidyZone(ourOldZone);
 		StartCoroutine(TweenCommanderToSpot(movingCmder3d, destinationZone.GetGoodSpotForCommander()));
 		if(runHasActed) CmderHasActed(movingCmder3d.data);
 	}
@@ -160,6 +163,12 @@ public class CommandPhaseMan : GamePhaseManager {
 			yield return null;
 		}
 
+	}
+
+	public override void InterruptPhase() {
+		base.InterruptPhase();
+		worldCommandScript.enabled = false;
+		selectedCmderBtnsGroup.interactable = false;
 	}
 
 }

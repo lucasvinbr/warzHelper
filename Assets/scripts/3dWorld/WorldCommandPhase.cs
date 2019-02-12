@@ -109,7 +109,9 @@ public class WorldCommandPhase : MonoBehaviour {
 
 	private void OnDisable() {
 		DeselectCmder();
-		zoneGrowScript.enabled = false;
+		if(zoneGrowScript) zoneGrowScript.enabled = false;
+		allowedCmders3d.Clear();
+		allowedMoveSpots.Clear();
 	}
 
 }

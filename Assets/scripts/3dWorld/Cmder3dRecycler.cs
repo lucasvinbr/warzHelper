@@ -22,7 +22,7 @@ public class Cmder3dRecycler : Recycler<Cmder3d> {
 
     public override Cmder3d CreateNewObj()
     {
-        GameObject newCmd = GameObject.Instantiate(cmder3dPrefab);
+        GameObject newCmd = Instantiate(cmder3dPrefab);
         newCmd.transform.SetParent(spawnedCmdersParent);
         return newCmd.GetComponent<Cmder3d>();
     }

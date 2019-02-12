@@ -21,7 +21,7 @@ public class AiPlayer {
 	/// make a commander more likely to leave a zone/not go to the only empty zone left?
 	/// the resulting value gets closer to this the further we are from the max cmder count
 	/// </summary>
-	public const float maxMakeRoomScoreBonus = 0.5f;
+	public const float maxMakeRoomScoreBonus = 0.9f;
 
 	/// <summary>
 	/// how much should the presence of a friendly commander in a potential move target zone
@@ -139,6 +139,9 @@ public class AiPlayer {
 			if (!hasActed && topMoveScore > GetRandomMoveScoreThreshold()) {
 				if(moveDestZone.ID != zoneCmderIsIn.ID) {
 					phaseScript.MoveCommander(commandableCmders[i].MeIn3d, moveDestZone.MyZoneSpot, false);
+					//refresh the empty zone list if we moved;
+					//that way, our other cmders may not "feel" the same need to move as this one did
+					emptyNewCmderZones = GameController.GetZonesForNewCmdersOfFaction(ourFac);
 					hasActed = true;
 				}
 			}
@@ -155,6 +158,7 @@ public class AiPlayer {
 				if (!hasActed) {
 					if (moveDestZone.ID != zoneCmderIsIn.ID) {
 						phaseScript.MoveCommander(commandableCmders[i].MeIn3d, moveDestZone.MyZoneSpot, false);
+						emptyNewCmderZones = GameController.GetZonesForNewCmdersOfFaction(ourFac);
 						hasActed = true;
 					}
 					//if we can't recruit nor train and staying is more interesting than moving...

@@ -66,5 +66,10 @@ public class BattlePhaseMan : GamePhaseManager {
 		OpenBattleResolutionPanelForZone(battleZones[0]);
 	}
 
+	public override void InterruptPhase() {
+		base.InterruptPhase();
+		battlePanel.FullInterrupt();
+	}
+
 
 }

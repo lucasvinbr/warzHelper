@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Xml.Serialization;
 
 [XmlInclude(typeof(GameInfo))]
+[System.Serializable]
 public class TemplateInfo {
 
     public string gameName;

@@ -68,10 +68,7 @@ public class ZoneSpot : MonoBehaviour {
 	/// </summary>
 	/// <returns></returns>
 	public Vector3 GetGoodSpotForCommander() {
-		int cmderCount = GameController.GetCommandersInZone(data).Count;
-		return transform.position + new Vector3((CMDER_OFFSET / 2) * (cmderCount % 2 == 1 ? -1 : 1),
-			CMDER_OFFSET * (cmderCount / 4),
-			CMDER_OFFSET * (cmderCount % 4 <= 1 ? 1 : -1));
+		return GetGoodSpotForCommander(GameController.GetCommandersInZone(data).Count);
 	}
 
 	/// <summary>

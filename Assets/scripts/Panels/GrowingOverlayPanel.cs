@@ -5,6 +5,8 @@ using UnityEngine.Events;
 
 /// <summary>
 /// a class that affects the openedPanelsOverlayLevel of GameInterface
+/// ... and grows and shrinks!
+/// (it only decrements the overlay level after done shrinking)
 /// </summary>
 public class GrowingOverlayPanel : GenericOverlayPanel {
 
@@ -27,6 +29,14 @@ public class GrowingOverlayPanel : GenericOverlayPanel {
 		StartCoroutine(TransitionRoutine(false, actionOnDoneShrinking));
 	}
 
+	/// <summary>
+	/// stops any coroutines and sets our transitioning var to false
+	/// </summary>
+	public virtual void ResetTransitionState() {
+		StopAllCoroutines();
+		transitioning = false;
+		transform.localScale = Vector3.one;
+	}
 
 	public virtual IEnumerator TransitionRoutine(bool growing, UnityAction actionOnDoneTransition = null) {
 		if (transitioning) {

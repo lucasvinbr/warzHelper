@@ -59,5 +59,9 @@ public class NewCmderPhaseMan : GamePhaseManager {
 		yield return base.ProceedToNextPhaseRoutine(noWait);
 	}
 
+	public override void InterruptPhase() {
+		base.InterruptPhase();
+		World.instance.cmderPlacerScript.enabled = false;
+	}
 
 }

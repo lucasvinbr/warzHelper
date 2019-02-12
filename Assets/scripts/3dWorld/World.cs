@@ -73,11 +73,9 @@ public class World : MonoBehaviour {
 	}
 
 	public static void CleanCmders() {
-		foreach (Cmder3d cmder in instance.spawnedCmders) {
-			Cmder3dRecycler.instance.PoolObj(cmder);
+		while(instance.spawnedCmders.Count > 0) {
+			RemoveCmder3d(instance.spawnedCmders[0]);
 		}
-
-		instance.spawnedCmders.Clear();
 	}
 
 	public static void BeginNewZonePlacement() {
@@ -131,7 +129,7 @@ public class World : MonoBehaviour {
 
 	public static Cmder3d GetCmder3dForCommander(Commander theCmder) {
 		foreach(Cmder3d cmd3d in instance.spawnedCmders) {
-			if(cmd3d.data == theCmder) {
+			if(cmd3d.data.ID == theCmder.ID) {
 				return cmd3d;
 			}
 		}
@@ -181,6 +179,18 @@ public class World : MonoBehaviour {
 			cmd3d.RefreshDataDisplay();
 			instance.spawnedCmders.Add(cmd3d);
 			placedCmdersInEachZone[curZone]++;
+		}
+	}
+
+	/// <summary>
+	/// Reset the positions of all the cmder3ds in the target zone, so that future cmder3ds 
+	/// won't overlap with those who stay if some switch zones
+	/// </summary>
+	public static void TidyZone(Zone targetZone) {
+		int resetCmders = 0;
+		foreach(Commander cmd in GameController.GetCommandersInZone(targetZone)) {
+			cmd.MeIn3d.transform.position = targetZone.MyZoneSpot.GetGoodSpotForCommander(resetCmders);
+			resetCmders++;
 		}
 	}
 
@@ -254,6 +264,7 @@ public class World : MonoBehaviour {
 
 	public static void RemoveCmder3d(Cmder3d target3d) {
 		Cmder3dRecycler.instance.PoolObj(target3d);
+		instance.spawnedCmders.Remove(target3d);
 		target3d.transform.localScale = Vector3.one;
 	}
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using UnityEngine;
 
+[System.Serializable]
 public class Zone : TroopContainer {
 
 	/// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class Rules {
 	/// <summary>
 	/// the maximum multiplier applied to the sum of all troops' autoResolvePower during autocalc battles.

@@ -150,6 +150,16 @@ public class BattlePanel : GrowingOverlayPanel {
 		battlePhase.OnBattleResolved(curWarzone);
 	}
 
+	/// <summary>
+	/// immediately stops coroutines for both sides and the panel itself.
+	/// things that would happen in the end of those coroutines won't happen
+	/// </summary>
+	public void FullInterrupt() {
+		attackerSide.StopAllCoroutines();
+		defenderSide.StopAllCoroutines();
+		ResetTransitionState();
+	}
+
 	public void ResetUI() {
 		manualResolutionOptionsBox.SetActive(false);
 		impExpResolutionOptionsBox.SetActive(false);

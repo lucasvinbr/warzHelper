@@ -45,6 +45,7 @@ public class GameModeHandler : ModeUI {
 		World.CleanCmders();
 		World.ToggleWorldDisplay(false);
 		World.instance.garrDescOnHoverScript.enabled = false;
+		StopAllPhaseMans();
 		GameInterface.instance.DisableAndStoreAllOpenOverlayPanels();
 		GameController.instance.facMatsHandler.PurgeFactionColorsDict();
 		TexLoader.PurgeTexDict();
@@ -118,6 +119,15 @@ public class GameModeHandler : ModeUI {
 	public void StartRespectivePhaseMan() {
 		phasesTabGroup.ToggleTabIndex((int)curPhase);
 		orderedPhaseManagers[(int)curPhase].OnPhaseStart();
+	}
+
+	/// <summary>
+	/// Interrupts all phases, properly stopping their routines and anything else they had running
+	/// </summary>
+	public void StopAllPhaseMans() {
+		foreach(GamePhaseManager phaseMan in orderedPhaseManagers) {
+			phaseMan.InterruptPhase();
+		}
 	}
 
 	public void GoToNextTurnPhase() {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
+[System.Serializable]
 public class Commander : TroopContainer {
 	public int ID;
 
@@ -27,6 +28,9 @@ public class Commander : TroopContainer {
 		{
 			if(_meIn3d == null) {
 				_meIn3d = World.GetCmder3dForCommander(this);
+				if(_meIn3d == null) {
+					Debug.LogWarning("no 3d for cmder! cmderID: " + ID);
+				}
 			}
 			return _meIn3d;
 		}
@@ -35,7 +39,7 @@ public class Commander : TroopContainer {
 	public Commander() { }
 
 	public Commander(int ownerFactionID, int zoneStartingLocation) {
-		this.ID = GameController.GetUnusedZoneID();
+		this.ID = GameController.GetUnusedCmderID();
 		this.ownerFaction = ownerFactionID;
 		this.zoneIAmIn = zoneStartingLocation;
 		troopsContained = new List<TroopNumberPair>();
