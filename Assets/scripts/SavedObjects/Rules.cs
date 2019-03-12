@@ -11,11 +11,21 @@ public class Rules {
 	public float autoResolveBattleDieSides = 6;
 
 	/// <summary>
+	/// in an autocalc battle, the auto-resolve power of the involved troops is multiplied by a random
+	/// value between 1 and autoResolveBattleDieSides. The side with the greatest resulting value wins,
+	/// and then the winner's resulting value is deducted from the loser's power, so that
+	/// some troops are lost.
+	/// This value defines if, and how much, the winner should also take damages according to the loser's
+	/// power result (a value greater than 1 will make the winner take extra damage compared to the loser!)
+	/// </summary>
+	public float autoResolveWinnerDamageMultiplier = 0.75f;
+
+	/// <summary>
 	/// when a battle is won, the victor gets bonus points according to the point cost of 
 	/// the defeated troops. This value multiplies the received points 
 	/// (use 0 to disable post-battle point awards)
 	/// </summary>
-	public float battleVictorPointAwardFactor = 0.4f;
+	public float battleWinnerPointAwardFactor = 0.4f;
 
 	/// <summary>
 	/// the points each commander receives at the beginning of their faction's turn
@@ -37,10 +47,18 @@ public class Rules {
 	/// </summary>
 	public int baseMaxUnitsInOneGarrison = 90;
 	/// <summary>
-	/// the maximum number of commanders one faction can have at the same time. 
+	/// the maximum number of commanders one faction can have at the same time, 
+	/// before bonus commanders per zone is applied. 
 	/// Having a high value here may favor a "turtle" strategy and rare but decisive attacks
 	/// </summary>
 	public int baseMaxCommandersPerFaction = 5;
+
+	/// <summary>
+	/// this value multiplied by the amount of zones owned by a faction 
+	/// equals the amount of bonus commanders the faction gets.
+	/// a high value can make a faction "snowball" with lots of cmders compared to others
+	/// </summary>
+	public float baseBonusCommandersPerZone = 0.35f;
 
 
 	public const string NO_FACTION_NAME = "No Faction";

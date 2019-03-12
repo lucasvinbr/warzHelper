@@ -6,7 +6,8 @@ using UnityEngine.UI;
 
 public class EditFactionPanel : EditDataPanel<Faction> {
 
-    public InputField facNameField, facInfoField, zonePointsField, cmdPointsField, zoneGarrField, cmdGarrField, maxCmdsField, turnPriorityField; //yay garrField
+    public InputField facNameField, facInfoField, zonePointsField, 
+		cmdPointsField, zoneGarrField, cmdGarrField, maxCmdsField, bonusCmdsField, turnPriorityField; //yay garrField
 
     public Image factionColorImg, factionIconImg;
 
@@ -21,6 +22,7 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 		facInfoField.text = dataBeingEdited.extraInfo;
 		zonePointsField.text = dataBeingEdited.multZonePointAwardOnTurnStart.ToString(CultureInfo.InvariantCulture);
 		cmdPointsField.text = dataBeingEdited.multCommanderPointAwardOnTurnStart.ToString(CultureInfo.InvariantCulture);
+		bonusCmdsField.text = dataBeingEdited.multBonusCmdersPerZone.ToString(CultureInfo.InvariantCulture);
 		zoneGarrField.text = dataBeingEdited.multMaxUnitsInOneGarrison.ToString(CultureInfo.InvariantCulture);
 		cmdGarrField.text = dataBeingEdited.multMaxUnitsUnderOneCommander.ToString(CultureInfo.InvariantCulture);
 		maxCmdsField.text = dataBeingEdited.extraMaxCommanders.ToString();
@@ -66,6 +68,7 @@ public class EditFactionPanel : EditDataPanel<Faction> {
 		dataBeingEdited.multZonePointAwardOnTurnStart = float.Parse(zonePointsField.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.multCommanderPointAwardOnTurnStart = float.Parse(cmdPointsField.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.multMaxUnitsInOneGarrison = float.Parse(zoneGarrField.text, CultureInfo.InvariantCulture);
+		dataBeingEdited.multBonusCmdersPerZone = float.Parse(bonusCmdsField.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.multMaxUnitsUnderOneCommander = float.Parse(cmdGarrField.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.extraMaxCommanders = int.Parse(maxCmdsField.text);
 		dataBeingEdited.turnPriority = int.Parse(turnPriorityField.text);

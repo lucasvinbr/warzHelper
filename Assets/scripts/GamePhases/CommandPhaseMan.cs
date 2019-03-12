@@ -27,6 +27,8 @@ public class CommandPhaseMan : GamePhaseManager {
 		}
 		if(commandableCommanders.Count > 0) {
 			if (playerFac.isPlayer) {
+				//sort commanders by zone so that the player's focus jumps around less often
+				commandableCommanders.Sort(Commander.SortByZoneIAmIn);
 				worldCommandScript.allowedCmders3d = GameController.CmdersToCmder3ds(commandableCommanders);
 				worldCommandScript.enabled = true;
 				SelectCmder(commandableCommanders[0]);

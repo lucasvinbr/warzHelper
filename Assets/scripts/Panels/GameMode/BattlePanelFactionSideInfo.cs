@@ -153,7 +153,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		}
 
 		pointsAwardedToVictor += Mathf.RoundToInt(pointsLost *
-			GameController.instance.curData.rules.battleVictorPointAwardFactor);
+			GameController.instance.curData.rules.battleWinnerPointAwardFactor);
 		UpdatePostBattleArmy(depleteBarRoutine);
 	}
 
@@ -173,7 +173,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		}
 
 		pointsAwardedToVictor += Mathf.RoundToInt(pointAward * 
-			GameController.instance.curData.rules.battleVictorPointAwardFactor);
+			GameController.instance.curData.rules.battleWinnerPointAwardFactor);
 		UpdatePostBattleArmy(depleteBarRoutine);
 	}
 

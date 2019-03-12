@@ -179,5 +179,10 @@ public class Commander : TroopContainer {
 
 	}
 
+
+	public static int SortByZoneIAmIn(Commander x, Commander y) {
+		return x.zoneIAmIn.CompareTo(y.zoneIAmIn);
+	}
+
 }
 

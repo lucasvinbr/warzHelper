@@ -84,8 +84,10 @@ public class AiPlayer {
 		for (int i = commandableCmders.Count - 1; i >= 0; i--) {
 			zoneCmderIsIn = GameController.GetZoneByID(commandableCmders[i].zoneIAmIn);
 
-			recruitChance = (1.0f - ((float) commandableCmders[i].TotalTroopsContained /
-				commandableCmders[i].MaxTroopsCommanded)) * zoneCmderIsIn.multRecruitmentPoints;
+			//recruit chance might be more than 100%, but it's ok as it will do something else
+			//if it can't recruit
+			recruitChance = (1.3f - ((float) commandableCmders[i].TotalTroopsContained /
+				commandableCmders[i].MaxTroopsCommanded)) * (zoneCmderIsIn.multRecruitmentPoints);
 
 			moveDestZone = zoneCmderIsIn;
 			//if no zone beats this score, we stay

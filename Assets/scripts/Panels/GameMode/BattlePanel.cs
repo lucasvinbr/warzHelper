@@ -32,7 +32,7 @@ public class BattlePanel : GrowingOverlayPanel {
 
 	public CanvasGroup resolutionBtnsGroup;
 
-	public void OpenWithFilledInfos(Faction attackerFaction, Faction defenderFaction, Zone warZone) {
+	public void OpenWithFilledInfos(Faction attackerFaction, Faction defenderFaction, Zone warZone, bool immediateAutocalc = false) {
 		gameObject.SetActive(true);
 		
 		curWarzone = warZone;
@@ -58,6 +58,10 @@ public class BattlePanel : GrowingOverlayPanel {
 		}
 
 		ResetUI();
+
+		if (immediateAutocalc) {
+			AutocalcResolution();
+		}
 	}
 
 	public void OpenPercentageResolution() {
@@ -82,6 +86,8 @@ public class BattlePanel : GrowingOverlayPanel {
 
 		bool shouldAnimateBars = false;
 
+		float winnerDmgMultiplier = GameController.instance.curData.rules.autoResolveWinnerDamageMultiplier;
+
 		while(attackerSide.curArmyPower > 0 && defenderSide.curArmyPower > 0) {
 			sampleSize = Mathf.Min(attackerSide.curArmyNumbers, defenderSide.curArmyNumbers, 20);
 
@@ -98,22 +104,22 @@ public class BattlePanel : GrowingOverlayPanel {
 				defenderSampleSize = Mathf.RoundToInt(sampleSize / armyNumbersProportion);
 			}
 
-			//Debug.Log("attacker sSize: " + attackerSampleSize);
-			//Debug.Log("defender sSize: " + defenderSampleSize);
+			Debug.Log("attacker sSize: " + attackerSampleSize);
+			Debug.Log("defender sSize: " + defenderSampleSize);
 
 			attackerAutoPower = GameController.
 				GetRandomBattleAutocalcPower(attackerSide.sideArmy, attackerSampleSize);
 			defenderAutoPower = GameController.
 				GetRandomBattleAutocalcPower(defenderSide.sideArmy, defenderSampleSize);
 
-			//Debug.Log("attacker auto power: " + attackerAutoPower);
-			//Debug.Log("defender auto power: " + defenderAutoPower);
+			Debug.Log("attacker auto power: " + attackerAutoPower);
+			Debug.Log("defender auto power: " + defenderAutoPower);
 
-			//who wins the mini-battle should lose less power
-			if(attackerAutoPower > defenderAutoPower) {
-				defenderAutoPower /= 3;
+			//make the winner lose some power as well (or not, depending on the rules)
+			if (attackerAutoPower > defenderAutoPower) {
+				defenderAutoPower *= winnerDmgMultiplier;
 			}else {
-				attackerAutoPower /= 3;
+				attackerAutoPower *= winnerDmgMultiplier;
 			}
 
 			//animate the power bars if the conflict is over

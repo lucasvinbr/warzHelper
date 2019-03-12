@@ -61,11 +61,18 @@ public class Faction
 	/// a multiplier applied on the value defined at the Rules. The bigger this multiplier is, the better for this faction
 	/// </summary>
 	public float multMaxUnitsInOneGarrison = 1;
+
+	/// <summary>
+	/// a multiplier... the bigger the better
+	/// </summary>
+	public float multBonusCmdersPerZone = 1;
+
 	/// <summary>
 	/// a number added to the value defined at the Rules. 
 	/// The bigger this number is, the more commanders this faction will be able to field in comparison with the default
 	/// </summary>
 	public int extraMaxCommanders = 0;
+
 
 	/// <summary>
 	/// if set to a number that's greater than or equal to 0,
@@ -122,15 +129,34 @@ public class Faction
 		}
 	}
 
-	[XmlIgnore]
 	/// <summary>
-	/// considers the base max defined in the rules and this faction's extra max
+	/// calls GetTotalMaxCmders using OwnedZones, so if you've already got the owned zones before,
+	/// it's better to call GetTotalMaxCmders directly
 	/// </summary>
+	[XmlIgnore]
 	public int MaxCmders
 	{
 		get
 		{
-			return extraMaxCommanders + GameController.instance.curData.rules.baseMaxCommandersPerFaction;
+			return GetTotalMaxCmders(OwnedZones);
 		}
+	}
+
+	/// <summary>
+	/// considers the base max defined in the rules and this faction's extra max... 
+	/// aand the bonus per zone from the provided list
+	/// </summary>
+	public int GetTotalMaxCmders(List<Zone> ourZones) {
+		Rules r = GameController.instance.curData.rules;
+		return extraMaxCommanders + r.baseMaxCommandersPerFaction +
+			Mathf.RoundToInt(r.baseBonusCommandersPerZone * multBonusCmdersPerZone * ourZones.Count);
+	}
+
+	public static int SortByTurnPriority(Faction x, Faction y) {
+		int comparison = x.turnPriority.CompareTo(y.turnPriority);
+		//if it's equal, randomize it
+		if (comparison == 0) comparison = Random.Range(0, 2) == 1 ? -1 : 1;
+
+		return comparison;
 	}
 }

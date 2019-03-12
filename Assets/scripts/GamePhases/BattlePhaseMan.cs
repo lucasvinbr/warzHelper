@@ -42,8 +42,23 @@ public class BattlePhaseMan : GamePhaseManager {
 
 	public void OpenBattleResolutionPanelForZone(Zone targetZone) {
 		battlePanel.OpenWithFilledInfos(GameModeHandler.instance.curPlayingFaction,
-			GameController.GetFactionByID(targetZone.ownerFaction), targetZone);
-	} 
+			GameController.GetFactionByID(targetZone.ownerFaction), targetZone,
+			ShouldBattleBeAutocalcd(targetZone));
+	}
+
+	/// <summary>
+	/// returns true if all involved factions are AI-controlled 
+	/// and the "always autocalc ai battles" option is active
+	/// </summary>
+	/// <returns></returns>
+	public bool ShouldBattleBeAutocalcd(Zone warZone) {
+		if((GameController.instance.curData as GameInfo).alwaysAutocalcAiBattles) {
+			return !GameModeHandler.instance.curPlayingFaction.isPlayer &&
+				!GameController.GetFactionByID(warZone.ownerFaction).isPlayer;
+		}
+
+		return false;
+	}
 
 	public void OnBattleResolved(Zone battleZone) {
 		battleZones.RemoveAt(0);

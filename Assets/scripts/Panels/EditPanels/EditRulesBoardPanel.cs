@@ -6,7 +6,8 @@ using UnityEngine.UI;
 
 public class EditRulesBoardPanel : EditDataPanel<Rules> {
 
-    public InputField maxGarrUnitsInput, maxCmderUnitsInput, pointAwardZonesInput, pointAwardCmdersInput,
+    public InputField maxGarrUnitsInput, maxCmderUnitsInput, bonusCmdersPerZoneInput, 
+		pointAwardZonesInput, pointAwardCmdersInput, pointAwardBattlesInput, winnerBattleDmgInput,
 		maxRandomAutocalcPowerInput, maxCmdersPerFactionInput, boardWidthInput, boardHeightInput;
 
 	public Image boardTextureImg;
@@ -19,7 +20,10 @@ public class EditRulesBoardPanel : EditDataPanel<Rules> {
 		maxCmdersPerFactionInput.text = dataBeingEdited.baseMaxCommandersPerFaction.ToString();
 		pointAwardZonesInput.text = dataBeingEdited.baseZonePointAwardOnTurnStart.ToString();
 		pointAwardCmdersInput.text = dataBeingEdited.baseCommanderPointAwardOnTurnStart.ToString();
-		maxRandomAutocalcPowerInput.text = dataBeingEdited.autoResolveBattleDieSides.ToString();
+		maxRandomAutocalcPowerInput.text = dataBeingEdited.autoResolveBattleDieSides.ToString(CultureInfo.InvariantCulture);
+		pointAwardBattlesInput.text = dataBeingEdited.battleWinnerPointAwardFactor.ToString(CultureInfo.InvariantCulture);
+		bonusCmdersPerZoneInput.text = dataBeingEdited.baseBonusCommandersPerZone.ToString(CultureInfo.InvariantCulture);
+		winnerBattleDmgInput.text = dataBeingEdited.autoResolveWinnerDamageMultiplier.ToString(CultureInfo.InvariantCulture);
 		boardWidthInput.text = dataBeingEdited.boardDimensions.x.ToString(CultureInfo.InvariantCulture);
 		boardHeightInput.text = dataBeingEdited.boardDimensions.y.ToString(CultureInfo.InvariantCulture);
 		//zoneIconImg.sprite = TODO get icon by path to file
@@ -35,7 +39,10 @@ public class EditRulesBoardPanel : EditDataPanel<Rules> {
 		if (!DataIsValid()) return;
 		dataBeingEdited.boardDimensions = new Vector2(float.Parse(boardWidthInput.text, CultureInfo.InvariantCulture), 
 			float.Parse(boardHeightInput.text, CultureInfo.InvariantCulture));
-		dataBeingEdited.autoResolveBattleDieSides = int.Parse(maxRandomAutocalcPowerInput.text);
+		dataBeingEdited.autoResolveBattleDieSides = float.Parse(maxRandomAutocalcPowerInput.text, CultureInfo.InvariantCulture);
+		dataBeingEdited.battleWinnerPointAwardFactor = float.Parse(pointAwardBattlesInput.text, CultureInfo.InvariantCulture);
+		dataBeingEdited.baseBonusCommandersPerZone = float.Parse(bonusCmdersPerZoneInput.text, CultureInfo.InvariantCulture);
+		dataBeingEdited.autoResolveWinnerDamageMultiplier = float.Parse(winnerBattleDmgInput.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.baseCommanderPointAwardOnTurnStart = int.Parse(pointAwardCmdersInput.text);
 		dataBeingEdited.baseZonePointAwardOnTurnStart = int.Parse(pointAwardZonesInput.text);
 		dataBeingEdited.baseMaxCommandersPerFaction = int.Parse(maxCmdersPerFactionInput.text);

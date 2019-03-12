@@ -763,7 +763,7 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	public static void MakeFactionTurnPrioritiesUnique() {
 		List<Faction> facList = instance.curData.factions;
-		facList.Sort(SortByTurnPriority);
+		facList.Sort(Faction.SortByTurnPriority);
 		int curComparedTP = facList[0].turnPriority;
 		for(int i = 1; i < facList.Count; i++) {
 			if(facList[i].turnPriority <= curComparedTP) {
@@ -771,14 +771,6 @@ public class GameController : MonoBehaviour {
 				facList[i].turnPriority = curComparedTP;
 			}
 		}
-	}
-
-	public static int SortByTurnPriority(Faction x, Faction y) {
-		int comparison = x.turnPriority.CompareTo(y.turnPriority);
-		//if it's equal, randomize it
-		if (comparison == 0) comparison = Random.Range(0, 2) == 1 ? -1 : 1;
-
-		return comparison;
 	}
 
 	/// <summary>

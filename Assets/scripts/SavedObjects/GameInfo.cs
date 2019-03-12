@@ -11,7 +11,7 @@ public class GameInfo : TemplateInfo {
 
 	public GameModeHandler.TurnPhase curTurnPhase = GameModeHandler.TurnPhase.newCmder;
 
-	public bool fastAiTurns = true;
+	public bool fastAiTurns = true, alwaysAutocalcAiBattles = false;
 
     public GameInfo(string name) : base(name)
     {

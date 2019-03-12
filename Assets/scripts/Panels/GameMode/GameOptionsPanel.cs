@@ -15,7 +15,7 @@ public class GameOptionsPanel : GenericOverlayPanel {
 
 	public FactionsPanel aiFactionsPanel;
 
-	public Toggle fastAiTurnsToggle;
+	public Toggle fastAiTurnsToggle, autocalcAiBattlesToggle;
 
 	public override void OnEnable() {
 		base.OnEnable();
@@ -24,7 +24,9 @@ public class GameOptionsPanel : GenericOverlayPanel {
 
 	public void ResetUI() {
 		aiFactionsPanel.gameObject.SetActive(false);
-		fastAiTurnsToggle.isOn = (GameController.instance.curData as GameInfo).fastAiTurns;
+		GameInfo gameData = GameController.instance.curData as GameInfo;
+		fastAiTurnsToggle.isOn = gameData.fastAiTurns;
+		autocalcAiBattlesToggle.isOn = gameData.alwaysAutocalcAiBattles;
 		mainOpsPanel.SetActive(true);
 	}
 
@@ -43,6 +45,8 @@ public class GameOptionsPanel : GenericOverlayPanel {
 			}
 		}
 
-		(GameController.instance.curData as GameInfo).fastAiTurns = fastAiTurnsToggle.isOn;
+		GameInfo gameData = GameController.instance.curData as GameInfo;
+		gameData.fastAiTurns = fastAiTurnsToggle.isOn;
+		gameData.alwaysAutocalcAiBattles = autocalcAiBattlesToggle.isOn;
 	}
 }
