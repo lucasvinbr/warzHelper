@@ -39,10 +39,11 @@ public class GameModeHandler : ModeUI {
 		instance = this;
 	}
 
-	public override void ClearUI() {
+	public override void Cleanup() {
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
 		World.CleanCmders();
+		Cmder3dMover.instance.StopAllTweens();
 		World.ToggleWorldDisplay(false);
 		World.instance.garrDescOnHoverScript.enabled = false;
 		StopAllPhaseMans();
@@ -51,7 +52,7 @@ public class GameModeHandler : ModeUI {
 		TexLoader.PurgeTexDict();
 	}
 
-	public override void InitializeUI() {
+	public override void Initialize() {
 		GameController.instance.facMatsHandler.ReBakeFactionColorsDict();
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();

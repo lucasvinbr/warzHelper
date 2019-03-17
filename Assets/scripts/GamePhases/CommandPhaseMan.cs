@@ -13,6 +13,8 @@ public class CommandPhaseMan : GamePhaseManager {
 
 	public WorldCommandPhase worldCommandScript;
 
+	public CmdPhaseCurCmderInfoBox curCmderInfoBox;
+
 	public override void OnPhaseStart() {
 		//check if we've got any cmder to actually command
 		commandableCommanders.Clear();
@@ -31,6 +33,7 @@ public class CommandPhaseMan : GamePhaseManager {
 				commandableCommanders.Sort(Commander.SortByZoneIAmIn);
 				worldCommandScript.allowedCmders3d = GameController.CmdersToCmder3ds(commandableCommanders);
 				worldCommandScript.enabled = true;
+				curCmderInfoBox.gameObject.SetActive(true);
 				SelectCmder(commandableCommanders[0]);
 			}else {
 				AiPlayer.AiCommandPhase(playerFac, commandableCommanders, this);
@@ -49,6 +52,7 @@ public class CommandPhaseMan : GamePhaseManager {
 	public void SelectCmder(Commander cmder) {
 		CameraPanner.instance.TweenToSpot(cmder.MeIn3d.transform.position);
 		worldCommandScript.SelectCmder(cmder.MeIn3d);
+		curCmderInfoBox.SetContent(cmder);
 	}
 
 	/// <summary>
@@ -132,13 +136,13 @@ public class CommandPhaseMan : GamePhaseManager {
 
 	}
 
-	public void MoveCommander(Cmder3d movingCmder3d, ZoneSpot destinationZone, bool runHasActed = true) {
+	public void MoveCommander(Cmder3d movingCmder3d, ZoneSpot destinationSpot, bool runHasActed = true) {
 		Zone ourOldZone = GameController.GetZoneByID(movingCmder3d.data.zoneIAmIn);
-		movingCmder3d.data.zoneIAmIn = destinationZone.data.ID;
+		movingCmder3d.data.zoneIAmIn = destinationSpot.data.ID;
 		movingCmder3d.data.pointsToSpend = 0;
 		//reset other cmders' positions after departing
 		World.TidyZone(ourOldZone);
-		StartCoroutine(TweenCommanderToSpot(movingCmder3d, destinationZone.GetGoodSpotForCommander()));
+		Cmder3dMover.instance.StartTween(movingCmder3d, destinationSpot);
 		if(runHasActed) CmderHasActed(movingCmder3d.data);
 	}
 
@@ -149,28 +153,15 @@ public class CommandPhaseMan : GamePhaseManager {
 	public override void OnPhaseEnd(bool noWait = false) {
 		worldCommandScript.enabled = false;
 		selectedCmderBtnsGroup.interactable = false;
+		curCmderInfoBox.gameObject.SetActive(false);
 		base.OnPhaseEnd(noWait);
-	}
-
-
-	IEnumerator TweenCommanderToSpot(Cmder3d movingCmder3d, Vector3 destSpot) {
-		float elapsedTime = 0;
-		Vector3 originalCmderPos = movingCmder3d.transform.position;
-
-		while (elapsedTime < Rules.CMDER3D_ANIM_MOVE_DURATION) {
-			movingCmder3d.transform.position =
-				Vector3.Slerp(originalCmderPos, destSpot, 
-				elapsedTime / Rules.CMDER3D_ANIM_MOVE_DURATION);
-			elapsedTime += Time.deltaTime;
-			yield return null;
-		}
-
 	}
 
 	public override void InterruptPhase() {
 		base.InterruptPhase();
 		worldCommandScript.enabled = false;
 		selectedCmderBtnsGroup.interactable = false;
+		curCmderInfoBox.gameObject.SetActive(false);
 	}
 
 }

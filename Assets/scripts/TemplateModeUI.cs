@@ -8,7 +8,7 @@ public class TemplateModeUI : ModeUI {
 
 	public GameObject mainLowerHUD, zoneLinkingLowerHUD;
 
-	public override void ClearUI() {
+	public override void Cleanup() {
 		if (World.instance.zoneLinkerScript.enabled) {
 			World.instance.zoneLinkerScript.DoneLinking();
 		}
@@ -22,7 +22,7 @@ public class TemplateModeUI : ModeUI {
 		TexLoader.PurgeTexDict();
 	}
 
-	public override void InitializeUI()
+	public override void Initialize()
     {
 		GameController.instance.facMatsHandler.ReBakeFactionColorsDict();
 		World.CleanZonesContainer();

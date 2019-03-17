@@ -112,7 +112,8 @@ public class World : MonoBehaviour {
 	public static void CreateNewCmderAtZone(Zone targetZone, Faction ownerFac) {
 		Commander newCmder = new Commander(ownerFac.ID, targetZone.ID);
 		Cmder3d cmd3d = Cmder3dRecycler.GetACmderObj();
-		cmd3d.transform.position = targetZone.MyZoneSpot.GetGoodSpotForCommander();
+		cmd3d.transform.position = targetZone.MyZoneSpot.
+			GetGoodSpotForCommander(GameController.GetCommandersInZone(targetZone).Count - 1);
 		cmd3d.data = newCmder;
 		cmd3d.RefreshDataDisplay();
 		instance.spawnedCmders.Add(cmd3d);
@@ -188,10 +189,13 @@ public class World : MonoBehaviour {
 	/// </summary>
 	public static void TidyZone(Zone targetZone) {
 		int resetCmders = 0;
-		foreach(Commander cmd in GameController.GetCommandersInZone(targetZone)) {
+		//adjust positions for commanders that are visually in our zone already
+		foreach(Commander cmd in GameController.GetCommandersInZone(targetZone, true)) {
 			cmd.MeIn3d.transform.position = targetZone.MyZoneSpot.GetGoodSpotForCommander(resetCmders);
 			resetCmders++;
 		}
+		//then reset destinations for cmders still tweening towards this zone
+		Cmder3dMover.instance.AdjustTweensThatTargetZone(targetZone.MyZoneSpot);
 	}
 
 	public static void PlaceZoneLink(Zone z1, Zone z2, bool alsoUpdateTheirLinkedList = false) {

@@ -442,11 +442,26 @@ public class GameController : MonoBehaviour {
 		return friendlyCommandersInTheZone;
 	}
 
-	public static List<Commander> GetCommandersInZone(Zone targetZone) {
+	/// <summary>
+	/// gets all commanders in the zone, optionally not getting commaders that are still tweening towards it
+	/// (those already count as in the zone for gameplay purposes, but haven't visually arrived there yet)
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="dontGetTweeningCommanders"></param>
+	/// <returns></returns>
+	public static List<Commander> GetCommandersInZone(Zone targetZone, bool dontGetTweeningCommanders = false) {
 		List<Commander> cmdersInZone = new List<Commander>();
 		foreach (Commander cmder in instance.curData.deployedCommanders) {
 			if (cmder.zoneIAmIn == targetZone.ID) {
 				cmdersInZone.Add(cmder);
+			}
+		}
+
+		if (dontGetTweeningCommanders) {
+			List<Cmder3dMover.CmderTween> tweens =
+				Cmder3dMover.instance.GetAllTweensTargetingZone(targetZone.MyZoneSpot);
+			foreach(Cmder3dMover.CmderTween tween in tweens) {
+				cmdersInZone.Remove(tween.movingCmder.data);
 			}
 		}
 

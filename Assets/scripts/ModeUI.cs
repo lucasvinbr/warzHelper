@@ -7,9 +7,9 @@ public abstract class ModeUI : MonoBehaviour {
 	[HideInInspector]
 	public GameObject curDisplayedLowerHUD;
 
-	abstract public void InitializeUI();
+	abstract public void Initialize();
 
-	abstract public void ClearUI();
+	abstract public void Cleanup();
 
 	public virtual void SetDisplayedLowerHUD(GameObject targetHUD) {
 		if(curDisplayedLowerHUD) curDisplayedLowerHUD.SetActive(false);

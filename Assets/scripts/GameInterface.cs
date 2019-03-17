@@ -156,12 +156,12 @@ public class GameInterface : MonoBehaviour {
 				curModeUI = templateModeUI;
                 break;
         }
-		curModeUI.InitializeUI();
+		curModeUI.Initialize();
 		curInterfaceMode = desiredMode;
 	}
 
 	public void ReturnToMenu() {
-		ModalPanel.Instance().YesNoBox("Return to Main Menu", "Any unsaved changes will be lost.\n Proceed?", ()=> { curModeUI.ClearUI(); SwitchInterface(InterfaceMode.start); }, null);
+		ModalPanel.Instance().YesNoBox("Return to Main Menu", "Any unsaved changes will be lost.\n Proceed?", ()=> { curModeUI.Cleanup(); SwitchInterface(InterfaceMode.start); }, null);
 	}
 
 

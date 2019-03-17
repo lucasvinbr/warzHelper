@@ -64,12 +64,6 @@ public class Rules {
 	public const string NO_FACTION_NAME = "No Faction";
 
 	/// <summary>
-	/// the time the commander 3d takes to reach their destination when moving.
-	/// Merely visual, the data involved in the movement is changed immediately
-	/// </summary>
-	public const float CMDER3D_ANIM_MOVE_DURATION = 0.65f;
-
-	/// <summary>
 	/// the board's x and y dimensions. Affects camera boundaries.
 	/// doesn't affect zone placement, but may make some zones inacessible to the player!
 	/// </summary>

@@ -78,10 +78,11 @@ public class ZoneSpot : MonoBehaviour {
 	/// <param name="placementIndex"></param>
 	/// <returns></returns>
 	public Vector3 GetGoodSpotForCommander(int placementIndex) {
-		float placementRads = (Mathf.PI / (NUM_CMDERS_BEFORE_PILE / 2.0f)) * placementIndex;
-		return transform.position + new Vector3(Mathf.Cos(placementRads) * CMDER_OFFSET,
-			Mathf.RoundToInt(CMDER_OFFSET / NUM_CMDERS_BEFORE_PILE),
-			Mathf.Sin(placementRads) * CMDER_OFFSET
+		float placementRads = (Mathf.PI / (NUM_CMDERS_BEFORE_PILE / 2.0f)) * placementIndex,
+			placementOffset = CMDER_OFFSET * (1 + (placementIndex / NUM_CMDERS_BEFORE_PILE));
+		return transform.position + new Vector3(Mathf.Cos(placementRads) * placementOffset,
+			0,
+			Mathf.Sin(placementRads) * placementOffset
 			);
 		
 	}
