@@ -11,7 +11,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 	private List<Commander> commandersBeingDeleted = new List<Commander>();
 
-	public const float CMDER_DESTROY_TIME = 1.0f;
+	public const float CMDER_DESTROY_TIME = 0.75f;
 
 	public override void OnPhaseStart() {
 		//only zones with our commanders should have something happening 
@@ -21,18 +21,22 @@ public class PostBattlePhaseMan : GamePhaseManager {
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
 		infoTxt.text = "The effects of any battles(commanders disappearing, zones being taken), happen now";
 		Zone zoneCmderIsIn = null;
+		Faction curZoneOwnerFac = null;
 		foreach (Commander cmder in factionCmders) {
 			zoneCmderIsIn = GameController.GetZoneByID(cmder.zoneIAmIn);
-			if (!conflictZones.Contains(zoneCmderIsIn) &&
-				zoneCmderIsIn.ownerFaction != playerFac.ID) {
-				conflictZones.Add(zoneCmderIsIn);
+			if (!conflictZones.Contains(zoneCmderIsIn)) {
+				if (zoneCmderIsIn.CanBeTakenBy(playerFac)) {
+					conflictZones.Add(zoneCmderIsIn);
+					curZoneOwnerFac = GameController.GetFactionByID(zoneCmderIsIn.ownerFaction);
+					DiplomacyManager.GlobalReactToAttack(playerFac, curZoneOwnerFac);
+				}
 			}
 		}
 
 		//also add owned zones that should become neutral due to being completely abandoned
 		foreach(Zone z in playerFac.OwnedZones) {
 			if (!conflictZones.Contains(z)) {
-				if(GameController.GetCombinedTroopsInZoneFromFaction(z, playerFac).Count == 0) {
+				if(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(z, playerFac).Count == 0) {
 					conflictZones.Add(z);
 				}
 			}
@@ -50,12 +54,17 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 		List<Commander> cmdersInZone = GameController.GetCommandersInZone(confZone);
 		bool zoneWasTaken = false;
+		Faction cmderFac = null, ownerFac = GameController.GetFactionByID(confZone.ownerFaction);
 		//"kill" all commanders with no troops
 		foreach(Commander c in cmdersInZone) {
 			if(c.TotalTroopsContained == 0) {
 				StartCoroutine(KillCommanderRoutine(c));
 			}else {
-				if(c.ownerFaction != confZone.ownerFaction && !zoneWasTaken) {
+				//allies won't take the zone for themselves even if the zone ends up with 0 garrison
+				cmderFac = GameController.GetFactionByID(c.ownerFaction);
+				if (cmderFac.GetStandingWith(ownerFac) != GameFactionRelations.FactionStanding.ally &&
+					!zoneWasTaken) {
+
 					confZone.ownerFaction = c.ownerFaction;
 					//clear the points to avoid "insta-max-garrison"
 					//when taking a zone that was piling points up
@@ -68,8 +77,8 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 		if (!zoneWasTaken) {
 			if(GameController.GetArmyAmountFromTroopList(
-				GameController.GetCombinedTroopsInZoneFromFaction
-				(confZone, GameController.GetFactionByID(confZone.ownerFaction))) == 0) {
+				GameController.GetCombinedTroopsInZoneFromFactionAndAllies
+				(confZone, ownerFac)) == 0) {
 				//the zone's been abandoned then
 				confZone.ownerFaction = -1;
 				confZone.MyZoneSpot.RefreshDataDisplay();
@@ -79,7 +88,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 		conflictZones.RemoveAt(0);
 		if (conflictZones.Count == 0) {
-			OnPhaseEnd();
+			OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
 		}
 		else {
 			StartCoroutine(GoToNextConflict());
@@ -91,7 +100,8 @@ public class PostBattlePhaseMan : GamePhaseManager {
 	/// </summary>
 	/// <returns></returns>
 	public IEnumerator GoToNextConflict() {
-		CameraPanner.instance.TweenToSpot(conflictZones[0].MyZoneSpot.transform.position);
+		if(!GameModeHandler.instance.currentTurnIsFast)
+			CameraPanner.instance.JumpToSpot(conflictZones[0].MyZoneSpot.transform.position);
 		yield return WaitWhileNoOverlays(0.35f);
 		SolveConflictsAt(conflictZones[0]);
 	}
@@ -102,7 +112,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 		if (noWait) {
 			yield return null;
 		}else {
-			yield return WaitWhileNoOverlays(0.8f); //some extra wait, since it's the turn's end
+			yield return WaitWhileNoOverlays(0.4f); //some extra wait, since it's the turn's end
 		}
 		
 		yield return base.ProceedToNextPhaseRoutine(noWait);

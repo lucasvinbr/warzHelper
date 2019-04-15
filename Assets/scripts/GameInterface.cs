@@ -160,6 +160,10 @@ public class GameInterface : MonoBehaviour {
 		curInterfaceMode = desiredMode;
 	}
 
+	public static bool IsInGameMode() {
+		return instance.curInterfaceMode == InterfaceMode.game;
+	}
+
 	public void ReturnToMenu() {
 		ModalPanel.Instance().YesNoBox("Return to Main Menu", "Any unsaved changes will be lost.\n Proceed?", ()=> { curModeUI.Cleanup(); SwitchInterface(InterfaceMode.start); }, null);
 	}

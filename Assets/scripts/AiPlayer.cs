@@ -9,11 +9,17 @@ public class AiPlayer {
 	/// how big is the influence of troops that aren't right on the spot, but can get to it quickly, in the AI's
 	/// decisions?
 	/// </summary>
-	public const float minNearbyTroopsInfluenceFactor = 0.2f, maxNearbyTroopsInfluenceFactor = 0.4f;
+	public const float MIN_NEARBY_TROOPS_INFLUENCE = 0.2f, MAX_NEARBY_TROOPS_INFLUENCE = 0.4f;
 	/// <summary>
 	/// how big should the "move to zone" score be before we actually decide to move?
 	/// </summary>
-	public const float minMoveScoreThreshold = 0.25f, maxMoveScoreThreshold = 0.5f;
+	public const float MIN_MOVE_SCORE_THRESHOLD = 0.1f, MAX_MOVE_SCORE_THRESHOLD = 0.35f;
+
+	/// <summary>
+	/// how much should the percentage of upgradeable-in-one-turn troops be
+	/// before we start considering training as a better option than recruiting/moving?
+	/// </summary>
+	public const float MIN_TRAIN_SCORE_THRESHOLD = 0.25f, MAX_TRAIN_SCORE_THRESHOLD = 0.35f;
 
 	/// <summary>
 	/// how much should a situation where there is no room for new commanders, 
@@ -21,19 +27,26 @@ public class AiPlayer {
 	/// make a commander more likely to leave a zone/not go to the only empty zone left?
 	/// the resulting value gets closer to this the further we are from the max cmder count
 	/// </summary>
-	public const float maxMakeRoomScoreBonus = 0.9f;
+	public const float MAX_MAKE_ROOM_SCORE_BONUS = 0.9f;
 
 	/// <summary>
 	/// how much should the presence of a friendly commander in a potential move target zone
 	/// make it more likely for more cmders to go to that zone as well?
 	/// </summary>
-	public const float friendlyCmderPresenceBonusMult = 1.15f;
+	public const float FRIENDLY_CMDER_PRESENCE_MULT = 1.15f;
 
 	/// <summary>
 	/// if the ratio of spawned cmders / max cmders is below this value,
 	/// the AI should try to make room for new cmders
 	/// </summary>
-	public const float shouldGetMoreCmdersThreshold = 0.75f;
+	public const float SHOULD_GET_MORE_CMDERS_THRESHOLD = 0.75f;
+
+
+	/// <summary>
+	/// how much should a zone's danger score be taken into account
+	/// when choosing where to spawn a new cmder?
+	/// </summary>
+	public const float NEW_CMDER_ZONE_DANGER_INFLUENCE = 0.75f;
 
 	public static void AiNewCmderPhase(Faction curFac, List<Zone> availableZones) {
 		if(availableZones.Count == 1) {
@@ -49,7 +62,7 @@ public class AiPlayer {
 		//also give more score to zones which might be in danger
 		foreach (Zone z in availableZones) {
 			zoneFavorScores.Add(z, z.multRecruitmentPoints +
-				GetZoneDangerScore(z, curFac) * 2);
+				GetZoneDangerScore(z, curFac) * NEW_CMDER_ZONE_DANGER_INFLUENCE);
 		}
 
 		Zone topZone = null;
@@ -78,7 +91,8 @@ public class AiPlayer {
 
 		//how close to our max cmders?
 		float factionCmderAmountRatio = ourCmders.Count / (float) ourFac.MaxCmders;
-		float recruitChance, topMoveScore, scoreCheckScore;
+
+		float recruitChance, topMoveScore, scoreCheckScore, trainChance;
 		bool hasActed = false;
 
 		for (int i = commandableCmders.Count - 1; i >= 0; i--) {
@@ -89,15 +103,19 @@ public class AiPlayer {
 			recruitChance = (1.3f - ((float) commandableCmders[i].TotalTroopsContained /
 				commandableCmders[i].MaxTroopsCommanded)) * (zoneCmderIsIn.multRecruitmentPoints);
 
+			trainChance = 
+				GetPercentOfTroopsUpgradedIfTrained(commandableCmders[i], ourFac, zoneCmderIsIn);
+
 			moveDestZone = zoneCmderIsIn;
 			//if no zone beats this score, we stay
-			topMoveScore = GetZoneDangerScore(zoneCmderIsIn, ourFac);
+			topMoveScore = GetZoneMoveScore(zoneCmderIsIn, ourFac);
 
-			if(factionCmderAmountRatio < shouldGetMoreCmdersThreshold &&
+			if(factionCmderAmountRatio < SHOULD_GET_MORE_CMDERS_THRESHOLD &&
 				emptyNewCmderZones.Count == 0) {
 				//if our territories are full of cmders, make it more likely to move around
 				topMoveScore *= factionCmderAmountRatio;
 				recruitChance *= factionCmderAmountRatio;
+				trainChance *= factionCmderAmountRatio;
 			}
 
 			foreach(int nearbyZoneID in zoneCmderIsIn.linkedZones) {
@@ -108,7 +126,7 @@ public class AiPlayer {
 				//if we're low on commanders,
 				//we should try to be more selective in our attacks...
 				//make room for new cmders by stacking existing cmders in a friendly zone and stuff
-				if(factionCmderAmountRatio < shouldGetMoreCmdersThreshold) {
+				if(factionCmderAmountRatio < SHOULD_GET_MORE_CMDERS_THRESHOLD) {
 					if (scoreCheckZone.ownerFaction != ourFac.ID) {
 						scoreCheckScore *= factionCmderAmountRatio;
 					}else {
@@ -117,9 +135,9 @@ public class AiPlayer {
 							//better not move to this spot, it's the only place for a new cmder
 							scoreCheckScore *= factionCmderAmountRatio;
 						}
-						else {
+						else if(emptyNewCmderZones.Count == 0) {
 							//make it more likely to move to this spot then
-							scoreCheckScore += Mathf.Lerp(0.0f, maxMakeRoomScoreBonus, (1 - factionCmderAmountRatio));
+							scoreCheckScore += Mathf.Lerp(0.0f, MAX_MAKE_ROOM_SCORE_BONUS, (1 - factionCmderAmountRatio));
 						}
 					}
 				} 
@@ -133,8 +151,12 @@ public class AiPlayer {
 			hasActed = false;
 
 			//Debug.Log("rec chance: " + recruitChance + " topMove: " + topMoveScore);
+			if(trainChance > GetRandomTrainScoreThreshold() && trainChance > recruitChance &&
+				trainChance > topMoveScore) {
+				commandableCmders[i].TrainTroops(out hasActed);
+			}
 
-			if(recruitChance > topMoveScore) {
+			if(!hasActed && recruitChance > topMoveScore) {
 				hasActed = commandableCmders[i].RecruitTroops();
 			}
 
@@ -174,9 +196,10 @@ public class AiPlayer {
 		}
 	}
 
+	#region getters
 	/// <summary>
 	/// gets forces in and around the zone and compares them.
-	/// The closer to 1, the more enemies are nearby
+	/// The closer to 1, the more enemies are nearby compared to allied forces
 	/// </summary>
 	/// <param name="targetZone"></param>
 	/// <param name="ourFac"></param>
@@ -186,21 +209,21 @@ public class AiPlayer {
 		float potentialAlliedPower = 0, potentialEnemyPower = 0;
 
 		potentialAlliedPower = GameController.GetArmyAutocalcPowerFromTroopList
-		(GameController.GetCombinedTroopsInZoneFromFaction(targetZone, ourFac));
+		(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(targetZone, ourFac));
 
 		potentialEnemyPower = GameController.GetArmyAutocalcPowerFromTroopList
-		(GameController.GetCombinedTroopsInZoneNotFromFaction(targetZone, ourFac));
+		(GameController.GetCombinedTroopsInZoneNotAlliedToFaction(targetZone, ourFac));
 			
 
 		foreach (int nearbyZoneID in targetZone.linkedZones) {
 			nearbyZone = GameController.GetZoneByID(nearbyZoneID);
 			if(nearbyZone.ownerFaction == ourFac.ID) {
 				potentialAlliedPower += GameController.GetArmyAutocalcPowerFromTroopList
-					(GameController.GetCombinedTroopsInZoneFromFaction(nearbyZone, ourFac, true)) *
+					(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(nearbyZone, ourFac, true)) *
 					GetRandomTroopInfluenceFactor();
 			}else {
 				potentialEnemyPower += GameController.GetArmyAutocalcPowerFromTroopList
-					(GameController.GetCombinedTroopsInZoneNotFromFaction(nearbyZone, ourFac, true)) *
+					(GameController.GetCombinedTroopsInZoneNotAlliedToFaction(nearbyZone, ourFac, true)) *
 					GetRandomTroopInfluenceFactor();
 			}
 		}
@@ -211,7 +234,8 @@ public class AiPlayer {
 	}
 
 	/// <summary>
-	/// uses the danger score and some extra info to get a "should I move there" score
+	/// uses the danger score and some extra info to get a "should I move there" score.
+	/// This favors zones with friendly cmders to help the AI make big armies
 	/// </summary>
 	/// <param name="targetZone"></param>
 	/// <param name="ourFac"></param>
@@ -220,17 +244,57 @@ public class AiPlayer {
 		float finalScore = GetZoneDangerScore(targetZone, ourFac);
 
 		//if the zone is hostile, the less danger the better
-		if(targetZone.ownerFaction != ourFac.ID) {
+		if(targetZone.CanBeTakenBy(ourFac)) {
 			finalScore = 1 - finalScore;
 		}
 
 		//we should add score if friendly commanders are already there,
 		//in order to make bigger armies
+		//(allied cmders shouldn't be considered here because they can't attack at the same time)
 		foreach(Commander cmd in GameController.GetCommandersOfFactionInZone(targetZone, ourFac)) {
-			finalScore *= friendlyCmderPresenceBonusMult;
+			finalScore *= FRIENDLY_CMDER_PRESENCE_MULT;
 		}
 
 		return finalScore;
+	}
+
+	/// <summary>
+	/// returns the percentage compared to the cmder's MAX amount of troops that would be upgraded if
+	/// the cmder trained instead of moving or recruiting
+	/// </summary>
+	/// <returns></returns>
+	public static float GetPercentOfTroopsUpgradedIfTrained(Commander cmder, Faction cmderFac, Zone zoneCmderIsIn) {
+		if (cmder.pointsToSpend > 0 && zoneCmderIsIn.multTrainingPoints > 0) {
+			int totalTrainableTroops = 0;
+			int trainableTroops = 0;
+			int troopTrainingCostHere = 0;
+			int troopIndexInGarrison = -1;
+			int fakePointsToSpend = cmder.pointsToSpend;
+			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
+			for (int i = 0; i < cmderFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
+				troopIndexInGarrison = cmder.IndexOfTroopInContainer(cmderFac.troopLine[i]);
+				if (troopIndexInGarrison >= 0) {
+					curTTBeingTrained = GameController.GetTroopTypeByID(cmderFac.troopLine[i]);
+					curTTUpgradeTo = GameController.GetTroopTypeByID(cmderFac.troopLine[i + 1]);
+					troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / zoneCmderIsIn.multTrainingPoints);
+					if (troopTrainingCostHere == 0) {
+						trainableTroops = cmder.troopsContained[troopIndexInGarrison].troopAmount;
+					}
+					else {
+						trainableTroops = Mathf.Min(fakePointsToSpend / troopTrainingCostHere,
+							cmder.troopsContained[troopIndexInGarrison].troopAmount);
+					}
+					if (trainableTroops > 0) {
+						totalTrainableTroops += trainableTroops;
+						fakePointsToSpend -= trainableTroops * troopTrainingCostHere;
+					}
+				}
+			}
+
+			return (float) totalTrainableTroops / cmder.MaxTroopsCommanded;
+		}
+
+		return 0.0f;
 	}
 
 	/// <summary>
@@ -238,7 +302,7 @@ public class AiPlayer {
 	/// </summary>
 	/// <returns></returns>
 	public static float GetRandomTroopInfluenceFactor() {
-		return Random.Range(minNearbyTroopsInfluenceFactor, maxNearbyTroopsInfluenceFactor);
+		return Random.Range(MIN_NEARBY_TROOPS_INFLUENCE, MAX_NEARBY_TROOPS_INFLUENCE);
 	}
 
 	/// <summary>
@@ -246,6 +310,17 @@ public class AiPlayer {
 	/// </summary>
 	/// <returns></returns>
 	public static float GetRandomMoveScoreThreshold() {
-		return Random.Range(minMoveScoreThreshold, maxMoveScoreThreshold);
+		return Random.Range(MIN_MOVE_SCORE_THRESHOLD, MAX_MOVE_SCORE_THRESHOLD);
 	}
+
+	/// <summary>
+	/// gets a factor between the min and max
+	/// </summary>
+	/// <returns></returns>
+	public static float GetRandomTrainScoreThreshold() {
+		return Random.Range(MIN_TRAIN_SCORE_THRESHOLD, MAX_TRAIN_SCORE_THRESHOLD);
+	}
+
+
+	#endregion
 }

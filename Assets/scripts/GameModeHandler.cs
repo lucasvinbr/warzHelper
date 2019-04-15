@@ -20,6 +20,10 @@ public class GameModeHandler : ModeUI {
 
 	public static GameModeHandler instance;
 
+	/// <summary>
+	/// the faction playing right now (it's this faction's turn).
+	/// It should be set to null if no one is playing (if we're not in game mode, for example)
+	/// </summary>
 	public Faction curPlayingFaction;
 
 	public GamePhaseManager[] orderedPhaseManagers;
@@ -50,6 +54,7 @@ public class GameModeHandler : ModeUI {
 		GameInterface.instance.DisableAndStoreAllOpenOverlayPanels();
 		GameController.instance.facMatsHandler.PurgeFactionColorsDict();
 		TexLoader.PurgeTexDict();
+		curPlayingFaction = null;
 	}
 
 	public override void Initialize() {
@@ -66,6 +71,13 @@ public class GameModeHandler : ModeUI {
 		GameController.MakeFactionTurnPrioritiesUnique();
 		//give initial points to zones if this is a new game
 		GameInfo data = GameController.instance.curData as GameInfo;
+
+		if(data.factionRelations == null ||
+			data.factionRelations.relations.Count == 0) {
+			data.factionRelations = new GameFactionRelations();
+			data.factionRelations.SetDefaultRelationsBetweenAllFactions();
+		}
+
 		if (data.elapsedTurns == 0) {
 			AddInitialPointsToZones();
 			GameInterface.instance.gameOpsPanel.gameObject.SetActive(true);

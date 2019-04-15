@@ -108,7 +108,7 @@ public class NumericInputFieldBtns : MonoBehaviour {
 	public void MinimizeField() {
 		if (targetField) {
 			if (targetField.contentType == InputField.ContentType.IntegerNumber) {
-				targetField.text = minValue.ToString();
+				targetField.text = minValue.ToString(CultureInfo.InvariantCulture);
 			}
 			else {
 				targetField.text = minValue.ToString(CultureInfo.InvariantCulture);
@@ -122,7 +122,7 @@ public class NumericInputFieldBtns : MonoBehaviour {
 	public void MaximizeField() {
 		if (targetField) {
 			if (targetField.contentType == InputField.ContentType.IntegerNumber) {
-				targetField.text = maxValue.ToString();
+				targetField.text = maxValue.ToString(CultureInfo.InvariantCulture);
 			}
 			else {
 				targetField.text = maxValue.ToString(CultureInfo.InvariantCulture);

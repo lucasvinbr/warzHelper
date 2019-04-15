@@ -76,6 +76,7 @@ public class CameraPanner : MonoBehaviour {
 			elapsedTweenTime += Time.deltaTime;
 			yield return null;
 		}
+		transform.position = targetTweenPos;
 		tweening = false;
 	}
 }

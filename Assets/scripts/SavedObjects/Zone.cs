@@ -250,5 +250,17 @@ public class Zone : TroopContainer {
 		}
 	}
 
+	/// <summary>
+	/// a zone can be taken by a faction if it's neutral,
+	/// if it's NOT already controlled by said faction
+	/// or if it's controlled by a faction that is NOT allied to the invader
+	/// </summary>
+	/// <param name="targetFac"></param>
+	/// <returns></returns>
+	public bool CanBeTakenBy(Faction targetFac) {
+		return ((ownerFaction != targetFac.ID) && (ownerFaction < 0 || 
+			GameController.GetFactionByID(ownerFaction).GetStandingWith(targetFac) !=
+				GameFactionRelations.FactionStanding.ally));
+	}
 
 }

@@ -103,6 +103,10 @@ public class LayoutToolTip : MonoBehaviour
 
 	public GameObject baseTitleEntry, baseTroopEntry, baseInfoEntry;
 
+	public Image backgroundImg;
+
+	public Color isAlliedColor, isNeutralColor, isEnemyColor, defaultColor;
+
 
     // Standard Singleton Access
     private static LayoutToolTip instance;
@@ -155,10 +159,42 @@ public class LayoutToolTip : MonoBehaviour
 		originalPivot = newPivot;
 	}
 
+	/// <summary>
+	/// if we're in game mode, the tooltip's background will change color according to the current playing faction's
+	/// relation value with the target owner faction
+	/// </summary>
+	/// <param name="targetOwnerFaction"></param>
+	public void ChangeBackgroundAccordingToFactionRelations(Faction targetOwnerFaction) {
+		if (GameInterface.IsInGameMode()) {
+			if (GameModeHandler.instance.curPlayingFaction != targetOwnerFaction) {
+				GameFactionRelations.FactionStanding relationToPlayer =
+					GameModeHandler.instance.curPlayingFaction.GetStandingWith(targetOwnerFaction);
+
+				switch (relationToPlayer) {
+					case GameFactionRelations.FactionStanding.ally:
+						backgroundImg.color = isAlliedColor;
+						break;
+					case GameFactionRelations.FactionStanding.enemy:
+						backgroundImg.color = isEnemyColor;
+						break;
+					default:
+						backgroundImg.color = isNeutralColor;
+						break;
+				}
+			}
+			else {
+				backgroundImg.color = defaultColor;
+			}
+		}else {
+			backgroundImg.color = defaultColor;
+		}
+	}
+
 	public void ShowTooltipForZone(Zone targetZone, Vector3 basePos, bool showGarrInfo = true, bool refreshCanvasesBeforeGetSize = false) {
 		baseTooltipPos = basePos;
 		Faction ownerFaction = GameController.GetFactionByID(targetZone.ownerFaction);
 		if(ownerFaction != null) {
+			ChangeBackgroundAccordingToFactionRelations(ownerFaction);
 			AddTooltipTitleEntry(targetZone.name, ownerFaction.color, 70);
 			AddTooltipTitleEntry("(" + ownerFaction.name + ")", ownerFaction.color);
 			AddTooltipTitleEntry("Garrison: " + targetZone.TotalTroopsContained + "/"
@@ -167,10 +203,11 @@ public class LayoutToolTip : MonoBehaviour
 				AddTooltipTroopEntry(GameController.GetTroopTypeByID(tnp.troopTypeID).name,
 					tnp.troopAmount.ToString());
 			}
-			List<Commander> cmdersInZone = GameController.GetCommandersOfFactionInZone(targetZone, ownerFaction);
+			List<Commander> cmdersInZone = 
+				GameController.GetCommandersOfFactionAndAlliesInZone(targetZone, ownerFaction);
 			if(cmdersInZone.Count > 0) {
 				List<TroopNumberPair> totalArmy =
-					GameController.GetCombinedTroopsInZoneFromFaction(targetZone, ownerFaction);
+					GameController.GetCombinedTroopsInZoneFromFactionAndAllies(targetZone, ownerFaction);
 				AddTooltipTitleEntry("Commanders: " + cmdersInZone.Count.ToString(), ownerFaction.color, 60);
 				AddTooltipTitleEntry("Combined Army: " + 
 					GameController.GetArmyAmountFromTroopList(totalArmy), Color.white, 50);
@@ -182,6 +219,7 @@ public class LayoutToolTip : MonoBehaviour
 			
 		}
 		else {
+			backgroundImg.color = defaultColor;
 			AddTooltipTitleEntry(targetZone.name, Color.white, 70);
 			AddTooltipTitleEntry("(" + Rules.NO_FACTION_NAME + ")", Color.white);
 		}
@@ -194,6 +232,7 @@ public class LayoutToolTip : MonoBehaviour
 	public void ShowTooltipForCmder(Commander targetCmder, Vector3 basePos, bool refreshCanvasesBeforeGetSize = false) {
 		baseTooltipPos = basePos;
 		Faction ownerFaction = GameController.GetFactionByID(targetCmder.ownerFaction);
+		ChangeBackgroundAccordingToFactionRelations(ownerFaction);
 		AddTooltipTitleEntry("Commander", ownerFaction.color, 50);
 		AddTooltipTitleEntry("(" + ownerFaction.name + ")", ownerFaction.color);
 		AddTooltipTitleEntry("Troops: " + targetCmder.TotalTroopsContained + "/" + targetCmder.MaxTroopsCommanded, Color.white);
@@ -204,7 +243,7 @@ public class LayoutToolTip : MonoBehaviour
 		}
 
 		List<Commander> cmdersInZone = 
-			GameController.GetCommandersOfFactionInZone(
+			GameController.GetCommandersOfFactionAndAlliesInZone(
 				GameController.GetZoneByID(targetCmder.zoneIAmIn), ownerFaction);
 		if (cmdersInZone.Count > 1) {
 			List<TroopNumberPair> totalCmderArmy = new List<TroopNumberPair>();

@@ -32,7 +32,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 
 	public bool depletingBar = false;
 
-	public const float BAR_DEPLETION_TIME = 0.8f, SIDE_DEFEATED_FADE_TIME = 1.0f, SIDE_DEFEATED_NOTIFY_DELAY = 1.0f;
+	public const float BAR_DEPLETION_TIME = 0.8f, SIDE_DEFEATED_FADE_TIME = 0.6f, SIDE_DEFEATED_NOTIFY_DELAY = 0.4f;
 
 	/// <summary>
 	/// if this army is defeated, it will award this amount of points to the other side
@@ -105,7 +105,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		factionForcesDescTxt.text = forceDescription;
 		curArmyNumbers = armyNumbers;
 		factionTroopNumbersTxt.text = armyNumbers.ToString() + " Troops";
-		factionAutocalcPowerTxt.text = "Power: " + armyPower.ToString(CultureInfo.InvariantCulture);
+		factionAutocalcPowerTxt.text = "Power: " + armyPower.ToString("0.00", CultureInfo.InvariantCulture);
 		initialArmyPower = armyPower;
 		curArmyPower = armyPower;
 	}
@@ -128,7 +128,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		}
 
 		factionTroopNumbersTxt.text = armyNumbers.ToString() + " Troops";
-		factionAutocalcPowerTxt.text = "Power: " + armyPower.ToString(CultureInfo.InvariantCulture);
+		factionAutocalcPowerTxt.text = "Power: " + armyPower.ToString("0.00", CultureInfo.InvariantCulture);
 
 		curArmyNumbers = armyNumbers;
 		curArmyPower = armyPower;
@@ -292,7 +292,7 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		//so that if only a few survive, they won't get tons of points
 		int pointsForEach = Mathf.RoundToInt((points / ourContainers.Count) *
 			(curArmyPower / initialArmyPower));
-		Debug.Log("points awarded for each cont: " + pointsForEach);
+		//Debug.Log("points awarded for each cont: " + pointsForEach);
 		foreach (TroopContainer tContainer in ourContainers) {
 			tContainer.pointsToSpend += pointsForEach;
 			tContainer.TrainTroops();

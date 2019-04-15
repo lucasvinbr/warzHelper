@@ -443,6 +443,26 @@ public class GameController : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// gets both the target faction's cmders and any cmders from allied factions
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFac"></param>
+	/// <returns></returns>
+	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, Faction targetFac) {
+		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
+		Faction curCmderFac = null;
+		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
+			curCmderFac = GetFactionByID(cmder.ownerFaction);
+			if (curCmderFac == targetFac || curCmderFac.GetStandingWith(targetFac) ==
+				GameFactionRelations.FactionStanding.ally) {
+				friendlyCommandersInTheZone.Add(cmder);
+			}
+		}
+
+		return friendlyCommandersInTheZone;
+	}
+
+	/// <summary>
 	/// gets all commanders in the zone, optionally not getting commaders that are still tweening towards it
 	/// (those already count as in the zone for gameplay purposes, but haven't visually arrived there yet)
 	/// </summary>
@@ -490,6 +510,27 @@ public class GameController : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// returns the combined troops of all forces from the target faction AND its allies in the zone,
+	/// both from the zone's garrison and from any commanders in the zone
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFac"></param>
+	/// <returns></returns>
+	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFactionAndAllies(Zone targetZone,
+		Faction targetFac, bool onlyCommanderArmies = false) {
+		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
+		if (targetZone.ownerFaction == targetFac.ID && !onlyCommanderArmies) {
+			returnedList.AddRange(targetZone.troopsContained);
+		}
+
+		foreach (Commander cmder in GetCommandersOfFactionAndAlliesInZone(targetZone, targetFac)) {
+			returnedList = cmder.GetCombinedTroops(returnedList);
+		}
+
+		return returnedList;
+	}
+
+	/// <summary>
 	/// just like GetCombinedTroopsInZoneFromFaction, 
 	/// but considering everything that is NOT from the target faction
 	/// </summary>
@@ -507,6 +548,37 @@ public class GameController : MonoBehaviour {
 		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
 			if(cmder.ownerFaction != targetFac.ID) {
 				returnedList = cmder.GetCombinedTroops(returnedList);
+			}
+		}
+
+		return returnedList;
+	}
+
+	/// <summary>
+	/// just like GetCombinedTroopsInZoneFromFaction, 
+	/// but considering everything that is NOT ALLIED to the target faction
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFac"></param>
+	/// <param name="onlyCommanderArmies"></param>
+	/// <returns></returns>
+	public static List<TroopNumberPair> GetCombinedTroopsInZoneNotAlliedToFaction(Zone targetZone,
+		Faction targetFac, bool onlyCommanderArmies = false) {
+		Faction curCheckedFac = GetFactionByID(targetZone.ownerFaction);
+		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
+		if (!onlyCommanderArmies && targetZone.ownerFaction != targetFac.ID &&
+			(curCheckedFac == null || curCheckedFac.GetStandingWith(targetFac) != GameFactionRelations.FactionStanding.ally)) {
+			returnedList.AddRange(targetZone.troopsContained);
+		}
+
+		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
+			if (cmder.ownerFaction != targetFac.ID) {
+				if (curCheckedFac == null || curCheckedFac.ID != cmder.ownerFaction)
+					curCheckedFac = GetFactionByID(cmder.ownerFaction);
+
+				if(curCheckedFac.GetStandingWith(targetFac) != GameFactionRelations.FactionStanding.ally) {
+					returnedList = cmder.GetCombinedTroops(returnedList);
+				}
 			}
 		}
 

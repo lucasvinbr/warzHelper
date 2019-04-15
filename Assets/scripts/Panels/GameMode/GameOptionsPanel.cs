@@ -5,9 +5,8 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// the battle panel!
-/// it will only go away after the battle has been resolved.
-/// A battle will only resolve after one of the sides has been completely eliminated
+/// the game options panel controls some details from the AI options panel
+/// (which has no script of its own)
 /// </summary>
 public class GameOptionsPanel : GenericOverlayPanel {
 

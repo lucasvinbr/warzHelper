@@ -40,12 +40,12 @@ public class BattlePanel : GrowingOverlayPanel {
 		attackerSide.SetContent(attackerFaction);
 		attackerSide.SetArmyData(null,
 			GameController.CmdersToTroopContainers
-			(GameController.GetCommandersOfFactionInZone(warZone, attackerFaction)));
+			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, attackerFaction)));
 
 		defenderSide.SetContent(defenderFaction);
 		defenderSide.SetArmyData(warZone,
 			GameController.CmdersToTroopContainers
-			(GameController.GetCommandersOfFactionInZone(warZone, defenderFaction)));
+			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, defenderFaction)));
 
 		//zone info...
 		zoneNameTxt.text = warZone.name;

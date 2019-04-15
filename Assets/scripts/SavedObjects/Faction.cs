@@ -152,6 +152,39 @@ public class Faction
 			Mathf.RoundToInt(r.baseBonusCommandersPerZone * multBonusCmdersPerZone * ourZones.Count);
 	}
 
+	public float GetRelationWith(Faction targetFac) {
+		if (targetFac == null) return GameFactionRelations.MIN_RELATIONS;
+
+		return (GameController.instance.curData as GameInfo).
+			factionRelations.GetRelationBetweenFactions(ID, targetFac.ID);
+	}
+
+	public GameFactionRelations.FactionStanding GetStandingWith(Faction targetFac) {
+		if (targetFac == null) return GameFactionRelations.FactionStanding.enemy;
+
+		return (GameController.instance.curData as GameInfo).
+			factionRelations.GetStandingBetweenFactions(ID, targetFac.ID);
+	}
+
+	public float SetRelationWith(Faction targetFac, float newValue) {
+		return (GameController.instance.curData as GameInfo).
+			factionRelations.SetRelationBetweenFactions(ID, targetFac.ID, newValue);
+	}
+
+	/// <summary>
+	/// adds relations with the target fac, 
+	/// optionally never becoming allies unless an alliance is proposed
+	/// </summary>
+	/// <param name="targetFac"></param>
+	/// <param name="addition"></param>
+	/// <returns></returns>
+	public float AddRelationWith(Faction targetFac, float addition, bool preventAutoAlly = false,
+		bool notifyRelationChange = false) {
+		return (GameController.instance.curData as GameInfo).
+			factionRelations.AddRelationBetweenFactions
+				(ID, targetFac.ID, addition, preventAutoAlly, notifyRelationChange, notifyRelationChange);
+	}
+
 	public static int SortByTurnPriority(Faction x, Faction y) {
 		int comparison = x.turnPriority.CompareTo(y.turnPriority);
 		//if it's equal, randomize it

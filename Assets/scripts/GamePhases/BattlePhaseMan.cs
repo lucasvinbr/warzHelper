@@ -18,14 +18,18 @@ public class BattlePhaseMan : GamePhaseManager {
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
 
 		Zone zoneCmderIsIn = null;
+		Faction ownerFac = null;
 		foreach(Commander cmder in factionCmders) {
+			if (cmder.TotalAutocalcPower <= 0) continue;
+
 			zoneCmderIsIn = GameController.GetZoneByID(cmder.zoneIAmIn);
 			if(!battleZones.Contains(zoneCmderIsIn) &&
 				zoneCmderIsIn.ownerFaction != playerFac.ID) {
-				if(zoneCmderIsIn.ownerFaction >= 0 && 
-					cmder.TotalAutocalcPower > 0 &&
-					GameController.GetCombinedTroopsInZoneFromFaction
-					(zoneCmderIsIn, GameController.GetFactionByID(zoneCmderIsIn.ownerFaction)).Count > 0) {
+				ownerFac = GameController.GetFactionByID(zoneCmderIsIn.ownerFaction);
+				if (ownerFac != null && 
+					ownerFac.GetStandingWith(playerFac) != GameFactionRelations.FactionStanding.ally &&
+					GameController.GetCombinedTroopsInZoneFromFactionAndAllies
+					(zoneCmderIsIn, ownerFac).Count > 0) {
 					battleZones.Add(zoneCmderIsIn);
 				}
 			}
@@ -53,8 +57,20 @@ public class BattlePhaseMan : GamePhaseManager {
 	/// <returns></returns>
 	public bool ShouldBattleBeAutocalcd(Zone warZone) {
 		if((GameController.instance.curData as GameInfo).alwaysAutocalcAiBattles) {
-			return !GameModeHandler.instance.curPlayingFaction.isPlayer &&
-				!GameController.GetFactionByID(warZone.ownerFaction).isPlayer;
+			if (GameModeHandler.instance.curPlayingFaction.isPlayer) {
+				return false;
+			}else {
+				Faction checkedFaction = GameController.GetFactionByID(warZone.ownerFaction);
+				if (checkedFaction.isPlayer) return false;
+				else {
+					foreach(Commander cmd in GameController.GetCommandersInZone(warZone)) {
+						checkedFaction = GameController.GetFactionByID(cmd.ownerFaction);
+						if (checkedFaction.isPlayer) return false;
+					}
+
+					return true;
+				}
+			}
 		}
 
 		return false;

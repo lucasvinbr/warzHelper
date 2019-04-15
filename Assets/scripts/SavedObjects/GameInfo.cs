@@ -13,9 +13,12 @@ public class GameInfo : TemplateInfo {
 
 	public bool fastAiTurns = true, alwaysAutocalcAiBattles = false;
 
+	public GameFactionRelations factionRelations;
+
     public GameInfo(string name) : base(name)
     {
 		this.isATemplate = false;
+		factionRelations = new GameFactionRelations();
 		lastTurnPriority = -1;
     }
 
@@ -26,6 +29,7 @@ public class GameInfo : TemplateInfo {
 		deployedCommanders = baseData.deployedCommanders;
 		rules = baseData.rules;
 		this.isATemplate = false;
+		factionRelations = new GameFactionRelations();
 		lastTurnPriority = -1;
 	}
 
@@ -36,6 +40,7 @@ public class GameInfo : TemplateInfo {
 		deployedCommanders = baseData.deployedCommanders;
 		rules = baseData.rules;
 		this.isATemplate = false;
+		factionRelations = new GameFactionRelations();
 		lastTurnPriority = -1;
 	}
 
