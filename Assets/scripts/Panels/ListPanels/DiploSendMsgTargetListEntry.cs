@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class DiploSendMsgTargetListEntry : FactionsRelationPanelListEntry {
 
 	public void OnSelectedAsTarget() {
-		//TODO open "target info and select msg type" menu
+		GameInterface.instance.diploMsgOpsPanel.OpenIfPossible(thePanelsCurFaction, myContent);
 	}
 
 }

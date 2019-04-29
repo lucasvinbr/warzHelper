@@ -5,11 +5,11 @@ using UnityEngine.UI;
 
 public class GameInterface : MonoBehaviour {
 
-    public static GameInterface instance;
+	public static GameInterface instance;
 
-    public EditFactionPanel editFactionPanel;
+	public EditFactionPanel editFactionPanel;
 
-    public EditZonePanel editZonePanel;
+	public EditZonePanel editZonePanel;
 
 	public EditTroopPanel editTroopPanel;
 
@@ -19,17 +19,17 @@ public class GameInterface : MonoBehaviour {
 
 	public ColorInputPanel colorInputPanel;
 
-    public SaveListPanel saveListPanel;
+	public SaveListPanel saveListPanel;
 
 	public ExportOptionsPanel exportOpsPanel;
 
-    public ModeUI startOptionsPanel, templateModeUI, gameModeUI;
+	public ModeUI startOptionsPanel, templateModeUI, gameModeUI;
 
 	private ModeUI curModeUI;
 
 	public InterfaceMode curInterfaceMode = InterfaceMode.start;
 
-    public Color positiveUIColor, negativeUIColor, selectedUIElementColor, deselectedUIElementColor;
+	public Color positiveUIColor, negativeUIColor, selectedUIElementColor, deselectedUIElementColor;
 
 	public ZonesPanel zonesPanel;
 
@@ -38,6 +38,8 @@ public class GameInterface : MonoBehaviour {
 	public TroopsPanel troopsPanel;
 
 	public GameOptionsPanel gameOpsPanel;
+
+	public DiploMsgOptionsPanel diploMsgOpsPanel;
 
 	public List<GenericOverlayPanel> overlayPanelsCurrentlyOpen = new List<GenericOverlayPanel>();
 
@@ -65,37 +67,31 @@ public class GameInterface : MonoBehaviour {
 	/// </summary>
 	public static bool factionDDownsAreStale = true;
 
-	public enum InterfaceMode
-    {
-        start,
-        template,
-        game
-    }
+	public enum InterfaceMode {
+		start,
+		template,
+		game
+	}
 
-    void Awake()
-    {
-        instance = this;
-    }
+	void Awake() {
+		instance = this;
+	}
 
-	public void ShowObject(GameObject obj)
-    {
-        obj.SetActive(true);
-    }
+	public void ShowObject(GameObject obj) {
+		obj.SetActive(true);
+	}
 
-    public void HideObject(GameObject obj)
-    {
-        obj.SetActive(false);
-    }
+	public void HideObject(GameObject obj) {
+		obj.SetActive(false);
+	}
 
-    public void EditFaction(Faction targetFaction, bool isNewEntry)
-    {
-        editFactionPanel.Open(targetFaction, isNewEntry);
-    }
+	public void EditFaction(Faction targetFaction, bool isNewEntry) {
+		editFactionPanel.Open(targetFaction, isNewEntry);
+	}
 
-    public void EditZone(Zone targetZone, bool isNewEntry)
-    {
-        editZonePanel.Open(targetZone, isNewEntry);
-    }
+	public void EditZone(Zone targetZone, bool isNewEntry) {
+		editZonePanel.Open(targetZone, isNewEntry);
+	}
 
 	public void EditTroopType(TroopType targetTT, bool isNewEntry) {
 		editTroopPanel.Open(targetTT, isNewEntry);
@@ -108,10 +104,9 @@ public class GameInterface : MonoBehaviour {
 		editRulesPanel.Open(GameController.instance.curData.rules, false);
 	}
 
-	public void OpenLoadGameMenu(bool templateMode = false)
-    {
-        saveListPanel.OpenUp(!templateMode, "Select one of the saved entries", UIStartLoadGame);
-    }
+	public void OpenLoadGameMenu(bool templateMode = false) {
+		saveListPanel.OpenUp(!templateMode, "Select one of the saved entries", UIStartLoadGame);
+	}
 
 	/// <summary>
 	/// opens the "load template" list panel; once an option is picked, imports the loaded entry's data into
@@ -129,33 +124,31 @@ public class GameInterface : MonoBehaviour {
 		GameController.instance.ImportTemplateDataAndStartGame(saveListPanel.PickedEntry.gameNameTxt.text);
 	}
 
-    /// <summary>
-    /// hides the other modes' UI and shows the desired mode's one
-    /// </summary>
-    /// <param name="desiredMode"></param>
-    public void SwitchInterface(InterfaceMode desiredMode)
-    {
-        switch (desiredMode)
-        {
-            case InterfaceMode.start:
-                templateModeUI.gameObject.SetActive(false);
-                gameModeUI.gameObject.SetActive(false);
-                startOptionsPanel.gameObject.SetActive(true);
+	/// <summary>
+	/// hides the other modes' UI and shows the desired mode's one
+	/// </summary>
+	/// <param name="desiredMode"></param>
+	public void SwitchInterface(InterfaceMode desiredMode) {
+		switch (desiredMode) {
+			case InterfaceMode.start:
+				templateModeUI.gameObject.SetActive(false);
+				gameModeUI.gameObject.SetActive(false);
+				startOptionsPanel.gameObject.SetActive(true);
 				curModeUI = startOptionsPanel;
-                break;
-            case InterfaceMode.game:
-                templateModeUI.gameObject.SetActive(false);
-                gameModeUI.gameObject.SetActive(true);
-                startOptionsPanel.gameObject.SetActive(false);
+				break;
+			case InterfaceMode.game:
+				templateModeUI.gameObject.SetActive(false);
+				gameModeUI.gameObject.SetActive(true);
+				startOptionsPanel.gameObject.SetActive(false);
 				curModeUI = gameModeUI;
-                break;
-            case InterfaceMode.template:
-                templateModeUI.gameObject.SetActive(true);
-                gameModeUI.gameObject.SetActive(false);
-                startOptionsPanel.gameObject.SetActive(false);
+				break;
+			case InterfaceMode.template:
+				templateModeUI.gameObject.SetActive(true);
+				gameModeUI.gameObject.SetActive(false);
+				startOptionsPanel.gameObject.SetActive(false);
 				curModeUI = templateModeUI;
-                break;
-        }
+				break;
+		}
 		curModeUI.Initialize();
 		curInterfaceMode = desiredMode;
 	}
@@ -165,7 +158,7 @@ public class GameInterface : MonoBehaviour {
 	}
 
 	public void ReturnToMenu() {
-		ModalPanel.Instance().YesNoBox("Return to Main Menu", "Any unsaved changes will be lost.\n Proceed?", ()=> { curModeUI.Cleanup(); SwitchInterface(InterfaceMode.start); }, null);
+		ModalPanel.Instance().YesNoBox("Return to Main Menu", "Any unsaved changes will be lost.\n Proceed?", () => { curModeUI.Cleanup(); SwitchInterface(InterfaceMode.start); }, null);
 	}
 
 
@@ -174,7 +167,7 @@ public class GameInterface : MonoBehaviour {
 	/// </summary>
 	public void DisableAndStoreAllOpenOverlayPanels() {
 		overlayPanelsOpenBeforeClear.Clear(); //we only store the ones from the last time this ran
-		foreach(GenericOverlayPanel GOP in overlayPanelsCurrentlyOpen) {
+		foreach (GenericOverlayPanel GOP in overlayPanelsCurrentlyOpen) {
 			overlayPanelsOpenBeforeClear.Add(GOP);
 		}
 		foreach (GenericOverlayPanel GOP in overlayPanelsOpenBeforeClear) {

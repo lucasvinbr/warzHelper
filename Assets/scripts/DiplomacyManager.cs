@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// this script defines how faction relations are affected by game events
+/// </summary>
 public class DiplomacyManager {
 
 	/// <summary>
@@ -76,6 +79,19 @@ public class DiplomacyManager {
 		}
 	}
 
+
+
+	/// <summary>
+	/// considers a random value between the MIN_REL_REQUIRED and the max 
+	/// and how close our relation is to the max
+	/// </summary>
+	/// <returns></returns>
+	public static bool ShouldConsiderAlliance(float curRelation) {
+		return Random.Range(MIN_RELPERCENT_REQUIRED_ALLIANCE * GameFactionRelations.CONSIDER_ALLY_THRESHOLD,
+			GameFactionRelations.CONSIDER_ALLY_THRESHOLD) < curRelation;
+	}
+
+	#region randomized value getters
 	public static float GetRelDmgAttacked() {
 		return Random.Range(MIN_REL_DMG_ATTACKED, MAX_REL_DMG_ATTACKED);
 	}
@@ -91,14 +107,7 @@ public class DiplomacyManager {
 	public static float GetRelGainEnemyAttacked() {
 		return Random.Range(MIN_REL_GAIN_ENEMY_ATTACKED, MAX_REL_GAIN_ENEMY_ATTACKED);
 	}
+	#endregion
 
-	/// <summary>
-	/// considers a random value between the MIN_REL_REQUIRED and the max 
-	/// and how close our relation is to the max
-	/// </summary>
-	/// <returns></returns>
-	public static bool ShouldConsiderAlliance(float curRelation) {
-		return Random.Range(MIN_RELPERCENT_REQUIRED_ALLIANCE * GameFactionRelations.CONSIDER_ALLY_THRESHOLD,
-			GameFactionRelations.CONSIDER_ALLY_THRESHOLD) < curRelation;
-	}
+
 }

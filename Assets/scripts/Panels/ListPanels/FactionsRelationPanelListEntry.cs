@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class FactionsRelationPanelListEntry : ListPanelEntry<Faction> {
 
-    public Text nameTxt;
+	public Text nameTxt;
 
-    public Image backgroundImg;
+	public Image backgroundImg;
 
 	public Slider relationSlider;
 
@@ -15,12 +15,11 @@ public class FactionsRelationPanelListEntry : ListPanelEntry<Faction> {
 
 	public Faction thePanelsCurFaction;
 
-	public override void SetContent(Faction targetFaction)
-    {
-        myContent = targetFaction;
-        nameTxt.text = targetFaction.name;
-        backgroundImg.color = targetFaction.color;
-    }
+	public override void SetContent(Faction targetFaction) {
+		myContent = targetFaction;
+		nameTxt.text = targetFaction.name;
+		backgroundImg.color = targetFaction.color;
+	}
 
 	/// <summary>
 	/// does some other required setup steps and sets the slider's value to the current relation value

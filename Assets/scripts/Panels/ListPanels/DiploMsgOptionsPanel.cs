@@ -29,13 +29,35 @@ public class DiploMsgOptionsPanel: GenericOverlayPanel {
 
 		CleanAllContainers();
 
+		this.sendingFac = sendingFac;
+		this.receivingFac = receivingFac;
+
 		//fill allies and enemies containers
-		
+		FillRelatedFactionsPanel(alliesContainer, 
+			GameFactionRelations.GetFactionsWithTargetStandingWithFac(receivingFac,
+			GameFactionRelations.FactionStanding.ally));
+
+		FillRelatedFactionsPanel(enemiesContainer,
+			GameFactionRelations.GetFactionsWithTargetStandingWithFac(receivingFac,
+			GameFactionRelations.FactionStanding.enemy));
 
 		//fill diplo options container
 
 		curTargetFacTxt.text = receivingFac.name;
 		curTargetFacTxt.color = receivingFac.color;
+	}
+
+
+
+	public void FillRelatedFactionsPanel(Transform targetContainer, List<Faction> relatedFacsList) {
+		foreach(Faction f in relatedFacsList) {
+			GameObject newEntry = Instantiate(factionRelatedEntryPrefab, targetContainer);
+			FactionEntryWithNameAndTooltip entryScript = 
+				newEntry.GetComponent<FactionEntryWithNameAndTooltip>();
+			entryScript.SetNameAndColorToFac(f);
+			entryScript.tooltip.text = string.Concat("Standing with ", sendingFac.name, ": ", 
+				GameFactionRelations.StandingToNiceName(sendingFac.GetStandingWith(f)));
+		}
 	}
 
 	public void CleanContainer(Transform container) {

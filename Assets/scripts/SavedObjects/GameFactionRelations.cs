@@ -203,4 +203,18 @@ public class GameFactionRelations
 	public static string RelationValueToNiceName(float relValue) {
 		return StandingToNiceName(RelationValueToStanding(relValue));
 	}
+
+
+	public static List<Faction> GetFactionsWithTargetStandingWithFac(Faction fac, FactionStanding targetStanding) {
+		List<Faction> facList = new List<Faction>(GameController.instance.curData.factions);
+		facList.Remove(fac);
+		for (int i = facList.Count - 1; i >= 0; i--) {
+			if (fac.GetStandingWith(facList[i]) != targetStanding) {
+				facList.RemoveAt(i);
+			}
+		}
+
+		return facList;
+	}
+
 }

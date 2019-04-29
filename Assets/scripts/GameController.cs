@@ -679,6 +679,50 @@ public class GameController : MonoBehaviour {
 		return availableZones;
 	}
 
+	/// <summary>
+	/// returns a list of zones owned by allies of target faction, but not by the faction itself
+	/// </summary>
+	/// <param name="fac"></param>
+	/// <returns></returns>
+	public static List<Zone> GetZonesOwnedByAlliesOfFac(Faction fac) {
+		List<int> foundAlliedFacIDs = new List<int>();
+		List<Zone> alliedZones = new List<Zone>();
+
+		foreach(Zone z in instance.curData.zones) {
+			if(z.ownerFaction != fac.ID && z.ownerFaction >= 0) {
+				if (foundAlliedFacIDs.Contains(z.ownerFaction)) {
+					alliedZones.Add(z);
+				}else {
+					if(fac.GetStandingWith(GetFactionByID(z.ownerFaction)) ==
+						GameFactionRelations.FactionStanding.ally) {
+						alliedZones.Add(z);
+						foundAlliedFacIDs.Add(z.ownerFaction);
+					}
+				}
+			}
+		}
+
+		return alliedZones;
+
+	}
+
+	/// <summary>
+	/// returns zones not owned by any faction
+	/// </summary>
+	/// <returns></returns>
+	public static List<Zone> GetNeutralZones() {
+		List<Zone> neutralZones = new List<Zone>();
+
+		foreach (Zone z in instance.curData.zones) {
+			if (z.ownerFaction < 0) {
+				neutralZones.Add(z);
+			}
+		}
+
+		return neutralZones;
+
+	}
+
 	public static int GetArmyAmountFromTroopList(List<TroopNumberPair> troopList) {
 		int total = 0;
 		for (int i = 0; i < troopList.Count; i++) {
