@@ -8,6 +8,7 @@ public class PointAwardPhaseMan : GamePhaseManager {
 	public Text infoTxt;
 
 	public override void OnPhaseStart() {
+		base.OnPhaseStart();
 		//add points to all zones and cmders of the playing faction
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
@@ -22,7 +23,7 @@ public class PointAwardPhaseMan : GamePhaseManager {
 			z.SpendPoints(true); //zones that actually do something with their points will emit some effects
 		}
 
-		OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+		OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
 	}
 
 	public override IEnumerator ProceedToNextPhaseRoutine(bool noWait = false) {

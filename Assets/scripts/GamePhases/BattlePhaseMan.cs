@@ -12,22 +12,24 @@ public class BattlePhaseMan : GamePhaseManager {
 	public BattlePanel battlePanel;
 
 	public override void OnPhaseStart() {
+		base.OnPhaseStart();
 		//find battles, register them and open a resolution menu for each one
 		infoTxt.text = "Resolution of any battles started in the Command Phase";
-		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
-		List<Commander> factionCmders = playerFac.OwnedCommanders;
+		GameInfo curGameData = GameController.CurGameData;
+		List<Commander> potentialFighterCmders = curGameData.unifyBattlePhase ?
+			curGameData.deployedCommanders : GameModeHandler.instance.curPlayingFaction.OwnedCommanders;
 
 		Zone zoneCmderIsIn = null;
 		Faction ownerFac = null;
-		foreach(Commander cmder in factionCmders) {
+		foreach(Commander cmder in potentialFighterCmders) {
 			if (cmder.TotalAutocalcPower <= 0) continue;
 
 			zoneCmderIsIn = GameController.GetZoneByID(cmder.zoneIAmIn);
 			if(!battleZones.Contains(zoneCmderIsIn) &&
-				zoneCmderIsIn.ownerFaction != playerFac.ID) {
+				zoneCmderIsIn.ownerFaction != cmder.ownerFaction) {
 				ownerFac = GameController.GetFactionByID(zoneCmderIsIn.ownerFaction);
 				if (ownerFac != null && 
-					ownerFac.GetStandingWith(playerFac) != GameFactionRelations.FactionStanding.ally &&
+					ownerFac.GetStandingWith(cmder.ownerFaction) != GameFactionRelations.FactionStanding.ally &&
 					GameController.GetCombinedTroopsInZoneFromFactionAndAllies
 					(zoneCmderIsIn, ownerFac).Count > 0) {
 					battleZones.Add(zoneCmderIsIn);
@@ -37,7 +39,7 @@ public class BattlePhaseMan : GamePhaseManager {
 		
 		if(battleZones.Count == 0) {
 			infoTxt.text = "No battles to resolve!";
-			OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+			OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
 		}else {
 			StartCoroutine(GoToNextBattle());
 		}
@@ -45,42 +47,27 @@ public class BattlePhaseMan : GamePhaseManager {
 	}
 
 	public void OpenBattleResolutionPanelForZone(Zone targetZone) {
-		battlePanel.OpenWithFilledInfos(GameModeHandler.instance.curPlayingFaction,
-			GameController.GetFactionByID(targetZone.ownerFaction), targetZone,
-			ShouldBattleBeAutocalcd(targetZone));
-	}
-
-	/// <summary>
-	/// returns true if all involved factions are AI-controlled 
-	/// and the "always autocalc ai battles" option is active
-	/// </summary>
-	/// <returns></returns>
-	public bool ShouldBattleBeAutocalcd(Zone warZone) {
-		if((GameController.instance.curData as GameInfo).alwaysAutocalcAiBattles) {
-			if (GameModeHandler.instance.curPlayingFaction.isPlayer) {
-				return false;
-			}else {
-				Faction checkedFaction = GameController.GetFactionByID(warZone.ownerFaction);
-				if (checkedFaction.isPlayer) return false;
-				else {
-					foreach(Commander cmd in GameController.GetCommandersInZone(warZone)) {
-						checkedFaction = GameController.GetFactionByID(cmd.ownerFaction);
-						if (checkedFaction.isPlayer) return false;
-					}
-
-					return true;
+		Faction attackerFaction = GameModeHandler.instance.curPlayingFaction,
+			defenderFaction = GameController.GetFactionByID(targetZone.ownerFaction);
+		if((GameController.CurGameData).unifyBattlePhase) {
+			foreach(Commander cmder in GameController.GetCommandersInZone(targetZone)) {
+				if(cmder.ownerFaction != defenderFaction.ID &&
+					defenderFaction.GetStandingWith(cmder.ownerFaction) != GameFactionRelations.FactionStanding.ally) {
+					attackerFaction = GameController.GetFactionByID(cmder.ownerFaction);
+					break;
 				}
 			}
 		}
 
-		return false;
+		battlePanel.OpenWithFilledInfos(attackerFaction,
+			defenderFaction, targetZone);
 	}
 
 	public void OnBattleResolved(Zone battleZone) {
 		battleZones.RemoveAt(0);
 		if (battleZones.Count == 0) {
 			infoTxt.text = "No more battles to resolve!";
-			OnPhaseEnd();
+			OnPhaseEnding();
 		}
 		else {
 			StartCoroutine(GoToNextBattle());

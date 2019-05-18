@@ -60,10 +60,10 @@ public class Commander : TroopContainer {
 	/// true if at least 1 troop was upgraded
 	/// </summary>
 	/// <returns></returns>
-	public bool TrainTroops(out bool hasTrained) {
+	public bool CmdTrainTroops() {
 		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
 		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
-		hasTrained = false;
+		bool hasTrained = false;
 		if (pointsToSpend > 0 && curZone.multTrainingPoints > 0) {
 			int trainableTroops = 0;
 			int troopTrainingCostHere = 0;

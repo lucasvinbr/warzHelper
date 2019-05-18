@@ -13,6 +13,12 @@ public class GameInfo : TemplateInfo {
 
 	public bool fastAiTurns = true, alwaysAutocalcAiBattles = false;
 
+	/// <summary>
+	/// this makes the battle phase only happen after all factions took turns,
+	/// making it possible for allied factions to attack at the same time
+	/// </summary>
+	public bool unifyBattlePhase = false;
+
 	public GameFactionRelations factionRelations;
 
     public GameInfo(string name) : base(name)

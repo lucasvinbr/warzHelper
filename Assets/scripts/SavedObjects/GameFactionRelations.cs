@@ -30,6 +30,12 @@ public class GameFactionRelations
 	/// </summary>
 	public bool lockRelations = false;
 
+	/// <summary>
+	/// this makes the game end if all remaining factions are allied to each other
+	/// </summary>
+	public bool alliedVictory = true;
+
+
 	public List<FactionRelation> relations = new List<FactionRelation>();
 
 	/// <summary>
@@ -74,6 +80,9 @@ public class GameFactionRelations
 	}
 
 	public float GetRelationBetweenFactions(int facID1, int facID2) {
+		if(facID1 == facID2) {
+			Debug.LogWarning("(FactionRelations) Attempted to get relation between faction and itself (probably wasn't meant to happen)");
+		}
 		foreach (FactionRelation rel in relations) {
 			if (rel.relatedFacs[0] == facID1 || rel.relatedFacs[1] == facID1) {
 				if (rel.relatedFacs[0] == facID2 || rel.relatedFacs[1] == facID2) {
@@ -126,6 +135,28 @@ public class GameFactionRelations
 		return 0;
 	}
 
+	/// <summary>
+	/// adds relation between fac1 and all the targetFacs
+	/// </summary>
+	/// <param name="facID1"></param>
+	/// <param name="targetFacs"></param>
+	/// <param name="addition"></param>
+	/// <param name="preventBecomingAllies"></param>
+	/// <param name="notifyIfFactionStandingChanged"></param>
+	/// <param name="announceRelationChange"></param>
+	/// <returns></returns>
+	public void AddRelationBetweenFactions(int facID1, List<int> targetFacs, float addition,
+		bool preventBecomingAllies = false, bool notifyIfFactionStandingChanged = false,
+		bool announceRelationChange = false) {
+
+		foreach (int targetFac in targetFacs) {
+			AddRelationBetweenFactions(facID1, targetFac, addition, preventBecomingAllies,
+				notifyIfFactionStandingChanged, announceRelationChange);
+		}
+
+	}
+
+
 	public float SetRelationBetweenFactions(int facID1, int facID2, float newValue) {
 		foreach (FactionRelation rel in relations) {
 			if (rel.relatedFacs[0] == facID1 || rel.relatedFacs[1] == facID1) {
@@ -139,6 +170,7 @@ public class GameFactionRelations
 		return 0;
 	}
 
+
 	public void LoggerAnnounceRelationChange(int facID1, int facID2, float newValue, float oldValue) {
 		if (newValue == oldValue) return; //yeah, no reporting if nothing changed
 		string announcement = string.Format("{0}'s relation with {1} has {2} to {3}",
@@ -150,6 +182,7 @@ public class GameFactionRelations
 			newValue > oldValue ? GameInterface.instance.positiveUIColor :
 				GameInterface.instance.negativeUIColor);
 	}
+
 
 	public void LoggerAnnounceStandingChange(int facID1, int facID2, FactionStanding newStanding) {
 		string announcement = string.Format("{0} and {1} have become ", 
@@ -168,6 +201,7 @@ public class GameFactionRelations
 
 		LoggerBox.instance.WriteText(announcement);
 	}
+
 
 	public static FactionStanding RelationValueToStanding(float relationValue) {
 		if (relationValue < CONSIDER_ENEMY_THRESHOLD) {

@@ -19,7 +19,7 @@ public class AiPlayer {
 	/// how much should the percentage of upgradeable-in-one-turn troops be
 	/// before we start considering training as a better option than recruiting/moving?
 	/// </summary>
-	public const float MIN_TRAIN_SCORE_THRESHOLD = 0.25f, MAX_TRAIN_SCORE_THRESHOLD = 0.35f;
+	public const float MIN_TRAIN_SCORE_THRESHOLD = 0.22f, MAX_TRAIN_SCORE_THRESHOLD = 0.39f;
 
 	/// <summary>
 	/// how much should a situation where there is no room for new commanders, 
@@ -46,7 +46,7 @@ public class AiPlayer {
 	/// how much should a zone's danger score be taken into account
 	/// when choosing where to spawn a new cmder?
 	/// </summary>
-	public const float NEW_CMDER_ZONE_DANGER_INFLUENCE = 0.75f;
+	public const float NEW_CMDER_ZONE_DANGER_INFLUENCE = 0.65f;
 
 	public static void AiNewCmderPhase(Faction curFac, List<Zone> availableZones) {
 		if (availableZones.Count == 1) {
@@ -55,23 +55,17 @@ public class AiPlayer {
 			return;
 		}
 
-		Dictionary<Zone, float> zoneFavorScores = new Dictionary<Zone, float>();
-
+		Zone topZone = null;
+		float topScore = 0;
+		float candidateScore = 0;
 
 		//zones with higher recruit factors are better for new cmders
 		//also give more score to zones which might be in danger
 		foreach (Zone z in availableZones) {
-			zoneFavorScores.Add(z, z.multRecruitmentPoints +
-				GetZoneDangerScore(z, curFac) * NEW_CMDER_ZONE_DANGER_INFLUENCE);
-		}
-
-		Zone topZone = null;
-		float topScore = 0;
-
-		foreach (KeyValuePair<Zone, float> kvp in zoneFavorScores) {
-			if (kvp.Value > topScore) {
-				topScore = kvp.Value;
-				topZone = kvp.Key;
+			candidateScore = z.multRecruitmentPoints + GetZoneDangerScore(z, curFac) * NEW_CMDER_ZONE_DANGER_INFLUENCE;
+			if (candidateScore >= topScore) {
+				topScore = candidateScore;
+				topZone = z;
 			}
 		}
 
@@ -155,11 +149,15 @@ public class AiPlayer {
 				//we should find a path to danger then
 				if (fallbackMoveDestZone == null) {
 					//get a good destination zone for the faction
-					fallbackMoveDestZone = FindDangerousZone(ourFac);
+					fallbackMoveDestZone = FindInterestingZone(ourFac);
+					Debug.Log("Faction " + ourFac.name + " got " + fallbackMoveDestZone.name +
+						" as fallback moveDest zone");
 				}
 
 				moveDestZone = GetNextZoneInPathToZone(fallbackMoveDestZone, zoneCmderIsIn);
 				topMoveScore = MAX_MOVE_SCORE_THRESHOLD;
+				Debug.Log("when trying to go from " + zoneCmderIsIn.name + " to " +
+					fallbackMoveDestZone.name + ", cmder got " + moveDestZone.name + " as path");
 
 			}
 
@@ -168,7 +166,7 @@ public class AiPlayer {
 			//Debug.Log("rec chance: " + recruitChance + " topMove: " + topMoveScore);
 			if (trainChance > GetRandomTrainScoreThreshold() && trainChance > recruitChance &&
 				trainChance > topMoveScore) {
-				commandableCmders[i].TrainTroops(out hasActed);
+				hasActed = commandableCmders[i].CmdTrainTroops();
 			}
 
 			if (!hasActed && recruitChance > topMoveScore) {
@@ -187,7 +185,7 @@ public class AiPlayer {
 
 			if (!hasActed) {
 				//if we decided to do nothing else, train troops
-				commandableCmders[i].TrainTroops(out hasActed);
+				hasActed = commandableCmders[i].CmdTrainTroops();
 
 				//try recruiting and moving again if we can't train!
 				if (!hasActed) {
@@ -223,24 +221,27 @@ public class AiPlayer {
 		Zone nearbyZone = null;
 		float potentialAlliedPower = 0, potentialEnemyPower = 0;
 
-		potentialAlliedPower = GameController.GetArmyAutocalcPowerFromTroopList
+		potentialAlliedPower = GameController.GetTotalAutocalcPowerFromTroopList
 		(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(targetZone, ourFac));
 
-		potentialEnemyPower = GameController.GetArmyAutocalcPowerFromTroopList
+		potentialEnemyPower = GameController.GetTotalAutocalcPowerFromTroopList
 		(GameController.GetCombinedTroopsInZoneNotAlliedToFaction(targetZone, ourFac));
 
 
 		foreach (int nearbyZoneID in targetZone.linkedZones) {
 			nearbyZone = GameController.GetZoneByID(nearbyZoneID);
 			if (nearbyZone.ownerFaction == ourFac.ID) {
-				potentialAlliedPower += GameController.GetArmyAutocalcPowerFromTroopList
+				//nearby allies have less meaning than nearby enemies
+				//because they may not arrive in time to help...
+				//or choose to not help at all
+				potentialAlliedPower += GameController.GetTotalAutocalcPowerFromTroopList
 					(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(nearbyZone, ourFac, true)) *
-					GetRandomTroopInfluenceFactor();
+					GetRandomNearbyTroopInfluenceFactor() / 1.5f;
 			}
 			else {
-				potentialEnemyPower += GameController.GetArmyAutocalcPowerFromTroopList
+				potentialEnemyPower += GameController.GetTotalAutocalcPowerFromTroopList
 					(GameController.GetCombinedTroopsInZoneNotAlliedToFaction(nearbyZone, ourFac, true)) *
-					GetRandomTroopInfluenceFactor();
+					GetRandomNearbyTroopInfluenceFactor();
 			}
 		}
 		//Debug.Log("pot enemy: " + potentialEnemyPower + " pot ally: " + potentialAlliedPower);
@@ -275,45 +276,6 @@ public class AiPlayer {
 	}
 
 	/// <summary>
-	/// returns the percentage compared to the cmder's MAX amount of troops that would be upgraded if
-	/// the cmder trained instead of moving or recruiting
-	/// </summary>
-	/// <returns></returns>
-	public static float GetPercentOfTroopsUpgradedIfTrained(Commander cmder, Faction cmderFac, Zone zoneCmderIsIn) {
-		if (cmder.pointsToSpend > 0 && zoneCmderIsIn.multTrainingPoints > 0) {
-			int totalTrainableTroops = 0;
-			int trainableTroops = 0;
-			int troopTrainingCostHere = 0;
-			int troopIndexInGarrison = -1;
-			int fakePointsToSpend = cmder.pointsToSpend;
-			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
-			for (int i = 0; i < cmderFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
-				troopIndexInGarrison = cmder.IndexOfTroopInContainer(cmderFac.troopLine[i]);
-				if (troopIndexInGarrison >= 0) {
-					curTTBeingTrained = GameController.GetTroopTypeByID(cmderFac.troopLine[i]);
-					curTTUpgradeTo = GameController.GetTroopTypeByID(cmderFac.troopLine[i + 1]);
-					troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / zoneCmderIsIn.multTrainingPoints);
-					if (troopTrainingCostHere == 0) {
-						trainableTroops = cmder.troopsContained[troopIndexInGarrison].troopAmount;
-					}
-					else {
-						trainableTroops = Mathf.Min(fakePointsToSpend / troopTrainingCostHere,
-							cmder.troopsContained[troopIndexInGarrison].troopAmount);
-					}
-					if (trainableTroops > 0) {
-						totalTrainableTroops += trainableTroops;
-						fakePointsToSpend -= trainableTroops * troopTrainingCostHere;
-					}
-				}
-			}
-
-			return (float)totalTrainableTroops / cmder.MaxTroopsCommanded;
-		}
-
-		return 0.0f;
-	}
-
-	/// <summary>
 	/// returns one of our zones that has the largest danger level.
 	/// looks for, in order:
 	/// -dangerous owned zone
@@ -324,17 +286,17 @@ public class AiPlayer {
 	/// </summary>
 	/// <param name="ourFac"></param>
 	/// <returns></returns>
-	public static Zone FindDangerousZone(Faction ourFac) {
+	public static Zone FindInterestingZone(Faction ourFac) {
 		List<Zone> browsedList = ourFac.OwnedZones;
 		float foundScore = 0.0f;
-		Zone foundZone = GetMostDangerousZoneInList(browsedList, ourFac, out foundScore);
+		Zone foundZone = GetMostInterestingZoneInList(browsedList, ourFac, out foundScore);
 
 		if (foundScore > 0.0f) {
 			return foundZone;
 		}
 
 		browsedList = GameController.GetZonesOwnedByAlliesOfFac(ourFac);
-		foundZone = GetMostDangerousZoneInList(browsedList, ourFac, out foundScore);
+		foundZone = GetMostEndangeredZoneInList(browsedList, out foundScore);
 
 		if (foundScore > 0.0f) {
 			return foundZone;
@@ -346,7 +308,7 @@ public class AiPlayer {
 		}
 
 		browsedList = GameController.instance.curData.zones;
-		foundZone = GetMostDangerousZoneInList(browsedList, ourFac, out foundScore);
+		foundZone = GetMostInterestingZoneInList(browsedList, ourFac, out foundScore);
 
 		if (foundScore > 0.0f) {
 			return foundZone;
@@ -356,11 +318,34 @@ public class AiPlayer {
 		return browsedList[Random.Range(0, browsedList.Count)];
 	}
 
-	public static Zone GetMostDangerousZoneInList(List<Zone> zList, Faction ourFac, out float bestScore) {
+	public static Zone GetMostInterestingZoneInList(List<Zone> zList, Faction ourFac,
+		out float bestScore) {
 		float topScore = 0.0f, candidateScore = 0.0f;
 		Zone topZone = null;
 		foreach (Zone z in zList) {
 			candidateScore = GetZoneMoveScore(z, ourFac);
+			if (topScore < candidateScore) {
+				topScore = candidateScore;
+				topZone = z;
+			}
+		}
+
+		bestScore = topScore;
+
+		return topZone;
+	}
+
+	/// <summary>
+	/// gets the zone with the biggest danger score according to the zone's owner faction
+	/// </summary>
+	/// <param name="zList"></param>
+	/// <param name="bestScore"></param>
+	/// <returns></returns>
+	public static Zone GetMostEndangeredZoneInList(List<Zone> zList, out float bestScore) {
+		float topScore = 0.0f, candidateScore = 0.0f;
+		Zone topZone = null;
+		foreach (Zone z in zList) {
+			candidateScore = GetZoneDangerScore(z, GameController.GetFactionByID(z.ownerFaction));
 			if (topScore < candidateScore) {
 				topScore = candidateScore;
 				topZone = z;
@@ -426,10 +411,49 @@ public class AiPlayer {
 			Debug.LogWarning("[AIPlayer] Couldn't find a path to zone " + targetZone.name);
 			return startZone;
 		}
-		
 
 
+		Debug.Log("pathfinding... going to " + GameController.GetZoneByID(foundPath[1]).name);
 		return GameController.GetZoneByID(foundPath[1]);
+	}
+
+	/// <summary>
+	/// returns the percentage compared to the cmder's MAX amount of troops that would be upgraded if
+	/// the cmder trained instead of moving or recruiting
+	/// </summary>
+	/// <returns></returns>
+	public static float GetPercentOfTroopsUpgradedIfTrained(Commander cmder, Faction cmderFac, Zone zoneCmderIsIn) {
+		if (cmder.pointsToSpend > 0 && zoneCmderIsIn.multTrainingPoints > 0) {
+			int totalTrainableTroops = 0;
+			int trainableTroops = 0;
+			int troopTrainingCostHere = 0;
+			int troopIndexInGarrison = -1;
+			int fakePointsToSpend = cmder.pointsToSpend;
+			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
+			for (int i = 0; i < cmderFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
+				troopIndexInGarrison = cmder.IndexOfTroopInContainer(cmderFac.troopLine[i]);
+				if (troopIndexInGarrison >= 0) {
+					curTTBeingTrained = GameController.GetTroopTypeByID(cmderFac.troopLine[i]);
+					curTTUpgradeTo = GameController.GetTroopTypeByID(cmderFac.troopLine[i + 1]);
+					troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / zoneCmderIsIn.multTrainingPoints);
+					if (troopTrainingCostHere == 0) {
+						trainableTroops = cmder.troopsContained[troopIndexInGarrison].troopAmount;
+					}
+					else {
+						trainableTroops = Mathf.Min(fakePointsToSpend / troopTrainingCostHere,
+							cmder.troopsContained[troopIndexInGarrison].troopAmount);
+					}
+					if (trainableTroops > 0) {
+						totalTrainableTroops += trainableTroops;
+						fakePointsToSpend -= trainableTroops * troopTrainingCostHere;
+					}
+				}
+			}
+
+			return (float)totalTrainableTroops / cmder.MaxTroopsCommanded;
+		}
+
+		return 0.0f;
 	}
 
 
@@ -438,7 +462,7 @@ public class AiPlayer {
 	/// gets a factor between the min and max
 	/// </summary>
 	/// <returns></returns>
-	public static float GetRandomTroopInfluenceFactor() {
+	public static float GetRandomNearbyTroopInfluenceFactor() {
 		return Random.Range(MIN_NEARBY_TROOPS_INFLUENCE, MAX_NEARBY_TROOPS_INFLUENCE);
 	}
 

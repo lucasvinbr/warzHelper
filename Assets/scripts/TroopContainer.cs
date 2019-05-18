@@ -21,7 +21,7 @@ public abstract class TroopContainer {
 	{
 		get
 		{
-			return GameController.GetArmyAmountFromTroopList(troopsContained);
+			return GameController.GetTotalTroopAmountFromTroopList(troopsContained);
 		}
 	}
 

@@ -14,7 +14,11 @@ public class GameOptionsPanel : GenericOverlayPanel {
 
 	public FactionsPanel aiFactionsPanel;
 
-	public Toggle fastAiTurnsToggle, autocalcAiBattlesToggle;
+	public Toggle fastAiTurnsToggle, autocalcAiBattlesToggle, unifyBattlePhaseToggle;
+
+	//TODO unified battles toggle doesn't really match the Ai Options panel,
+	//but for now there's not many other game options menus,
+	//and not enough general game options to make a new menu
 
 	public override void OnEnable() {
 		base.OnEnable();
@@ -23,9 +27,10 @@ public class GameOptionsPanel : GenericOverlayPanel {
 
 	public void ResetUI() {
 		aiFactionsPanel.gameObject.SetActive(false);
-		GameInfo gameData = GameController.instance.curData as GameInfo;
+		GameInfo gameData = GameController.CurGameData;
 		fastAiTurnsToggle.isOn = gameData.fastAiTurns;
 		autocalcAiBattlesToggle.isOn = gameData.alwaysAutocalcAiBattles;
+		unifyBattlePhaseToggle.isOn = gameData.unifyBattlePhase;
 		mainOpsPanel.SetActive(true);
 	}
 
@@ -44,8 +49,9 @@ public class GameOptionsPanel : GenericOverlayPanel {
 			}
 		}
 
-		GameInfo gameData = GameController.instance.curData as GameInfo;
+		GameInfo gameData = GameController.CurGameData;
 		gameData.fastAiTurns = fastAiTurnsToggle.isOn;
 		gameData.alwaysAutocalcAiBattles = autocalcAiBattlesToggle.isOn;
+		gameData.unifyBattlePhase = unifyBattlePhaseToggle.isOn;
 	}
 }

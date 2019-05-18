@@ -4,13 +4,19 @@ using UnityEngine;
 
 public abstract class GamePhaseManager : MonoBehaviour {
 
-	public abstract void OnPhaseStart();
+	public virtual void OnPhaseStart() {
+		enabled = true;
+	}
 
 	/// <summary>
 	/// starts the nextPhase coroutine
 	/// </summary>
-	public virtual void OnPhaseEnd(bool noWait = false) {
+	public virtual void OnPhaseEnding(bool noWait = false) {
 		StartCoroutine(ProceedToNextPhaseRoutine(noWait));
+	}
+
+	public virtual void OnPhaseEnded() {
+		enabled = false;
 	}
 
 	/// <summary>
@@ -27,6 +33,7 @@ public abstract class GamePhaseManager : MonoBehaviour {
 		}
 		
 		GameModeHandler.instance.GoToNextTurnPhase();
+		OnPhaseEnded();
 	}
 
 	/// <summary>

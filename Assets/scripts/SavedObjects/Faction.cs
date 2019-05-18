@@ -155,19 +155,26 @@ public class Faction
 	public float GetRelationWith(Faction targetFac) {
 		if (targetFac == null) return GameFactionRelations.MIN_RELATIONS;
 
-		return (GameController.instance.curData as GameInfo).
+		return GameController.CurGameData.
 			factionRelations.GetRelationBetweenFactions(ID, targetFac.ID);
 	}
 
 	public GameFactionRelations.FactionStanding GetStandingWith(Faction targetFac) {
 		if (targetFac == null) return GameFactionRelations.FactionStanding.enemy;
 
-		return (GameController.instance.curData as GameInfo).
+		return GameController.CurGameData.
 			factionRelations.GetStandingBetweenFactions(ID, targetFac.ID);
 	}
 
+	public GameFactionRelations.FactionStanding GetStandingWith(int targetFacID) {
+		if (targetFacID < 0) return GameFactionRelations.FactionStanding.enemy;
+
+		return GameController.CurGameData.
+			factionRelations.GetStandingBetweenFactions(ID, targetFacID);
+	}
+
 	public float SetRelationWith(Faction targetFac, float newValue) {
-		return (GameController.instance.curData as GameInfo).
+		return GameController.CurGameData.
 			factionRelations.SetRelationBetweenFactions(ID, targetFac.ID, newValue);
 	}
 
@@ -180,9 +187,24 @@ public class Faction
 	/// <returns></returns>
 	public float AddRelationWith(Faction targetFac, float addition, bool preventAutoAlly = false,
 		bool notifyRelationChange = false) {
-		return (GameController.instance.curData as GameInfo).
+		return GameController.CurGameData.
 			factionRelations.AddRelationBetweenFactions
 				(ID, targetFac.ID, addition, preventAutoAlly, notifyRelationChange, notifyRelationChange);
+	}
+
+
+	/// <summary>
+	/// adds relations with the target facs, 
+	/// optionally never becoming allies unless an alliance is proposed
+	/// </summary>
+	/// <param name="targetFacsIDs"></param>
+	/// <param name="addition"></param>
+	/// <returns></returns>
+	public void AddRelationWith(List<int> targetFacsIDs, float addition, bool preventAutoAlly = false,
+		bool notifyRelationChange = false) {
+		GameController.CurGameData.
+			factionRelations.AddRelationBetweenFactions
+				(ID, targetFacsIDs, addition, preventAutoAlly, notifyRelationChange, notifyRelationChange);
 	}
 
 	public static int SortByTurnPriority(Faction x, Faction y) {

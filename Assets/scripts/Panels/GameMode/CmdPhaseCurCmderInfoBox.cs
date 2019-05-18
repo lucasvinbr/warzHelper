@@ -45,6 +45,29 @@ public class CmdPhaseCurCmderInfoBox : MonoBehaviour
 		zoneInfoEntry.rightTxt.text = curZone.multTrainingPoints.ToString("0%");
 	}
 
+	/// <summary>
+	/// variation used for getting info from all owned commanders in the zone where the selected cmder is in
+	/// </summary>
+	/// <param name="cmdersArmy"></param>
+	/// <param name="cmdersCount"></param>
+	/// <param name="sampleCmder"></param>
+	public void SetContent(List<TroopNumberPair> cmdersArmy, int cmdersCount, Commander sampleCmder) {
+		//clear troop entries first
+		ClearTroopEntries();
+
+		numTroopsTxt.text = "Troops: " + GameController.GetTotalTroopAmountFromTroopList(cmdersArmy) + "/" + sampleCmder.MaxTroopsCommanded * cmdersCount;
+
+		foreach (TroopNumberPair tnp in cmdersArmy) {
+			AddTroopEntry(tnp);
+		}
+
+
+		//and the zone info
+		Zone curZone = GameController.GetZoneByID(sampleCmder.zoneIAmIn);
+		zoneInfoEntry.leftTxt.text = curZone.multRecruitmentPoints.ToString("0%");
+		zoneInfoEntry.rightTxt.text = curZone.multTrainingPoints.ToString("0%");
+	}
+
 	public void ClearTroopEntries() {
 		for (int i = 0; i < troopEntriesContainer.childCount; i++) {
 			Destroy(troopEntriesContainer.GetChild(i).gameObject);

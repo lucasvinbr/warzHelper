@@ -14,6 +14,17 @@ public class GameController : MonoBehaviour {
 	private TroopType m_lastRelevantTType;
 
 	/// <summary>
+	/// shorthand for instance.curData as GameInfo
+	/// </summary>
+	public static GameInfo CurGameData
+	{
+		get
+		{
+			return instance.curData as GameInfo;
+		}
+	}
+
+	/// <summary>
 	/// the last relevant troop type. It's the one that will be used when adding a new troop tier to a faction, for example.
 	/// Could be the last troop type created or edited, or one automatically created by the GameController
 	/// </summary>
@@ -443,6 +454,37 @@ public class GameController : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// can only get cmders that are also in the provided whitelist
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFac"></param>
+	/// <param name="whitelist"></param>
+	/// <returns></returns>
+	public static List<Commander> GetCommandersOfFactionInZone(Zone targetZone, Faction targetFac, List<Commander> whitelist) {
+		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
+		foreach (Commander cmder in targetFac.OwnedCommanders) {
+			if (cmder.zoneIAmIn == targetZone.ID && whitelist.Contains(cmder)) {
+				friendlyCommandersInTheZone.Add(cmder);
+			}
+		}
+
+		return friendlyCommandersInTheZone;
+	}
+
+	public static List<Commander> GetCommandersOfFactionInZone(Zone targetZone, Faction targetFac, out List<TroopNumberPair> cmdersArmy) {
+		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
+		cmdersArmy = new List<TroopNumberPair>();
+		foreach (Commander cmder in targetFac.OwnedCommanders) {
+			if (cmder.zoneIAmIn == targetZone.ID) {
+				friendlyCommandersInTheZone.Add(cmder);
+				cmdersArmy = GetCombinedTroopsFromTwoLists(cmdersArmy, cmder.troopsContained);
+			}
+		}
+
+		return friendlyCommandersInTheZone;
+	}
+
+	/// <summary>
 	/// gets both the target faction's cmders and any cmders from allied factions
 	/// </summary>
 	/// <param name="targetZone"></param>
@@ -462,8 +504,44 @@ public class GameController : MonoBehaviour {
 		return friendlyCommandersInTheZone;
 	}
 
+	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, int targetFacID) {
+		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
+		Faction curCmderFac = null;
+		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
+			curCmderFac = GetFactionByID(cmder.ownerFaction);
+			if (curCmderFac.ID == targetFacID || curCmderFac.GetStandingWith(targetFacID) ==
+				GameFactionRelations.FactionStanding.ally) {
+				friendlyCommandersInTheZone.Add(cmder);
+			}
+		}
+
+		return friendlyCommandersInTheZone;
+	}
+
 	/// <summary>
-	/// gets all commanders in the zone, optionally not getting commaders that are still tweening towards it
+	/// gets both the target faction's cmders and any cmders from allied factions
+	/// that aren't also allied to the provided enemy faction
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFac"></param>
+	/// <returns></returns>
+	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, Faction targetFac, Faction enemyFac) {
+		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
+		Faction curCmderFac = null;
+		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
+			curCmderFac = GetFactionByID(cmder.ownerFaction);
+			if (curCmderFac == targetFac || (curCmderFac.GetStandingWith(targetFac) ==
+				GameFactionRelations.FactionStanding.ally && 
+				curCmderFac.GetStandingWith(enemyFac) != GameFactionRelations.FactionStanding.ally)) {
+				friendlyCommandersInTheZone.Add(cmder);
+			}
+		}
+
+		return friendlyCommandersInTheZone;
+	}
+
+	/// <summary>
+	/// gets all commanders in the zone, optionally not getting commanders that are still tweening towards it
 	/// (those already count as in the zone for gameplay purposes, but haven't visually arrived there yet)
 	/// </summary>
 	/// <param name="targetZone"></param>
@@ -524,6 +602,20 @@ public class GameController : MonoBehaviour {
 		}
 
 		foreach (Commander cmder in GetCommandersOfFactionAndAlliesInZone(targetZone, targetFac)) {
+			returnedList = cmder.GetCombinedTroops(returnedList);
+		}
+
+		return returnedList;
+	}
+
+	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFactionAndAllies(Zone targetZone,
+		int targetFacID, bool onlyCommanderArmies = false) {
+		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
+		if (targetZone.ownerFaction == targetFacID && !onlyCommanderArmies) {
+			returnedList.AddRange(targetZone.troopsContained);
+		}
+
+		foreach (Commander cmder in GetCommandersOfFactionAndAlliesInZone(targetZone, targetFacID)) {
 			returnedList = cmder.GetCombinedTroops(returnedList);
 		}
 
@@ -723,7 +815,7 @@ public class GameController : MonoBehaviour {
 
 	}
 
-	public static int GetArmyAmountFromTroopList(List<TroopNumberPair> troopList) {
+	public static int GetTotalTroopAmountFromTroopList(List<TroopNumberPair> troopList) {
 		int total = 0;
 		for (int i = 0; i < troopList.Count; i++) {
 			total += troopList[i].troopAmount;
@@ -731,7 +823,7 @@ public class GameController : MonoBehaviour {
 		return total;
 	}
 
-	public static float GetArmyAutocalcPowerFromTroopList(List<TroopNumberPair> troopList) {
+	public static float GetTotalAutocalcPowerFromTroopList(List<TroopNumberPair> troopList) {
 		float total = 0;
 
 		for (int i = 0; i < troopList.Count; i++) {
@@ -751,7 +843,7 @@ public class GameController : MonoBehaviour {
 	/// <param name="baseArmy"></param>
 	/// <returns></returns>
 	public static List<TroopNumberPair> GetRandomSampleArmyFromArmy(List<TroopNumberPair> baseArmy, int sampleSize) {
-		if(sampleSize > 0 && GetArmyAmountFromTroopList(baseArmy) > sampleSize) {
+		if(sampleSize > 0 && GetTotalTroopAmountFromTroopList(baseArmy) > sampleSize) {
 			List<TroopNumberPair> returnedSample = new List<TroopNumberPair>();
 			int addedTroops = 0;
 			int randomTroopID = -1, randomTroopIndex;
@@ -791,7 +883,7 @@ public class GameController : MonoBehaviour {
 	public static float GetRandomBattleAutocalcPower(List<TroopNumberPair> baseArmy, int sampleSizeLimit = -1) {
 		List<TroopNumberPair> sampleArmy = GetRandomSampleArmyFromArmy(baseArmy, sampleSizeLimit);
 
-		return GetArmyAutocalcPowerFromTroopList(sampleArmy) * 
+		return GetTotalAutocalcPowerFromTroopList(sampleArmy) * 
 			Random.Range(1.0f, instance.curData.rules.autoResolveBattleDieSides);
 
 	}
@@ -872,17 +964,31 @@ public class GameController : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// converts the troop number pairs to their serializable equivalents, using troop names instead of IDs.
+	/// converts the troop number pairs to their serializable equivalents, using troop names instead of IDs,
+	/// optionally splitting entries that have too many troops (if the limit is 0, the default, or below 0,
+	/// there is no splitting limit).
 	/// should be used in order to make JSONs
 	/// </summary>
 	/// <param name="troopList"></param>
 	/// <returns></returns>
-	public static SerializableTroopList TroopListToSerializableTroopList(List<TroopNumberPair> troopList) {
+	public static SerializableTroopList TroopListToSerializableTroopList(List<TroopNumberPair> troopList, int splitLargeTroopEntriesLimit = 0) {
 		SerializableTroopList exportedList = new SerializableTroopList();
 
 		foreach (TroopNumberPair tnp in troopList) {
-			exportedList.troops.Add(new SerializedTroop
+			if(splitLargeTroopEntriesLimit > 0 && tnp.troopAmount > splitLargeTroopEntriesLimit) {
+				int exportedAmount = 0;
+
+				while(exportedAmount < tnp.troopAmount) {
+					exportedList.troops.Add(new SerializedTroop
+						(GetTroopTypeByID(tnp.troopTypeID).name,
+						Mathf.Min(splitLargeTroopEntriesLimit, tnp.troopAmount - exportedAmount)));
+					exportedAmount += splitLargeTroopEntriesLimit;
+				}
+			}else {
+				exportedList.troops.Add(new SerializedTroop
 				(GetTroopTypeByID(tnp.troopTypeID).name, tnp.troopAmount));
+			}
+			
 		}
 
 		return exportedList;

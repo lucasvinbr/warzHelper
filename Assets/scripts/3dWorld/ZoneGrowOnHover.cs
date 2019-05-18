@@ -25,7 +25,7 @@ public class ZoneGrowOnHover : MonoBehaviour {
 
     void Update()
     {
-		if (EventSystem.current.IsPointerOverGameObject()) {
+		if (EventSystem.current.IsPointerOverGameObject() || GameInterface.openedPanelsOverlayLevel != 0) {
 			return;
 		}
 		//zones' colliders are in the "zone" layer (num. 8)

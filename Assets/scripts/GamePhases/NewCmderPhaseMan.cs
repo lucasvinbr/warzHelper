@@ -9,9 +9,10 @@ public class NewCmderPhaseMan : GamePhaseManager {
 	public Text infoTxt;
 
 	public override void OnPhaseStart() {
+		base.OnPhaseStart();
 		//check if it's possible for the player faction to place a new cmder
 		//(if the limit hasn't been reached and the faction has a zone without a commander in it)
-		
+
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
 		
@@ -27,12 +28,12 @@ public class NewCmderPhaseMan : GamePhaseManager {
 				}
 				else {
 					AiPlayer.AiNewCmderPhase(playerFac, availableZones);
-					OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+					OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
 				}
 			}
 			else {
 				infoTxt.text = "All owned zones are already occupied!";
-				OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+				OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
 			}
 		}
 		else {
@@ -40,18 +41,18 @@ public class NewCmderPhaseMan : GamePhaseManager {
 			if (!GameModeHandler.instance.currentTurnIsFast)
 				SmallTextAnnouncer.instance.DoAnnouncement
 					("The faction's commander limit has been reached!", Color.white);
-			OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+			OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
 		}
 	}
 
 	public void DonePlacing() {
 		infoTxt.text = "Done!";
-		OnPhaseEnd();
+		OnPhaseEnding();
 	}
 
 	public void SkipBtn() {
 		infoTxt.text = "Skipped!";
-		OnPhaseEnd();
+		OnPhaseEnding();
 	}
 
 	public override IEnumerator ProceedToNextPhaseRoutine(bool noWait = false) {

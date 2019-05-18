@@ -36,7 +36,11 @@ public class CommanderPlacer : MonoBehaviour {
 
     void Update()
     {
-        if(Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out hit, 100, 1 << 8))
+		if (GameInterface.openedPanelsOverlayLevel != 0) {
+			return;
+		}
+
+		if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out hit, 100, 1 << 8))
         {
 			ZoneSpot hitSpotScript = hit.transform.GetComponent<ZoneSpot>();
 			if (allowedSpots.Contains(hitSpotScript)) {

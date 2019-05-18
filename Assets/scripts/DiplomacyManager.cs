@@ -22,7 +22,7 @@ public class DiplomacyManager {
 	/// slowly corrode all relations as the war progresses, to make alliances end and
 	/// factions that keep taking too many zones become targets
 	/// </summary>
-	public const float MIN_REL_DMG_TOOK_ZONE = -0.025F, MAX_REL_DMG_TOOK_ZONE = -0.06F;
+	public const float MIN_REL_DMG_AGGRESSIVE = -0.025F, MAX_REL_DMG_AGGRESSIVE = -0.06F;
 
 	/// <summary>
 	/// our relation worsens with the faction that became allies with an enemy of ours
@@ -44,15 +44,47 @@ public class DiplomacyManager {
 	/// </summary>
 	public const float MIN_RELPERCENT_REQUIRED_ALLIANCE = 0.75f;
 
-
+	/// <summary>
+	/// the attacked should get angry with the attacker;
+	/// all who aren't allied to the attackers get a little relation decrease with them,
+	/// just enough to make allies and enemies form up eventually
+	/// </summary>
+	/// <param name="attackerFac"></param>
+	/// <param name="attackedFac"></param>
 	public static void GlobalReactToAttack(Faction attackerFac, Faction attackedFac) {
-		GameInfo gData = GameController.instance.curData as GameInfo;
+		GameInfo gData = GameController.CurGameData;
 		if (!gData.factionRelations.lockRelations) {
 			foreach (Faction fac in gData.factions) {
 				FacReactToAttack(fac, attackerFac, attackedFac);
 			}
 		}
 		
+	}
+
+	/// <summary>
+	/// gets attackers and defenders according to the zone owner's diplomacy.
+	/// the attacked should get angry with the attacker;
+	/// everyone gets a little relation decrease with the attacker as well...
+	/// unless we're enemies with the attacked
+	/// </summary>
+	/// <param name="attackedZone"></param>
+	public static void GlobalReactToAttack(Zone attackedZone) {
+		GameInfo gData = GameController.CurGameData;
+		if (!gData.factionRelations.lockRelations) {
+			List<int> attackers = new List<int>();
+			foreach (Commander cmder in GameController.GetCommandersInZone(attackedZone)) {
+				if(cmder.ownerFaction != attackedZone.ownerFaction && 
+					gData.factionRelations.GetStandingBetweenFactions
+					(cmder.ownerFaction, attackedZone.ownerFaction) != GameFactionRelations.FactionStanding.ally &&
+					!attackers.Contains(cmder.ownerFaction)) {
+					attackers.Add(cmder.ownerFaction);
+				}
+			}
+			foreach (Faction fac in gData.factions) {
+				FacReactToAttack(fac.ID, attackers, attackedZone.ownerFaction);
+			}
+		}
+
 	}
 
 	/// <summary>
@@ -75,10 +107,40 @@ public class DiplomacyManager {
 				ourFac.AddRelationWith(attackerFac, GetRelDmgAllyAttacked(), notifyRelationChange: ourFac.isPlayer);
 			}
 			//and worsen relations
-			ourFac.AddRelationWith(attackerFac, GetRelDmgTookZone());
+			ourFac.AddRelationWith(attackerFac, GetRelDmgAggressiveBehaviour());
 		}
 	}
 
+	/// <summary>
+	/// this makes our faction change its relation levels after an attack
+	/// if the attack somehow affected it (attacked faction was an ally, for example)
+	/// </summary>
+	/// <param name="ourFacID"></param>
+	/// <param name="attackerFacs"></param>
+	/// <param name="attackedFacID"></param>
+	public static void FacReactToAttack(int ourFacID, List<int> attackerFacs, int attackedFacID) {
+		GameInfo gData = GameController.CurGameData;
+
+		Faction ourFac = GameController.GetFactionByID(ourFacID);
+
+		if (ourFacID == attackedFacID) {
+			gData.factionRelations.AddRelationBetweenFactions(ourFacID, attackerFacs, GetRelDmgAttacked(),
+				false, ourFac.isPlayer, ourFac.isPlayer);
+		}
+		else if (attackedFacID >= 0 && !attackerFacs.Contains(ourFacID)) {
+			Faction attackedFac = GameController.GetFactionByID(attackedFacID);
+			GameFactionRelations.FactionStanding standingWithAttacked =
+				attackedFac.GetStandingWith(ourFacID);
+			if (standingWithAttacked == GameFactionRelations.FactionStanding.enemy) {
+				ourFac.AddRelationWith(attackerFacs, GetRelGainEnemyAttacked(), notifyRelationChange: ourFac.isPlayer);
+			}
+			else if (standingWithAttacked == GameFactionRelations.FactionStanding.ally) {
+				ourFac.AddRelationWith(attackerFacs, GetRelDmgAllyAttacked(), notifyRelationChange: ourFac.isPlayer);
+			}
+			//and worsen relations
+			ourFac.AddRelationWith(attackerFacs, GetRelDmgAggressiveBehaviour());
+		}
+	}
 
 
 	/// <summary>
@@ -100,8 +162,8 @@ public class DiplomacyManager {
 		return Random.Range(MIN_REL_DMG_ALLY_ATTACKED, MAX_REL_DMG_ALLY_ATTACKED);
 	}
 
-	public static float GetRelDmgTookZone() {
-		return Random.Range(MIN_REL_DMG_TOOK_ZONE, MAX_REL_DMG_TOOK_ZONE);
+	public static float GetRelDmgAggressiveBehaviour() {
+		return Random.Range(MIN_REL_DMG_AGGRESSIVE, MAX_REL_DMG_AGGRESSIVE);
 	}
 
 	public static float GetRelGainEnemyAttacked() {

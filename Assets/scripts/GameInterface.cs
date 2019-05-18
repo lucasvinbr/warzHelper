@@ -17,6 +17,8 @@ public class GameInterface : MonoBehaviour {
 
 	public TextInputPanel textInputPanel;
 
+	public CustomInputPanel customInputPanel;
+
 	public ColorInputPanel colorInputPanel;
 
 	public SaveListPanel saveListPanel;

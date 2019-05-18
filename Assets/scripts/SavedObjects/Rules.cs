@@ -8,7 +8,14 @@ public class Rules {
 	/// the maximum multiplier applied to the sum of all troops' autoResolvePower during autocalc battles.
 	/// it might help a losing faction win some battles, but may make troop training lose relevance if too high
 	/// </summary>
-	public float autoResolveBattleDieSides = 6;
+	public float autoResolveBattleDieSides = 6f;
+
+	/// <summary>
+	/// in an autocalc battle, samples are taken from both the involved sides and their power is compared.
+	/// this defines the base sample size used.
+	/// The side with more troops gets a proportionally bigger sample
+	/// </summary>
+	public int autoResolveBattleSampleSize = 10;
 
 	/// <summary>
 	/// in an autocalc battle, the auto-resolve power of the involved troops is multiplied by a random

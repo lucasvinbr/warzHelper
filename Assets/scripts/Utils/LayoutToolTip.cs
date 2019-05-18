@@ -210,7 +210,7 @@ public class LayoutToolTip : MonoBehaviour
 					GameController.GetCombinedTroopsInZoneFromFactionAndAllies(targetZone, ownerFaction);
 				AddTooltipTitleEntry("Commanders: " + cmdersInZone.Count.ToString(), ownerFaction.color, 60);
 				AddTooltipTitleEntry("Combined Army: " + 
-					GameController.GetArmyAmountFromTroopList(totalArmy), Color.white, 50);
+					GameController.GetTotalTroopAmountFromTroopList(totalArmy), Color.white, 50);
 				foreach (TroopNumberPair tnp in	totalArmy) {
 					AddTooltipTroopEntry(GameController.GetTroopTypeByID(tnp.troopTypeID).name,
 						tnp.troopAmount.ToString());
@@ -252,7 +252,7 @@ public class LayoutToolTip : MonoBehaviour
 			}
 			
 			AddTooltipTitleEntry("Combined Cmd. Army: " +
-				GameController.GetArmyAmountFromTroopList(totalCmderArmy), Color.white, 50);
+				GameController.GetTotalTroopAmountFromTroopList(totalCmderArmy), Color.white, 50);
 			foreach (TroopNumberPair tnp in totalCmderArmy) {
 				AddTooltipTroopEntry(GameController.GetTroopTypeByID(tnp.troopTypeID).name,
 					tnp.troopAmount.ToString());

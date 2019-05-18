@@ -15,7 +15,22 @@ public class CommandPhaseMan : GamePhaseManager {
 
 	public CmdPhaseCurCmderInfoBox curCmderInfoBox;
 
+	public Toggle commandPhaseTab;
+
+	private ColorBlock defaultTabColors;
+
+	private bool isMultiOrdering = false;
+
+
+	[Header("Colors when Multi-ordering is active")]
+	public ColorBlock multiOrderingTabColors;
+
+	private void Start() {
+		defaultTabColors = commandPhaseTab.colors;
+	}
+
 	public override void OnPhaseStart() {
+		base.OnPhaseStart();
 		//check if we've got any cmder to actually command
 		commandableCommanders.Clear();
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
@@ -37,22 +52,64 @@ public class CommandPhaseMan : GamePhaseManager {
 				SelectCmder(commandableCommanders[0]);
 			}else {
 				AiPlayer.AiCommandPhase(playerFac, commandableCommanders, this);
-				OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+				OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
 			}
 		}else {
 			bool fastEnd = (GameModeHandler.instance.currentTurnIsFast);
 			if(!fastEnd)
 				SmallTextAnnouncer.instance.DoAnnouncement("No active commanders found!", Color.white);
-			OnPhaseEnd(fastEnd);
+			OnPhaseEnding(fastEnd);
 		}
 		
 		
 	}
 
+	private void Update() {
+		if (GameModeHandler.instance.curPlayingFaction != null && 
+			GameModeHandler.instance.curPlayingFaction.isPlayer) {
+			if (Input.GetButtonDown("Do Multi-order")) {
+				ToggleMultiOrdering(true);
+			}
+
+			if (Input.GetButtonUp("Do Multi-order")) {
+				ToggleMultiOrdering(false);
+			}
+		}
+	}
+
+	public void ToggleMultiOrdering(bool enable) {
+		isMultiOrdering = enable;
+		commandPhaseTab.colors = enable ? multiOrderingTabColors : defaultTabColors;
+
+		if (worldCommandScript.curSelectedCmder) {
+			SetCmderInfoBoxContent(worldCommandScript.curSelectedCmder.data);
+		}
+	}
+
+	/// <summary>
+	/// sets the content of the info box 
+	/// taking multi-ordering into consideration:
+	/// uses either the info on all cmders in the zone
+	/// or with the target cmder's info only
+	/// </summary>
+	/// <param name="cmder"></param>
+	private void SetCmderInfoBoxContent(Commander cmder) {
+		if (isMultiOrdering) {
+			Zone curZone = GameController.GetZoneByID(cmder.zoneIAmIn);
+			Faction curFac = GameModeHandler.instance.curPlayingFaction;
+			List<TroopNumberPair> cmderArmies = null;
+			List<Commander> cmdersInZone = GameController.GetCommandersOfFactionInZone(curZone, curFac, out cmderArmies);
+			curCmderInfoBox.SetContent(cmderArmies, cmdersInZone.Count, cmder);
+		}else {
+			curCmderInfoBox.SetContent(cmder);
+		}
+	}
+
 	public void SelectCmder(Commander cmder) {
-		CameraPanner.instance.TweenToSpot(cmder.MeIn3d.transform.position);
+		CameraPanner.instance.TweenToSpot(GameController.GetZoneByID(cmder.zoneIAmIn).
+			MyZoneSpot.transform.position);
 		worldCommandScript.SelectCmder(cmder.MeIn3d);
-		curCmderInfoBox.SetContent(cmder);
+		SetCmderInfoBoxContent(cmder);
 	}
 
 	/// <summary>
@@ -72,12 +129,13 @@ public class CommandPhaseMan : GamePhaseManager {
 	}
 
 	/// <summary>
-	/// goes to the next idle cmder in the commandable commanders list.
+	/// goes to the next idle cmder in the commandable commanders list,
+	/// optionally tweening the cam to the only idle one left.
 	/// must be called before removing the active commander from the list
 	/// </summary>
-	public void GoToNextIdleCmder(Commander curActiveCmder, bool jumpToActiveIfOnlyOne = false) {
+	public void GoToNextIdleCmder(Commander curActiveCmder, bool moveCamToCmderIfNoNext = false) {
 		if(commandableCommanders.Count <= 1) {
-			if (jumpToActiveIfOnlyOne) {
+			if (moveCamToCmderIfNoNext) {
 				CameraPanner.instance.TweenToSpot(worldCommandScript.curSelectedCmder.transform.position);
 			}
 			return;
@@ -109,52 +167,129 @@ public class CommandPhaseMan : GamePhaseManager {
 		commandableCommanders.Remove(cmder);
 		worldCommandScript.allowedCmders3d = GameController.CmdersToCmder3ds(commandableCommanders);
 		if(commandableCommanders.Count == 0) {
-			OnPhaseEnd();
+			OnPhaseEnding();
 		}
+	}
+
+	public void CmderBatchHasActed(List<Commander> actedCmders) {
+		if(actedCmders.Count > 0) {
+			int nextCmderIndex = commandableCommanders.IndexOf(actedCmders[0]);
+
+			foreach(Commander cmd in actedCmders) {
+				commandableCommanders.Remove(cmd);
+			}
+
+			worldCommandScript.allowedCmders3d = GameController.CmdersToCmder3ds(commandableCommanders);
+
+			if (commandableCommanders.Count == 0) {
+				OnPhaseEnding();
+			}else {
+				if (nextCmderIndex >= commandableCommanders.Count) nextCmderIndex = 0;
+				SelectCmder(commandableCommanders[nextCmderIndex]);
+			}
+		}
+		
 	}
 
 
 	public void RecruitBtnPressed() {
-		Commander curCmder = worldCommandScript.curSelectedCmder.data;
-		if (curCmder.RecruitTroops()) {
-			CmderHasActed(curCmder);
+		if (isMultiOrdering) {
+			List<Commander> actedCmders = new List<Commander>();
+
+			foreach (Commander cmd in GameController.GetCommandersOfFactionInZone
+				(GameController.GetZoneByID(worldCommandScript.curSelectedCmder.data.zoneIAmIn),
+				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
+				if (cmd.RecruitTroops()) {
+					actedCmders.Add(cmd);
+				}
+			}
+
+			CmderBatchHasActed(actedCmders);
 		}else {
-			SmallTextAnnouncer.instance.DoAnnouncement("Couldn't recruit any troops!", Color.white);
+			Commander curCmder = worldCommandScript.curSelectedCmder.data;
+			if (curCmder.RecruitTroops()) {
+				CmderHasActed(curCmder);
+			}
+			else {
+				SmallTextAnnouncer.instance.DoAnnouncement("Couldn't recruit any troops!", Color.white);
+			}
 		}
+		
 
 	}
 
 	public void TrainingBtnPressed() {
-		Commander curCmder = worldCommandScript.curSelectedCmder.data;
-		bool hasTrained = false;
-		if (curCmder.TrainTroops(out hasTrained)) {
-			CmderHasActed(curCmder);
+		if (isMultiOrdering) {
+			List<Commander> actedCmders = new List<Commander>();
+
+			foreach (Commander cmd in GameController.GetCommandersOfFactionInZone
+				(GameController.GetZoneByID(worldCommandScript.curSelectedCmder.data.zoneIAmIn),
+				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
+				if (cmd.CmdTrainTroops()) {
+					actedCmders.Add(cmd);
+				}
+			}
+
+			CmderBatchHasActed(actedCmders);
 		}
 		else {
-			SmallTextAnnouncer.instance.DoAnnouncement("Couldn't train any troops!", Color.white);
+			Commander curCmder = worldCommandScript.curSelectedCmder.data;
+			if (curCmder.CmdTrainTroops()) {
+				CmderHasActed(curCmder);
+			}
+			else {
+				SmallTextAnnouncer.instance.DoAnnouncement("Couldn't train any troops!", Color.white);
+			}
 		}
+		
 
 	}
 
 	public void MoveCommander(Cmder3d movingCmder3d, ZoneSpot destinationSpot, bool runHasActed = true) {
 		Zone ourOldZone = GameController.GetZoneByID(movingCmder3d.data.zoneIAmIn);
-		movingCmder3d.data.zoneIAmIn = destinationSpot.data.ID;
-		movingCmder3d.data.pointsToSpend = 0;
-		//reset other cmders' positions after departing
-		World.TidyZone(ourOldZone);
-		Cmder3dMover.instance.StartTween(movingCmder3d, destinationSpot);
-		if(runHasActed) CmderHasActed(movingCmder3d.data);
+
+		if (isMultiOrdering && runHasActed) {
+			List<Commander> actedCmders = new List<Commander>();
+
+			foreach (Commander cmd in GameController.GetCommandersOfFactionInZone
+				(ourOldZone,
+				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
+				cmd.zoneIAmIn = destinationSpot.data.ID;
+				cmd.pointsToSpend = 0;
+				Cmder3dMover.instance.StartTween(cmd.MeIn3d, destinationSpot);
+				actedCmders.Add(cmd);
+			}
+
+			World.TidyZone(ourOldZone);
+
+			CmderBatchHasActed(actedCmders);
+		}
+		else {
+			movingCmder3d.data.zoneIAmIn = destinationSpot.data.ID;
+			movingCmder3d.data.pointsToSpend = 0;
+			//reset other cmders' positions after departing
+			World.TidyZone(ourOldZone);
+			Cmder3dMover.instance.StartTween(movingCmder3d, destinationSpot);
+			if (runHasActed) CmderHasActed(movingCmder3d.data);
+		}
+		
+		
 	}
 
 	public void SkipBtnPressed() {
 		CmderHasActed(worldCommandScript.curSelectedCmder.data);
 	}
 
-	public override void OnPhaseEnd(bool noWait = false) {
+	public override void OnPhaseEnding(bool noWait = false) {
 		worldCommandScript.enabled = false;
 		selectedCmderBtnsGroup.interactable = false;
 		curCmderInfoBox.gameObject.SetActive(false);
-		base.OnPhaseEnd(noWait);
+		base.OnPhaseEnding(noWait);
+	}
+
+	public override void OnPhaseEnded() {
+		base.OnPhaseEnded();
+		ToggleMultiOrdering(false);
 	}
 
 	public override void InterruptPhase() {

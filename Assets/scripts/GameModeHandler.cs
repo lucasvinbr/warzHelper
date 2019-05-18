@@ -70,7 +70,7 @@ public class GameModeHandler : ModeUI {
 		World.SetupBoardDetails();
 		GameController.MakeFactionTurnPrioritiesUnique();
 		//give initial points to zones if this is a new game
-		GameInfo data = GameController.instance.curData as GameInfo;
+		GameInfo data = GameController.CurGameData;
 
 		if(data.factionRelations == null ||
 			data.factionRelations.relations.Count == 0) {
@@ -107,7 +107,7 @@ public class GameModeHandler : ModeUI {
 
 	public void StartNewTurn(TurnPhase startingPhase = TurnPhase.newCmder) {
 		//find out which faction turn it is now
-		GameInfo data = GameController.instance.curData as GameInfo;
+		GameInfo data = GameController.CurGameData;
 		curPlayingFaction = GameController.GetNextFactionInTurnOrder(data.lastTurnPriority);
 		
 		if (GameController.IsFactionStillInGame(curPlayingFaction)) {
@@ -145,9 +145,20 @@ public class GameModeHandler : ModeUI {
 
 	public void GoToNextTurnPhase() {
 		if(curPhase != TurnPhase.postBattle) {
+			GameInfo curData = GameController.CurGameData;
 			curPhase++;
-			GameInfo data = GameController.instance.curData as GameInfo;
-			data.curTurnPhase = curPhase;
+			if (curPhase == TurnPhase.battle) {
+				//skip this battle and post-battle phases if we're in "unified" mode
+				//and it's not the last faction's turn
+				if (curData.unifyBattlePhase) {
+					if (curPlayingFaction.ID != curData.factions[curData.factions.Count - 1].ID) {
+						curPhase = TurnPhase.postBattle;
+						GoToNextTurnPhase();
+						return;
+					}
+				}
+			}
+			curData.curTurnPhase = curPhase;
 			StartRespectivePhaseMan();
 		}else {
 			TurnFinished();
@@ -156,7 +167,7 @@ public class GameModeHandler : ModeUI {
 
 
 	public void TurnFinished() {
-		GameInfo data = GameController.instance.curData as GameInfo;
+		GameInfo data = GameController.CurGameData;
 		data.lastTurnPriority = curPlayingFaction.turnPriority;
 		data.elapsedTurns++;
 		//TODO victory check

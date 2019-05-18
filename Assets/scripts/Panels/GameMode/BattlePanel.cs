@@ -32,7 +32,7 @@ public class BattlePanel : GrowingOverlayPanel {
 
 	public CanvasGroup resolutionBtnsGroup;
 
-	public void OpenWithFilledInfos(Faction attackerFaction, Faction defenderFaction, Zone warZone, bool immediateAutocalc = false) {
+	public void OpenWithFilledInfos(Faction attackerFaction, Faction defenderFaction, Zone warZone) {
 		gameObject.SetActive(true);
 		
 		curWarzone = warZone;
@@ -40,12 +40,12 @@ public class BattlePanel : GrowingOverlayPanel {
 		attackerSide.SetContent(attackerFaction);
 		attackerSide.SetArmyData(null,
 			GameController.CmdersToTroopContainers
-			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, attackerFaction)));
+			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, attackerFaction, defenderFaction)));
 
 		defenderSide.SetContent(defenderFaction);
 		defenderSide.SetArmyData(warZone,
 			GameController.CmdersToTroopContainers
-			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, defenderFaction)));
+			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, defenderFaction, attackerFaction)));
 
 		//zone info...
 		zoneNameTxt.text = warZone.name;
@@ -59,9 +59,27 @@ public class BattlePanel : GrowingOverlayPanel {
 
 		ResetUI();
 
-		if (immediateAutocalc) {
+
+		//if the "always autocalc AI battles" option is active,
+		//we must check if the player's troops aren't participating
+		//before forcing autocalc resolution
+		if (GameController.CurGameData.alwaysAutocalcAiBattles) {
+
+			foreach(TroopContainer tc in attackerSide.ourContainers) {
+				if (GameController.GetFactionByID(tc.ownerFaction).isPlayer) {
+					return;
+				}
+			}
+
+			foreach (TroopContainer tc in defenderSide.ourContainers) {
+				if (GameController.GetFactionByID(tc.ownerFaction).isPlayer) {
+					return;
+				}
+			}
+
 			AutocalcResolution();
 		}
+
 	}
 
 	public void OpenPercentageResolution() {
@@ -76,6 +94,9 @@ public class BattlePanel : GrowingOverlayPanel {
 	/// multiple mini-battles are made between randomized samples of each side's army
 	/// </summary>
 	public void AutocalcResolution() {
+		Debug.Log("---AUTOBATTLE START---");
+		Debug.Log(attackerSide.factionNameTxt.text + " VS " + defenderSide.factionNameTxt.text);
+
 		int sampleSize;
 
 		int attackerSampleSize, defenderSampleSize;
@@ -88,19 +109,25 @@ public class BattlePanel : GrowingOverlayPanel {
 
 		float winnerDmgMultiplier = GameController.instance.curData.rules.autoResolveWinnerDamageMultiplier;
 
-		while(attackerSide.curArmyPower > 0 && defenderSide.curArmyPower > 0) {
-			sampleSize = Mathf.Min(attackerSide.curArmyNumbers, defenderSide.curArmyNumbers, 20);
+		int baseSampleSize = GameController.instance.curData.rules.autoResolveBattleSampleSize;
+
+		while (attackerSide.curArmyPower > 0 && defenderSide.curArmyPower > 0) {
+			sampleSize = Mathf.Min(attackerSide.curArmyNumbers, defenderSide.curArmyNumbers, baseSampleSize);
 
 			attackerSampleSize = sampleSize;
 			defenderSampleSize = sampleSize;
 
 			armyNumbersProportion = (float)attackerSide.curArmyNumbers / defenderSide.curArmyNumbers;
 			//Debug.Log("army num proportion: " + armyNumbersProportion);
-			//the size with a bigger army gets a bigger sample
+			//the size with a bigger army gets a bigger sample...
+			//but not a simple proportion because the more targets you've got,
+			//the easier it is to randomly hit a target hahaha
 			if (armyNumbersProportion > 1.0f) {
+				armyNumbersProportion = Mathf.Max(0.1f + ((armyNumbersProportion * sampleSize) / (armyNumbersProportion + baseSampleSize)), 1.0f);
 				attackerSampleSize = Mathf.RoundToInt(sampleSize * armyNumbersProportion);
 			}
 			else {
+				armyNumbersProportion = ((armyNumbersProportion * baseSampleSize) / (armyNumbersProportion + baseSampleSize));
 				defenderSampleSize = Mathf.RoundToInt(sampleSize / armyNumbersProportion);
 			}
 
@@ -130,7 +157,8 @@ public class BattlePanel : GrowingOverlayPanel {
 			attackerSide.SetPostBattleArmyData_PowerLost(defenderAutoPower, shouldAnimateBars);
 
 		}
-		
+
+		Debug.Log("---AUTOBATTLE END---");
 	}
 
 	/// <summary>
@@ -183,7 +211,7 @@ public class BattlePanel : GrowingOverlayPanel {
 		//add export options now...
 
 		//JSON basic "all troops together" export!
-		exportOptions.Add(new KeyValuePair<string, UnityAction>("Export to JSON (all troops in a simple list - don't use if both sides use the same troop type)", () => {
+		exportOptions.Add(new KeyValuePair<string, UnityAction>("Basic Export to JSON (all troops in a simple list - don't use if both sides use the same troop type)", () => {
 			SerializableTroopList exportedList = GameController.TroopListToSerializableTroopList
 				(GameController.GetCombinedTroopsFromTwoLists
 				(attackerSide.sideArmy, defenderSide.sideArmy));
@@ -196,6 +224,29 @@ public class BattlePanel : GrowingOverlayPanel {
 			});
 			GI.textInputPanel.Open();
 			GI.exportOpsPanel.gameObject.SetActive(false);
+		}));
+
+		//JSON basic "all troops together" export, splitting entries if troop amounts go above a certain limit!
+		exportOptions.Add(new KeyValuePair<string, UnityAction>("Basic Export to JSON, splitting large troop entries", () => {
+			GI.exportOpsPanel.gameObject.SetActive(false);
+
+			GI.customInputPanel.Open();
+			NumericInputFieldBtns numBtns = GI.customInputPanel.AddNumericInput("Split Limit", true, 1, 0, 9999, 5,
+				"Troop entries with more than this amount of troops will be divided in more than one JSON entry");
+			GI.customInputPanel.SetPanelInfo("Set Troop Entry Split Limit...", "Confirm", () => {
+				SerializableTroopList exportedList = GameController.TroopListToSerializableTroopList
+				(GameController.GetCombinedTroopsFromTwoLists
+				(attackerSide.sideArmy, defenderSide.sideArmy), int.Parse(numBtns.targetField.text));
+				string JSONContent = JsonUtility.ToJson(exportedList);
+				Debug.Log(JSONContent);
+				GI.textInputPanel.SetPanelInfo("JSON Export Result", "", JSONContent, "Copy to Clipboard", () => {
+
+					GameInterface.CopyToClipboard(GI.textInputPanel.theInputField.text);
+
+				});
+				GI.customInputPanel.Close();
+				GI.textInputPanel.Open();
+			});
 		}));
 
 

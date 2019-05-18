@@ -9,34 +9,46 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 	public List<Zone> conflictZones = new List<Zone>();
 
+	private List<Zone> zonesToCleanUp = new List<Zone>();
+
 	private List<Commander> commandersBeingDeleted = new List<Commander>();
 
 	public const float CMDER_DESTROY_TIME = 0.75f;
 
 	public override void OnPhaseStart() {
+		base.OnPhaseStart();
 		//only zones with our commanders should have something happening 
 		conflictZones.Clear();
+		zonesToCleanUp.Clear();
 		commandersBeingDeleted.Clear();
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
-		List<Commander> factionCmders = playerFac.OwnedCommanders;
-		infoTxt.text = "The effects of any battles(commanders disappearing, zones being taken), happen now";
+		GameInfo gData = GameController.CurGameData;
+		List<Commander> verifiedCmders = playerFac.OwnedCommanders;
+		List<Zone> verifiedZones = playerFac.OwnedZones;
+
+		if(gData.unifyBattlePhase && playerFac.ID == gData.factions[gData.factions.Count - 1].ID) {
+			//if it's the "big post-battle", check all cmders instead of just the playing faction's
+			verifiedCmders = gData.deployedCommanders;
+		}
+
+		infoTxt.text = "The effects of any battles(commanders disappearing, zones being taken) happen now";
 		Zone zoneCmderIsIn = null;
 		Faction curZoneOwnerFac = null;
-		foreach (Commander cmder in factionCmders) {
+		foreach (Commander cmder in verifiedCmders) {
 			zoneCmderIsIn = GameController.GetZoneByID(cmder.zoneIAmIn);
 			if (!conflictZones.Contains(zoneCmderIsIn)) {
-				if (zoneCmderIsIn.CanBeTakenBy(playerFac)) {
+				if (zoneCmderIsIn.CanBeTakenBy(cmder.ownerFaction)) {
 					conflictZones.Add(zoneCmderIsIn);
 					curZoneOwnerFac = GameController.GetFactionByID(zoneCmderIsIn.ownerFaction);
-					DiplomacyManager.GlobalReactToAttack(playerFac, curZoneOwnerFac);
+					DiplomacyManager.GlobalReactToAttack(zoneCmderIsIn);
 				}
 			}
 		}
 
 		//also add owned zones that should become neutral due to being completely abandoned
-		foreach(Zone z in playerFac.OwnedZones) {
+		foreach(Zone z in verifiedZones) {
 			if (!conflictZones.Contains(z)) {
-				if(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(z, playerFac).Count == 0) {
+				if(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(z, z.ownerFaction).Count == 0) {
 					conflictZones.Add(z);
 				}
 			}
@@ -46,7 +58,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 			StartCoroutine(GoToNextConflict());
 		}else {
 			infoTxt.text = "End of Turn!";
-			OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+			OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
 		}
 	}
 
@@ -59,6 +71,10 @@ public class PostBattlePhaseMan : GamePhaseManager {
 		foreach(Commander c in cmdersInZone) {
 			if(c.TotalTroopsContained == 0) {
 				StartCoroutine(KillCommanderRoutine(c));
+				//mark for tidying after all "dead" cmders have been removed
+				if (!zonesToCleanUp.Contains(confZone)) {
+					zonesToCleanUp.Add(confZone);
+				}
 			}else {
 				//allies won't take the zone for themselves even if the zone ends up with 0 garrison
 				cmderFac = GameController.GetFactionByID(c.ownerFaction);
@@ -76,7 +92,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 		}
 
 		if (!zoneWasTaken) {
-			if(GameController.GetArmyAmountFromTroopList(
+			if(GameController.GetTotalTroopAmountFromTroopList(
 				GameController.GetCombinedTroopsInZoneFromFactionAndAllies
 				(confZone, ownerFac)) == 0) {
 				//the zone's been abandoned then
@@ -88,7 +104,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 		conflictZones.RemoveAt(0);
 		if (conflictZones.Count == 0) {
-			OnPhaseEnd(GameModeHandler.instance.currentTurnIsFast);
+			OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
 		}
 		else {
 			StartCoroutine(GoToNextConflict());
@@ -109,6 +125,14 @@ public class PostBattlePhaseMan : GamePhaseManager {
 	public override IEnumerator ProceedToNextPhaseRoutine(bool noWait = false) {
 		//wait for all commanders to actually "die"
 		while (commandersBeingDeleted.Count > 0) yield return null;
+
+		//then tidy up "dirty" zones
+		foreach(Zone z in zonesToCleanUp) {
+			World.TidyZone(z);
+		}
+
+		zonesToCleanUp.Clear();
+
 		if (noWait) {
 			yield return null;
 		}else {
@@ -123,7 +147,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 		Transform commander3dTrans = cmder.MeIn3d.transform;
 		float elapsedTime = 0;
 
-		while(elapsedTime < CMDER_DESTROY_TIME) {
+		while (elapsedTime < CMDER_DESTROY_TIME) {
 			commander3dTrans.Rotate(Vector3.up * 200 * Time.deltaTime);
 			commander3dTrans.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, elapsedTime / CMDER_DESTROY_TIME);
 			elapsedTime += Time.deltaTime;
