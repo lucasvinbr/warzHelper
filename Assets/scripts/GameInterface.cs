@@ -13,6 +13,8 @@ public class GameInterface : MonoBehaviour {
 
 	public EditTroopPanel editTroopPanel;
 
+	public EditMercCaravanPanel editMercCaravanPanel;
+
 	public EditRulesBoardPanel editRulesPanel;
 
 	public TextInputPanel textInputPanel;
@@ -97,6 +99,10 @@ public class GameInterface : MonoBehaviour {
 
 	public void EditTroopType(TroopType targetTT, bool isNewEntry) {
 		editTroopPanel.Open(targetTT, isNewEntry);
+	}
+
+	public void EditMercCaravan(MercCaravan targetMC, bool isNewEntry) {
+		editMercCaravanPanel.Open(targetMC, isNewEntry);
 	}
 
 	/// <summary>

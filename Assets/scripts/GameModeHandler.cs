@@ -47,7 +47,8 @@ public class GameModeHandler : ModeUI {
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
 		World.CleanCmders();
-		Cmder3dMover.instance.StopAllTweens();
+		World.CleanMCaravans();
+		TransformTweener.instance.StopAllTweens();
 		World.ToggleWorldDisplay(false);
 		World.instance.garrDescOnHoverScript.enabled = false;
 		StopAllPhaseMans();
@@ -62,11 +63,13 @@ public class GameModeHandler : ModeUI {
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
 		World.CleanCmders();
+		World.CleanMCaravans();
 		World.ToggleWorldDisplay(true);
 		World.SetupAllZonesFromData();
 		World.LinkAllZonesFromData();
 		World.SetupAllCommandersFromData();
 		World.instance.garrDescOnHoverScript.enabled = true;
+		World.SetupAllMercCaravansFromData();
 		World.SetupBoardDetails();
 		GameController.MakeFactionTurnPrioritiesUnique();
 		//give initial points to zones if this is a new game
@@ -110,7 +113,7 @@ public class GameModeHandler : ModeUI {
 		GameInfo data = GameController.CurGameData;
 		curPlayingFaction = GameController.GetNextFactionInTurnOrder(data.lastTurnPriority);
 		
-		if (GameController.IsFactionStillInGame(curPlayingFaction)) {
+		if (GameController.ShouldFactionGetATurn(curPlayingFaction)) {
 			currentTurnIsFast = (!curPlayingFaction.isPlayer && data.fastAiTurns);
 			if(!currentTurnIsFast)
 				bigAnnouncer.DoAnnouncement(curPlayingFaction.name + "\nTurn", curPlayingFaction.color);
@@ -123,8 +126,10 @@ public class GameModeHandler : ModeUI {
 		}
 		else{
 			data.lastTurnPriority = curPlayingFaction.turnPriority;
+			//kill this faction then!
+			KillFaction(curPlayingFaction);
 			StartNewTurn();
-			//TODO victory check, no factions capable of doing anything check
+			//TODO "game should end" checks
 		}
 		
 	}
@@ -144,8 +149,9 @@ public class GameModeHandler : ModeUI {
 	}
 
 	public void GoToNextTurnPhase() {
-		if(curPhase != TurnPhase.postBattle) {
-			GameInfo curData = GameController.CurGameData;
+		GameInfo curData = GameController.CurGameData;
+		if (curPhase != TurnPhase.postBattle) {
+			
 			curPhase++;
 			if (curPhase == TurnPhase.battle) {
 				//skip this battle and post-battle phases if we're in "unified" mode
@@ -161,6 +167,11 @@ public class GameModeHandler : ModeUI {
 			curData.curTurnPhase = curPhase;
 			StartRespectivePhaseMan();
 		}else {
+			//move caravans if it's the "last faction"'s turn end
+			if (curPlayingFaction.ID == curData.factions[curData.factions.Count - 1].ID) {
+				MercCaravansPseudoTurn();
+			}
+
 			TurnFinished();
 		}
 	}
@@ -171,6 +182,34 @@ public class GameModeHandler : ModeUI {
 		data.lastTurnPriority = curPlayingFaction.turnPriority;
 		data.elapsedTurns++;
 		//TODO victory check
+		//check for a special case:
+		//in "unified mode" last faction in turn order isn't killed right away
+		if (data.unifyBattlePhase && curPlayingFaction.ID == data.factions[data.factions.Count - 1].ID) {
+			if(!GameController.ShouldFactionGetATurn(curPlayingFaction, false)) {
+				KillFaction(curPlayingFaction);
+			}
+		}
 		StartNewTurn();
+	}
+
+	/// <summary>
+	/// makes all caravans think about moving
+	/// </summary>
+	public void MercCaravansPseudoTurn() {
+		whoseTurnTxt.text = "MERC CARAVANS";
+		whoseTurnTxt.color = Color.white;
+
+		foreach(MercCaravan mc in GameController.CurGameData.mercCaravans) {
+			mc.CaravanThinkMove();
+		}
+	}
+
+	/// <summary>
+	/// does the remove faction procedure and shows a message
+	/// </summary>
+	public void KillFaction(Faction killedFac) {
+		ModalPanel.Instance().MessageBox(null, "Faction Eliminated", killedFac.name + " is no more!", null,
+			null, null, null, false, ModalPanel.ModalMessageType.Ok); //TODO show the faction's logo if set
+		GameController.RemoveFaction(killedFac);
 	}
 }

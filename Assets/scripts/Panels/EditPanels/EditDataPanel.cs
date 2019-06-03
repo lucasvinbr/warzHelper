@@ -13,9 +13,7 @@ public abstract class EditDataPanel<T> : DirtableOverlayPanel{
 
     public T dataBeingEdited;
 
-	public delegate void OnDoneEditing();
-
-	public OnDoneEditing onDoneEditing;
+	public UnityAction onDoneEditing;
 
 	public Button closeBtn, deleteBtn;
 

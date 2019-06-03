@@ -125,7 +125,10 @@ public abstract class TroopContainer {
 	}
 
 	/// <summary>
-	/// function used when receiving points for victories
+	/// function used when receiving points for victories or training troops
 	/// </summary>
-	public abstract void TrainTroops();
+	public abstract bool TrainTroops();
+
+
+	public abstract bool RecruitTroops();
 }

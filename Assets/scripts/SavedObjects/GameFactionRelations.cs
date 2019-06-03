@@ -170,6 +170,14 @@ public class GameFactionRelations
 		return 0;
 	}
 
+	public void RemoveAllRelationEntriesWithFaction(int facID) {
+		for(int i = relations.Count - 1; i >= 0; i--) {
+			if(relations[i].relatedFacs[0] == facID || relations[i].relatedFacs[1] == facID) {
+				relations.RemoveAt(i);
+			}
+		}
+	}
+
 
 	public void LoggerAnnounceRelationChange(int facID1, int facID2, float newValue, float oldValue) {
 		if (newValue == oldValue) return; //yeah, no reporting if nothing changed

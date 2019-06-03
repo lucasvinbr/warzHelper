@@ -14,6 +14,7 @@ public class TemplateModeUI : ModeUI {
 		}
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
+		World.CleanMCaravans();
 		World.ToggleWorldDisplay(false);
 		World.instance.zoneEditOnClickScript.enabled = false;
 		World.instance.garrDescOnHoverScript.enabled = false;
@@ -27,10 +28,12 @@ public class TemplateModeUI : ModeUI {
 		GameController.instance.facMatsHandler.ReBakeFactionColorsDict();
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
+		World.CleanMCaravans();
 		World.ToggleWorldDisplay(true);
 		World.SetupAllZonesFromData();
 		World.LinkAllZonesFromData();
 		World.SetupBoardDetails();
+		World.SetupAllMercCaravansFromData();
 		SetDisplayedLowerHUD(mainLowerHUD);
 		World.instance.zoneEditOnClickScript.enabled = true;
 		World.instance.garrDescOnHoverScript.enabled = true;

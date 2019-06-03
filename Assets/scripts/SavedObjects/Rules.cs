@@ -18,6 +18,13 @@ public class Rules {
 	public int autoResolveBattleSampleSize = 10;
 
 	/// <summary>
+	/// if one of the sides involved in an autocalc battle has an army size above this,
+	/// it won't make a difference when calculating army sample size proportions.
+	/// Useful for preventing huge steamrollers that don't take any losses
+	/// </summary>
+	public int autoResolveBattleMaxArmyForProportion = 400;
+
+	/// <summary>
 	/// in an autocalc battle, the auto-resolve power of the involved troops is multiplied by a random
 	/// value between 1 and autoResolveBattleDieSides. The side with the greatest resulting value wins,
 	/// and then the winner's resulting value is deducted from the loser's power, so that
@@ -33,6 +40,11 @@ public class Rules {
 	/// (use 0 to disable post-battle point awards)
 	/// </summary>
 	public float battleWinnerPointAwardFactor = 0.4f;
+
+	/// <summary>
+	/// the chance of a mercenary caravan staying in a zone for one turn instead of moving to another one
+	/// </summary>
+	public float caravanStayChance = 0.25f;
 
 	/// <summary>
 	/// the points each commander receives at the beginning of their faction's turn

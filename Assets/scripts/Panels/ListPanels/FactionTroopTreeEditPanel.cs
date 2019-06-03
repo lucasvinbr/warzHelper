@@ -273,6 +273,8 @@ public class FactionTroopTreeEditPanel : ListContainerPanel<TroopType> {
 		entryScript.SetContent(entryData);
 		entryScript.ReFillDropdownOptions();
 		entryScript.selectEntryBtn.onClick.AddListener(()=>SelectTierEntry(entryScript));
+		entryScript.parentDirtablePanel = GameInterface.instance.editFactionPanel;
+		entryScript.actionOnEditTroopType = UpdateTreeTroopOptions;
 
 		newEntry.transform.SetSiblingIndex(listContainer.childCount - 2);
 		return entryScript;

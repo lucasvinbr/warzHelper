@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class FactionTroopListEntry : ListPanelEntry<TroopType> {
@@ -9,7 +10,14 @@ public class FactionTroopListEntry : ListPanelEntry<TroopType> {
 
 	public Dropdown troopTypeDropdown;
 
+	/// <summary>
+	/// used by parent containers' scripts
+	/// </summary>
 	public Button selectEntryBtn;
+
+	public DirtableOverlayPanel parentDirtablePanel;
+
+	public UnityAction actionOnEditTroopType; 
 
 	public override void SetContent(TroopType targetTroop) {
 		if (targetTroop != null) {
@@ -20,7 +28,9 @@ public class FactionTroopListEntry : ListPanelEntry<TroopType> {
 
 	public void SetContentAccordingToDDown(int ddownValue) {
 		SetContent(GameController.GetTroopTypeByName(troopTypeDropdown.options[ddownValue].text));
-		GameInterface.instance.editFactionPanel.isDirty = true;
+
+		if (parentDirtablePanel) parentDirtablePanel.isDirty = true;
+
 	}
 
 	public void RefreshInfoLabels(bool alsoRefillDropdown = true) {
@@ -43,7 +53,12 @@ public class FactionTroopListEntry : ListPanelEntry<TroopType> {
 	}
 
 	public void CreateNewTroopTypeForMe() {
-		GameInterface.instance.editFactionPanel.troopTreePanel.CreateNewTroopTypeForEntry(this);
+		TroopType newTT = new TroopType(GameController.instance.LastRelevantTType);
+		SetContent(newTT);
+		RefreshInfoLabels();
+		OpenEditTroopPanel();
+		GameInterface.instance.editTroopPanel.onDoneEditing += actionOnEditTroopType;
+		if (parentDirtablePanel) parentDirtablePanel.isDirty = true;
 		troopTypeDropdown.Hide();
 	}
 

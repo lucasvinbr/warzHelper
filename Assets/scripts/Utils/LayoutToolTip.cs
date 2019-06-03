@@ -226,6 +226,13 @@ public class LayoutToolTip : MonoBehaviour
 
 		AddTooltipInfoEntry(targetZone.multRecruitmentPoints.ToString("0%"),
 			targetZone.multTrainingPoints.ToString("0%"));
+
+		MercCaravan localCaravan = GameController.GetMercCaravanInZone(targetZone.ID);
+		if(localCaravan != null) {
+			AddTooltipInfoEntry("Merc Caravan Troop", 
+				GameController.GetTroopTypeByID(localCaravan.containedTroopType).name);
+		}
+
 		ContextualTooltipUpdate(refreshCanvasesBeforeGetSize);
 	}
 

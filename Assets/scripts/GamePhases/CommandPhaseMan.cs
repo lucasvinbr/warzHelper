@@ -225,7 +225,7 @@ public class CommandPhaseMan : GamePhaseManager {
 			foreach (Commander cmd in GameController.GetCommandersOfFactionInZone
 				(GameController.GetZoneByID(worldCommandScript.curSelectedCmder.data.zoneIAmIn),
 				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
-				if (cmd.CmdTrainTroops()) {
+				if (cmd.TrainTroops()) {
 					actedCmders.Add(cmd);
 				}
 			}
@@ -234,7 +234,7 @@ public class CommandPhaseMan : GamePhaseManager {
 		}
 		else {
 			Commander curCmder = worldCommandScript.curSelectedCmder.data;
-			if (curCmder.CmdTrainTroops()) {
+			if (curCmder.TrainTroops()) {
 				CmderHasActed(curCmder);
 			}
 			else {
@@ -256,7 +256,7 @@ public class CommandPhaseMan : GamePhaseManager {
 				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
 				cmd.zoneIAmIn = destinationSpot.data.ID;
 				cmd.pointsToSpend = 0;
-				Cmder3dMover.instance.StartTween(cmd.MeIn3d, destinationSpot);
+				TransformTweener.instance.StartTween(cmd.MeIn3d.transform, destinationSpot, true);
 				actedCmders.Add(cmd);
 			}
 
@@ -269,7 +269,7 @@ public class CommandPhaseMan : GamePhaseManager {
 			movingCmder3d.data.pointsToSpend = 0;
 			//reset other cmders' positions after departing
 			World.TidyZone(ourOldZone);
-			Cmder3dMover.instance.StartTween(movingCmder3d, destinationSpot);
+			TransformTweener.instance.StartTween(movingCmder3d.transform, destinationSpot, true);
 			if (runHasActed) CmderHasActed(movingCmder3d.data);
 		}
 		

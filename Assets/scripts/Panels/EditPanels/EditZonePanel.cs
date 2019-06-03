@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class EditZonePanel : EditDataPanel<Zone> {
 
-    public InputField nameInput, eInfoInput, multTrainingInput, multRecruitInput, multMaxGarrInput, startPointsInput;
-    public Dropdown ownerFactionDropdown;
+	public InputField nameInput, eInfoInput, multTrainingInput, multRecruitInput, multMaxGarrInput, startPointsInput;
+	public Dropdown ownerFactionDropdown;
 
 	public ZonePointMultInputPredicter trainingMultPredicter, recruitMultPredicter;
 	public ZoneGarrMultInputPredicter garrMultPredicter;
@@ -88,6 +88,10 @@ public class EditZonePanel : EditDataPanel<Zone> {
 	public void CloseWithoutSaving() {
 		gameObject.SetActive(false);
 		dataBeingEdited.MyZoneSpot.transform.position = dataBeingEdited.CoordsForWorld;
+
+		MercCaravan localCaravan = GameController.GetMercCaravanInZone(dataBeingEdited.ID);
+		if (localCaravan != null) localCaravan.MeIn3d.InstantlyUpdatePosition();
+
 		foreach (int zoneID in dataBeingEdited.linkedZones) {
 			Zone linkedZone = GameController.GetZoneByID(zoneID);
 			World.GetLinkLineBetween(dataBeingEdited, linkedZone).UpdatePositions();
@@ -114,7 +118,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 			OnConfirmDelete();
 		}
 		else {
-			ModalPanel.Instance().YesNoBox("Confirm Zone Deletion", "You are about to delete this zone. This cannot be undone unless this game is reloaded without saving. Are you sure?", OnConfirmDelete, null);
+			ModalPanel.Instance().YesNoBox("Confirm Zone Deletion", "You are about to delete this zone. Any caravans in this zone will also be deleted. This cannot be undone unless this game is reloaded without saving. Are you sure?", OnConfirmDelete, null);
 		}
 	}
 
@@ -126,20 +130,34 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		OnWindowIsClosing();
 	}
 
-    public void EditZoneLocation()
-    {
+	public void EditZoneLocation() {
 		GameInterface.instance.DisableAndStoreAllOpenOverlayPanels();
 		World.BeginCustomZonePlacement(() => {
 			dataBeingEdited.MyZoneSpot.transform.position =
 			World.instance.zonePlacerScript.zoneBlueprint.position;
 			isDirty = true;
 			GameInterface.instance.RestoreOpenOverlayPanels();
-			foreach(int zoneID in dataBeingEdited.linkedZones) {
+
+			MercCaravan localCaravan = GameController.GetMercCaravanInZone(dataBeingEdited.ID);
+			if (localCaravan != null) localCaravan.MeIn3d.InstantlyUpdatePosition();
+
+			foreach (int zoneID in dataBeingEdited.linkedZones) {
 				Zone linkedZone = GameController.GetZoneByID(zoneID);
 				World.GetLinkLineBetween(dataBeingEdited, linkedZone).UpdatePositions();
 			}
 		});
-    }
+	}
 
+	public void EditLocalMercCaravan() {
+		MercCaravan localCaravan = GameController.GetMercCaravanInZone(dataBeingEdited.ID);
 
+		if(localCaravan != null) {
+			GameInterface.instance.EditMercCaravan(localCaravan, false);
+		}else {
+			ModalPanel.Instance().YesNoBox("No Caravan Found Here", "Create a new Mercenary Caravan in this zone?", () => {
+				localCaravan = World.CreateNewMercCaravanAtZone(dataBeingEdited);
+				GameInterface.instance.EditMercCaravan(localCaravan, true);
+			}, null);
+		}
+	}
 }

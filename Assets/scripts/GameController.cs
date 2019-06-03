@@ -224,6 +224,10 @@ public class GameController : MonoBehaviour {
 		}
 		instance.curData.factions.Remove(targetFaction);
 		GameInterface.factionDDownsAreStale = true;
+		GameInfo gData = CurGameData;
+		if(gData != null) {
+			gData.factionRelations.RemoveAllRelationEntriesWithFaction(targetFaction.ID);
+		}
 	}
 
 	public static void RemoveZone(Zone targetZone) {
@@ -233,7 +237,15 @@ public class GameController : MonoBehaviour {
 			}
 		}
 
+		MercCaravan localCaravan = GetMercCaravanInZone(targetZone.ID);
+		if (localCaravan != null) RemoveMercCaravan(localCaravan);
+
 		instance.curData.zones.Remove(targetZone);		
+	}
+
+	public static void RemoveMercCaravan(MercCaravan MC) {
+		World.RemoveMercCaravan3d(MC.MeIn3d);
+		instance.curData.mercCaravans.Remove(MC);
 	}
 
 	public static void RemoveCommander(Commander targetCmder) {
@@ -285,6 +297,15 @@ public class GameController : MonoBehaviour {
 		return freeID;
 	}
 
+	public static int GetUnusedMercCaravanID() {
+		int freeID = 0;
+		while (GetMercCaravanByID(freeID) != null) {
+			freeID++;
+		}
+
+		return freeID;
+	}
+
 	public static int GetUnusedTroopTypeID() {
 		int freeID = 0;
 		while (GetTroopTypeByID(freeID) != null) {
@@ -322,6 +343,17 @@ public class GameController : MonoBehaviour {
 		for (int i = 0; i < cmderList.Count; i++) {
 			if (cmderList[i].ID == cmderID) {
 				return cmderList[i];
+			}
+		}
+
+		return null;
+	}
+
+	public static MercCaravan GetMercCaravanByID(int mcID) {
+		List<MercCaravan> mcList = instance.curData.mercCaravans;
+		for (int i = 0; i < mcList.Count; i++) {
+			if (mcList[i].ID == mcID) {
+				return mcList[i];
 			}
 		}
 
@@ -556,14 +588,26 @@ public class GameController : MonoBehaviour {
 		}
 
 		if (dontGetTweeningCommanders) {
-			List<Cmder3dMover.CmderTween> tweens =
-				Cmder3dMover.instance.GetAllTweensTargetingZone(targetZone.MyZoneSpot);
-			foreach(Cmder3dMover.CmderTween tween in tweens) {
-				cmdersInZone.Remove(tween.movingCmder.data);
+			List<TransformTweener.TransformTween> tweens =
+				TransformTweener.instance.GetAllTweensTargetingZone(targetZone.MyZoneSpot);
+			foreach(TransformTweener.TransformTween tween in tweens) {
+				Cmder3d tweeningCmder3d = tween.movingTrans.GetComponent<Cmder3d>();
+				if(tweeningCmder3d) cmdersInZone.Remove(tweeningCmder3d.data);
 			}
 		}
 
 		return cmdersInZone;
+	}
+
+	public static MercCaravan GetMercCaravanInZone(int targetZoneID) {
+
+		foreach(MercCaravan mc in instance.curData.mercCaravans) {
+			if(mc.zoneIAmIn == targetZoneID) {
+				return mc;
+			}
+		}
+
+		return null;
 	}
 
 	/// <summary>
@@ -1013,12 +1057,16 @@ public class GameController : MonoBehaviour {
 	/// <summary>
 	/// checks if it's worth to give the faction a turn.
 	/// Factions without any commanders or zones just can't do anything,
-	/// so no need to give them a turn
+	/// so no need to give them a turn...
+	/// unless they're the last faction in turn order and we're in "unified" mode;
+	/// in that case, their turn is important because it's when battles and other stuff happen
 	/// </summary>
 	/// <param name="fac"></param>
 	/// <returns></returns>
-	public static bool IsFactionStillInGame(Faction fac) {
-		return fac.OwnedCommanders.Count > 0 || fac.OwnedZones.Count > 0;
+	public static bool ShouldFactionGetATurn(Faction fac, bool lastFactionException = true) {
+		return fac.OwnedCommanders.Count > 0 || fac.OwnedZones.Count > 0 || 
+			(lastFactionException && CurGameData.unifyBattlePhase &&
+			fac.ID == CurGameData.factions[CurGameData.factions.Count - 1].ID);
 	}
 
 	/// <summary>

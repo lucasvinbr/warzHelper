@@ -26,9 +26,9 @@ public class Commander : TroopContainer {
 	{
 		get
 		{
-			if(_meIn3d == null) {
+			if (_meIn3d == null) {
 				_meIn3d = World.GetCmder3dForCommander(this);
-				if(_meIn3d == null) {
+				if (_meIn3d == null) {
 					Debug.LogWarning("no 3d for cmder! cmderID: " + ID);
 				}
 			}
@@ -60,11 +60,14 @@ public class Commander : TroopContainer {
 	/// true if at least 1 troop was upgraded
 	/// </summary>
 	/// <returns></returns>
-	public bool CmdTrainTroops() {
+	public override bool TrainTroops() {
+		if (pointsToSpend <= 0) return false;
+
 		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
-		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
-		bool hasTrained = false;
-		if (pointsToSpend > 0 && curZone.multTrainingPoints > 0) {
+
+		if (curZone.multTrainingPoints > 0) {
+			Faction ownerFac = GameController.GetFactionByID(ownerFaction);
+			bool hasTrained = false;
 			int trainableTroops = 0;
 			int troopTrainingCostHere = 0;
 			int troopIndexInGarrison = -1;
@@ -97,88 +100,152 @@ public class Commander : TroopContainer {
 					GameController.GetFactionByID(ownerFaction).color);
 				troopsContained.Sort(TroopNumberPair.CompareTroopNumberPairsByAutocalcPower);
 			}
+
+			return hasTrained;
+		}
+		else {
+			return false;
 		}
 
-		return hasTrained;
 	}
 
 	/// <summary>
 	/// true if at least 1 troop was successfully recruited
 	/// </summary>
 	/// <returns></returns>
-	public bool RecruitTroops() {
+	public override bool RecruitTroops() {
 		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
 		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
 		if (TotalTroopsContained < MaxTroopsCommanded && curZone.multRecruitmentPoints > 0) {
 			//recruitment!
-			if (ownerFac.troopLine.Count > 0) {
-				TroopType baseFactionTroop = GameController.GetTroopTypeByID(ownerFac.troopLine[0]);
-				int troopRecruitmentCostHere =
-					Mathf.RoundToInt(baseFactionTroop.pointCost / curZone.multRecruitmentPoints);
-				int recruitableTroopsAmount = 0;
-				//this troop can be so cheap and the zone so good that the troop ends up with cost 0 after rounding
-				if (troopRecruitmentCostHere == 0) {
-					recruitableTroopsAmount = MaxTroopsCommanded - TotalTroopsContained;
-				}
-				else {
-					recruitableTroopsAmount = Mathf.Min(pointsToSpend / troopRecruitmentCostHere,
-						MaxTroopsCommanded - TotalTroopsContained);
-				}
-				AddTroop(baseFactionTroop.ID, recruitableTroopsAmount);
-				pointsToSpend -= troopRecruitmentCostHere * recruitableTroopsAmount;
-				WorldFXManager.instance.EmitParticle(WorldFXManager.instance.recruitParticle, MeIn3d.transform.position,
-					GameController.GetFactionByID(ownerFaction).color);
-				troopsContained.Sort(TroopNumberPair.CompareTroopNumberPairsByAutocalcPower);
-				return true;
-				
+
+			TroopType recruitableTroopType = GetTroopTypeRecruitedHere(ownerFac);
+			if (recruitableTroopType == null) return false;
+
+			int troopRecruitmentCostHere =
+				Mathf.RoundToInt(recruitableTroopType.pointCost / curZone.multRecruitmentPoints);
+			int recruitableTroopsAmount = 0;
+			//this troop can be so cheap and the zone so good that the troop ends up with cost 0 after rounding
+			if (troopRecruitmentCostHere == 0) {
+				recruitableTroopsAmount = MaxTroopsCommanded - TotalTroopsContained;
 			}
+			else {
+				recruitableTroopsAmount = Mathf.Min(pointsToSpend / troopRecruitmentCostHere,
+					MaxTroopsCommanded - TotalTroopsContained);
+			}
+			AddTroop(recruitableTroopType.ID, recruitableTroopsAmount);
+			pointsToSpend -= troopRecruitmentCostHere * recruitableTroopsAmount;
+			WorldFXManager.instance.EmitParticle(WorldFXManager.instance.recruitParticle, MeIn3d.transform.position,
+				GameController.GetFactionByID(ownerFaction).color);
+			troopsContained.Sort(TroopNumberPair.CompareTroopNumberPairsByAutocalcPower);
+			return true;
 
 		}
 
 		return false;
 	}
 
-	public override void TrainTroops() {
+	/// <summary>
+	/// returns the percentage compared to the cmder's MAX amount of troops that would be upgraded if
+	/// the cmder trained instead of moving or recruiting
+	/// </summary>
+	/// <returns></returns>
+	public float GetPercentOfTroopsUpgradedIfTrained() {
+		if (pointsToSpend <= 0) return 0.0f;
+
 		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
-		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
-		bool hasTrained = false;
-		if (pointsToSpend > 0 && curZone.multTrainingPoints > 0) {
+
+		if (curZone.multTrainingPoints > 0) {
+			Faction cmderFac = GameController.GetFactionByID(ownerFaction);
+			int totalTrainableTroops = 0;
 			int trainableTroops = 0;
 			int troopTrainingCostHere = 0;
 			int troopIndexInGarrison = -1;
+			int fakePointsToSpend = pointsToSpend;
 			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
-			for (int i = 0; i < ownerFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
-
-				troopIndexInGarrison = IndexOfTroopInContainer(ownerFac.troopLine[i]);
+			for (int i = 0; i < cmderFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
+				troopIndexInGarrison = IndexOfTroopInContainer(cmderFac.troopLine[i]);
 				if (troopIndexInGarrison >= 0) {
-					curTTBeingTrained = GameController.GetTroopTypeByID(ownerFac.troopLine[i]);
-					curTTUpgradeTo = GameController.GetTroopTypeByID(ownerFac.troopLine[i + 1]);
+					curTTBeingTrained = GameController.GetTroopTypeByID(cmderFac.troopLine[i]);
+					curTTUpgradeTo = GameController.GetTroopTypeByID(cmderFac.troopLine[i + 1]);
 					troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / curZone.multTrainingPoints);
 					if (troopTrainingCostHere == 0) {
 						trainableTroops = troopsContained[troopIndexInGarrison].troopAmount;
 					}
 					else {
-						trainableTroops = Mathf.Min(pointsToSpend / troopTrainingCostHere,
+						trainableTroops = Mathf.Min(fakePointsToSpend / troopTrainingCostHere,
 							troopsContained[troopIndexInGarrison].troopAmount);
 					}
 					if (trainableTroops > 0) {
-						RemoveTroop(curTTBeingTrained.ID, trainableTroops);
-						AddTroop(curTTUpgradeTo.ID, trainableTroops);
-						pointsToSpend -= trainableTroops * troopTrainingCostHere;
-						hasTrained = true;
+						totalTrainableTroops += trainableTroops;
+						fakePointsToSpend -= trainableTroops * troopTrainingCostHere;
 					}
 				}
 			}
 
-			if (hasTrained) {
-				WorldFXManager.instance.EmitParticle(WorldFXManager.instance.bolsterParticle, MeIn3d.transform.position,
-					GameController.GetFactionByID(ownerFaction).color);
-				troopsContained.Sort(TroopNumberPair.CompareTroopNumberPairsByAutocalcPower);
-			}
+			return (float)totalTrainableTroops / MaxTroopsCommanded;
 		}
 
+		return 0.0f;
 	}
 
+	/// <summary>
+	/// returns the percentage compared to the cmder's MAX amount of troops that would be added if
+	/// the cmder recruited instead of moving or training
+	/// </summary>
+	/// <returns></returns>
+	public float GetPercentOfNewTroopsIfRecruited() {
+		if (pointsToSpend <= 0) return 0.0f;
+
+		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
+
+		if (curZone.multRecruitmentPoints > 0) {
+			Faction cmderFac = GameController.GetFactionByID(ownerFaction);
+			int fakePointsToSpend = pointsToSpend;
+
+			TroopType recruitableTroopType = GetTroopTypeRecruitedHere(cmderFac);
+			if (recruitableTroopType == null) return 0.0f;
+
+			int troopRecruitmentCostHere =
+				Mathf.RoundToInt(recruitableTroopType.pointCost / curZone.multRecruitmentPoints);
+			int recruitableTroopsAmount = 0;
+			//this troop can be so cheap and the zone so good that the troop ends up with cost 0 after rounding
+			if (troopRecruitmentCostHere == 0) {
+				recruitableTroopsAmount = MaxTroopsCommanded - TotalTroopsContained;
+			}
+			else {
+				recruitableTroopsAmount = Mathf.Min(pointsToSpend / troopRecruitmentCostHere,
+					MaxTroopsCommanded - TotalTroopsContained);
+			}
+
+			return (float)recruitableTroopsAmount / MaxTroopsCommanded;
+		}
+
+		return 0.0f;
+	}
+
+	/// <summary>
+	/// returns either our faction's base troop type 
+	/// or the local merc caravan's type...
+	/// or null, if there is no caravan and our faction has no troop types at all
+	/// </summary>
+	/// <returns></returns>
+	public TroopType GetTroopTypeRecruitedHere(Faction ownerFac = null) {
+		if(ownerFac == null) ownerFac = GameController.GetFactionByID(ownerFaction);
+
+		TroopType recruitableTroopType = null;
+
+		MercCaravan localCaravan = GameController.GetMercCaravanInZone(zoneIAmIn);
+
+		if (localCaravan != null) {
+			recruitableTroopType = GameController.GetTroopTypeByID(localCaravan.containedTroopType);
+		}
+		else if (ownerFac.troopLine.Count > 0) {
+			recruitableTroopType = GameController.GetTroopTypeByID(ownerFac.troopLine[0]); //maybe this is some kind of special faction that only relies on mercs?
+		}
+
+		return recruitableTroopType;
+	}
 
 	public static int SortByZoneIAmIn(Commander x, Commander y) {
 		return x.zoneIAmIn.CompareTo(y.zoneIAmIn);

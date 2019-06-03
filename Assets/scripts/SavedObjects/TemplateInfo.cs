@@ -21,6 +21,8 @@ public class TemplateInfo {
 
 	public List<Commander> deployedCommanders;
 
+	public List<MercCaravan> mercCaravans;
+
     public TemplateInfo(string name)
     {
         this.gameName = name;
@@ -28,6 +30,7 @@ public class TemplateInfo {
         zones = new List<Zone>();
 		troopTypes = new List<TroopType>();
 		deployedCommanders = new List<Commander>();
+		mercCaravans = new List<MercCaravan>();
 		rules = new Rules();
 		this.isATemplate = true;
     }

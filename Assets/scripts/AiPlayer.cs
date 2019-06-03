@@ -95,11 +95,9 @@ public class AiPlayer {
 
 			//recruit chance might be more than 100%, but it's ok as it will do something else
 			//if it can't recruit
-			recruitChance = (1.3f - ((float)commandableCmders[i].TotalTroopsContained /
-				commandableCmders[i].MaxTroopsCommanded)) * (zoneCmderIsIn.multRecruitmentPoints);
+			recruitChance = commandableCmders[i].GetPercentOfNewTroopsIfRecruited() * 1.35f;
 
-			trainChance =
-				GetPercentOfTroopsUpgradedIfTrained(commandableCmders[i], ourFac, zoneCmderIsIn);
+			trainChance = commandableCmders[i].GetPercentOfTroopsUpgradedIfTrained();
 
 			moveDestZone = zoneCmderIsIn;
 			//if no zone beats this score, we stay
@@ -166,7 +164,7 @@ public class AiPlayer {
 			//Debug.Log("rec chance: " + recruitChance + " topMove: " + topMoveScore);
 			if (trainChance > GetRandomTrainScoreThreshold() && trainChance > recruitChance &&
 				trainChance > topMoveScore) {
-				hasActed = commandableCmders[i].CmdTrainTroops();
+				hasActed = commandableCmders[i].TrainTroops();
 			}
 
 			if (!hasActed && recruitChance > topMoveScore) {
@@ -185,7 +183,7 @@ public class AiPlayer {
 
 			if (!hasActed) {
 				//if we decided to do nothing else, train troops
-				hasActed = commandableCmders[i].CmdTrainTroops();
+				hasActed = commandableCmders[i].TrainTroops();
 
 				//try recruiting and moving again if we can't train!
 				if (!hasActed) {
@@ -417,45 +415,7 @@ public class AiPlayer {
 		return GameController.GetZoneByID(foundPath[1]);
 	}
 
-	/// <summary>
-	/// returns the percentage compared to the cmder's MAX amount of troops that would be upgraded if
-	/// the cmder trained instead of moving or recruiting
-	/// </summary>
-	/// <returns></returns>
-	public static float GetPercentOfTroopsUpgradedIfTrained(Commander cmder, Faction cmderFac, Zone zoneCmderIsIn) {
-		if (cmder.pointsToSpend > 0 && zoneCmderIsIn.multTrainingPoints > 0) {
-			int totalTrainableTroops = 0;
-			int trainableTroops = 0;
-			int troopTrainingCostHere = 0;
-			int troopIndexInGarrison = -1;
-			int fakePointsToSpend = cmder.pointsToSpend;
-			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
-			for (int i = 0; i < cmderFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
-				troopIndexInGarrison = cmder.IndexOfTroopInContainer(cmderFac.troopLine[i]);
-				if (troopIndexInGarrison >= 0) {
-					curTTBeingTrained = GameController.GetTroopTypeByID(cmderFac.troopLine[i]);
-					curTTUpgradeTo = GameController.GetTroopTypeByID(cmderFac.troopLine[i + 1]);
-					troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / zoneCmderIsIn.multTrainingPoints);
-					if (troopTrainingCostHere == 0) {
-						trainableTroops = cmder.troopsContained[troopIndexInGarrison].troopAmount;
-					}
-					else {
-						trainableTroops = Mathf.Min(fakePointsToSpend / troopTrainingCostHere,
-							cmder.troopsContained[troopIndexInGarrison].troopAmount);
-					}
-					if (trainableTroops > 0) {
-						totalTrainableTroops += trainableTroops;
-						fakePointsToSpend -= trainableTroops * troopTrainingCostHere;
-					}
-				}
-			}
-
-			return (float)totalTrainableTroops / cmder.MaxTroopsCommanded;
-		}
-
-		return 0.0f;
-	}
-
+	
 
 	#region random factor getters
 	/// <summary>

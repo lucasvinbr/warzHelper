@@ -114,6 +114,7 @@ public class Faction
 			return returnedList;
 		}
 	}
+
 	[XmlIgnore]
 	public List<Commander> OwnedCommanders
 	{
@@ -192,6 +193,19 @@ public class Faction
 				(ID, targetFac.ID, addition, preventAutoAlly, notifyRelationChange, notifyRelationChange);
 	}
 
+	/// <summary>
+	/// adds relations with the target fac, 
+	/// optionally never becoming allies unless an alliance is proposed
+	/// </summary>
+	/// <param name="targetFacID"></param>
+	/// <param name="addition"></param>
+	/// <returns></returns>
+	public float AddRelationWith(int targetFacID, float addition, bool preventAutoAlly = false,
+		bool notifyRelationChange = false) {
+		return GameController.CurGameData.
+			factionRelations.AddRelationBetweenFactions
+				(ID, targetFacID, addition, preventAutoAlly, notifyRelationChange, notifyRelationChange);
+	}
 
 	/// <summary>
 	/// adds relations with the target facs, 

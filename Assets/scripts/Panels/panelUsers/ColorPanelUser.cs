@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// an editable color image that opens the "Set Color" panel
+/// </summary>
 public class ColorPanelUser : PanelUser<ColorInputPanel> {
 
 	public Image colorImg;

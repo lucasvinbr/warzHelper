@@ -97,68 +97,68 @@ public class BattlePanel : GrowingOverlayPanel {
 		Debug.Log("---AUTOBATTLE START---");
 		Debug.Log(attackerSide.factionNameTxt.text + " VS " + defenderSide.factionNameTxt.text);
 
-		int sampleSize;
-
-		int attackerSampleSize, defenderSampleSize;
-
-		float armyNumbersProportion;
-
-		float attackerAutoPower, defenderAutoPower;
-
-		bool shouldAnimateBars = false;
-
 		float winnerDmgMultiplier = GameController.instance.curData.rules.autoResolveWinnerDamageMultiplier;
 
 		int baseSampleSize = GameController.instance.curData.rules.autoResolveBattleSampleSize;
+		int maxArmyForProportions = GameController.instance.curData.rules.autoResolveBattleMaxArmyForProportion;
 
-		while (attackerSide.curArmyPower > 0 && defenderSide.curArmyPower > 0) {
-			sampleSize = Mathf.Min(attackerSide.curArmyNumbers, defenderSide.curArmyNumbers, baseSampleSize);
-
-			attackerSampleSize = sampleSize;
-			defenderSampleSize = sampleSize;
-
-			armyNumbersProportion = (float)attackerSide.curArmyNumbers / defenderSide.curArmyNumbers;
-			//Debug.Log("army num proportion: " + armyNumbersProportion);
-			//the size with a bigger army gets a bigger sample...
-			//but not a simple proportion because the more targets you've got,
-			//the easier it is to randomly hit a target hahaha
-			if (armyNumbersProportion > 1.0f) {
-				armyNumbersProportion = Mathf.Max(0.1f + ((armyNumbersProportion * sampleSize) / (armyNumbersProportion + baseSampleSize)), 1.0f);
-				attackerSampleSize = Mathf.RoundToInt(sampleSize * armyNumbersProportion);
-			}
-			else {
-				armyNumbersProportion = ((armyNumbersProportion * baseSampleSize) / (armyNumbersProportion + baseSampleSize));
-				defenderSampleSize = Mathf.RoundToInt(sampleSize / armyNumbersProportion);
-			}
-
-			Debug.Log("attacker sSize: " + attackerSampleSize);
-			Debug.Log("defender sSize: " + defenderSampleSize);
-
-			attackerAutoPower = GameController.
-				GetRandomBattleAutocalcPower(attackerSide.sideArmy, attackerSampleSize);
-			defenderAutoPower = GameController.
-				GetRandomBattleAutocalcPower(defenderSide.sideArmy, defenderSampleSize);
-
-			Debug.Log("attacker auto power: " + attackerAutoPower);
-			Debug.Log("defender auto power: " + defenderAutoPower);
-
-			//make the winner lose some power as well (or not, depending on the rules)
-			if (attackerAutoPower > defenderAutoPower) {
-				defenderAutoPower *= winnerDmgMultiplier;
-			}else {
-				attackerAutoPower *= winnerDmgMultiplier;
-			}
-
-			//animate the power bars if the conflict is over
-			shouldAnimateBars = attackerAutoPower >= defenderSide.curArmyPower ||
-				defenderAutoPower >= attackerSide.curArmyPower;
-
-			defenderSide.SetPostBattleArmyData_PowerLost(attackerAutoPower, shouldAnimateBars);
-			attackerSide.SetPostBattleArmyData_PowerLost(defenderAutoPower, shouldAnimateBars);
-
+		do {
+			DoMiniBattle(baseSampleSize, winnerDmgMultiplier, maxArmyForProportions);
 		}
+		while (attackerSide.curArmyPower > 0 && defenderSide.curArmyPower > 0);
 
 		Debug.Log("---AUTOBATTLE END---");
+	}
+
+	/// <summary>
+	/// makes the involved factions "fight each other" once, returning True if the conflict is over
+	/// </summary>
+	public void DoMiniBattle(int baseSampleSize, float winnerDmgMultiplier, int maxArmyForProportions) {
+		int sampleSize = Mathf.Min(attackerSide.curArmyNumbers, defenderSide.curArmyNumbers, baseSampleSize);
+
+		int attackerSampleSize = sampleSize;
+		int defenderSampleSize = sampleSize;
+
+		float armyNumbersProportion = (float)Mathf.Min(attackerSide.curArmyNumbers, maxArmyForProportions) / Mathf.Min(defenderSide.curArmyNumbers, maxArmyForProportions);
+		//Debug.Log("army num proportion: " + armyNumbersProportion);
+		//the size with a bigger army gets a bigger sample...
+		//but not a simple proportion because the more targets you've got,
+		//the easier it is to randomly hit a target hahaha
+		if (armyNumbersProportion > 1.0f) {
+			armyNumbersProportion = Mathf.Max(0.1f + ((armyNumbersProportion * sampleSize) / (armyNumbersProportion + baseSampleSize)), 1.0f);
+			attackerSampleSize = Mathf.RoundToInt(sampleSize * armyNumbersProportion);
+		}
+		else {
+			armyNumbersProportion = ((armyNumbersProportion * baseSampleSize) / (armyNumbersProportion + baseSampleSize));
+			defenderSampleSize = Mathf.RoundToInt(sampleSize / armyNumbersProportion);
+		}
+
+		Debug.Log("attacker sSize: " + attackerSampleSize);
+		Debug.Log("defender sSize: " + defenderSampleSize);
+
+		float attackerAutoPower = GameController.
+			GetRandomBattleAutocalcPower(attackerSide.sideArmy, attackerSampleSize);
+		float defenderAutoPower = GameController.
+			GetRandomBattleAutocalcPower(defenderSide.sideArmy, defenderSampleSize);
+
+		Debug.Log("attacker auto power: " + attackerAutoPower);
+		Debug.Log("defender auto power: " + defenderAutoPower);
+
+		//make the winner lose some power as well (or not, depending on the rules)
+		if (attackerAutoPower > defenderAutoPower) {
+			defenderAutoPower *= winnerDmgMultiplier;
+		}
+		else {
+			attackerAutoPower *= winnerDmgMultiplier;
+		}
+
+		//animate the power bars if the conflict is over
+		bool shouldAnimateBars = attackerAutoPower >= defenderSide.curArmyPower ||
+			defenderAutoPower >= attackerSide.curArmyPower;
+
+		defenderSide.SetPostBattleArmyData_PowerLost(attackerAutoPower, shouldAnimateBars);
+		attackerSide.SetPostBattleArmyData_PowerLost(defenderAutoPower, shouldAnimateBars);
+
 	}
 
 	/// <summary>

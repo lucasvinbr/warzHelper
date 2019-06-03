@@ -6,9 +6,9 @@ using UnityEngine.Events;
 public class World : MonoBehaviour {
 
     public Transform ground;
-    public Transform zonesContainer;
+    public Transform zonesContainer, mercCaravansContainer;
 
-    public GameObject zonePrefab;
+    public GameObject zonePrefab, mercCaravan3dPrefab;
 
     public static World instance;
 
@@ -27,6 +27,8 @@ public class World : MonoBehaviour {
 	private List<LinkLine> linkLines = new List<LinkLine>();
 
 	private List<Cmder3d> spawnedCmders = new List<Cmder3d>();
+
+	private List<MercCaravan3d> spawnedMCs = new List<MercCaravan3d>();
 
 	void Awake() {
 		instance = this;
@@ -78,6 +80,12 @@ public class World : MonoBehaviour {
 		}
 	}
 
+	public static void CleanMCaravans() {
+		while (instance.spawnedMCs.Count > 0) {
+			RemoveMercCaravan3d(instance.spawnedMCs[0]);
+		}
+	}
+
 	public static void BeginNewZonePlacement() {
 		instance.zonePlacerScript.StartNewZonePlacement();
 	}
@@ -119,6 +127,16 @@ public class World : MonoBehaviour {
 		instance.spawnedCmders.Add(cmd3d);
 	}
 
+	/// <summary>
+	/// places a new merc caravan in the target zone. There shouldn't be two caravans in the same zone!
+	/// </summary>
+	/// <param name="targetZone"></param>
+	public static MercCaravan CreateNewMercCaravanAtZone(Zone targetZone) {
+		MercCaravan newCaravan = new MercCaravan(targetZone.ID);
+		
+		return PlaceSavedMercCaravan(newCaravan).data;
+	}
+
 	public static ZoneSpot GetZoneSpotByZoneName(string zoneName) {
 		Transform theZoneTransform = instance.zonesContainer.Find(zoneName);
 		if (theZoneTransform) {
@@ -132,6 +150,16 @@ public class World : MonoBehaviour {
 		foreach(Cmder3d cmd3d in instance.spawnedCmders) {
 			if(cmd3d.data.ID == theCmder.ID) {
 				return cmd3d;
+			}
+		}
+
+		return null;
+	}
+
+	public static MercCaravan3d GetCaravan3dForMC(MercCaravan theMC) {
+		foreach (MercCaravan3d MC3d in instance.spawnedMCs) {
+			if (MC3d.data.ID == theMC.ID) {
+				return MC3d;
 			}
 		}
 
@@ -184,6 +212,16 @@ public class World : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// places all caravans stored in the current game data
+	/// </summary>
+	public static void SetupAllMercCaravansFromData() {
+		foreach (MercCaravan MC in GameController.instance.curData.mercCaravans) {
+			PlaceSavedMercCaravan(MC);
+		}
+		
+	}
+
+	/// <summary>
 	/// Reset the positions of all the cmder3ds in the target zone, so that future cmder3ds 
 	/// won't overlap with those who stay if some switch zones
 	/// </summary>
@@ -195,7 +233,7 @@ public class World : MonoBehaviour {
 			resetCmders++;
 		}
 		//then reset destinations for cmders still tweening towards this zone
-		Cmder3dMover.instance.AdjustTweensThatTargetZone(targetZone.MyZoneSpot);
+		TransformTweener.instance.AdjustTweensThatTargetZone(targetZone.MyZoneSpot);
 	}
 
 	public static void PlaceZoneLink(Zone z1, Zone z2, bool alsoUpdateTheirLinkedList = false) {
@@ -234,6 +272,8 @@ public class World : MonoBehaviour {
 		}
 	}
 
+
+
 	public static LinkLine GetLinkLineBetween(Zone z1, Zone z2) {
 		foreach(LinkLine line in instance.linkLines) {
 			if(line.LinksZone(z1) && line.LinksZone(z2)) {
@@ -266,9 +306,29 @@ public class World : MonoBehaviour {
 		zsScript.RefreshDataDisplay();
 	}
 
+	/// <summary>
+	/// place a merc caravan in the world using its saved location
+	/// </summary>
+	/// <param name="targetZone"></param>
+	public static MercCaravan3d PlaceSavedMercCaravan(MercCaravan MCdata) {
+		Zone targetZone = GameController.GetZoneByID(MCdata.zoneIAmIn);
+		GameObject mc3d = Instantiate(instance.mercCaravan3dPrefab, targetZone.CoordsForWorld, Quaternion.identity);
+		mc3d.transform.parent = instance.mercCaravansContainer;
+		MercCaravan3d MC3dScript = mc3d.GetComponent<MercCaravan3d>();
+		MC3dScript.data = MCdata;
+		MC3dScript.RefreshDataDisplay();
+		instance.spawnedMCs.Add(MC3dScript);
+		return MC3dScript;
+	}
+
 	public static void RemoveCmder3d(Cmder3d target3d) {
 		Cmder3dRecycler.instance.PoolObj(target3d);
 		instance.spawnedCmders.Remove(target3d);
 		target3d.transform.localScale = Vector3.one;
+	}
+
+	public static void RemoveMercCaravan3d(MercCaravan3d target3d) {
+		instance.spawnedMCs.Remove(target3d);
+		Destroy(target3d.gameObject);
 	}
 }
