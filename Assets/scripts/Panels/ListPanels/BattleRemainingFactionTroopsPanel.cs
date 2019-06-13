@@ -58,8 +58,8 @@ public class BattleRemainingFactionTroopsPanel : ListContainerPanel<TroopNumberP
 	}
 
 	public void OpenExportOps() {
-		SerializableTroopList exportedList = 
-			GameController.TroopListToSerializableTroopList(BakeIntoArmy());
+		SerializableTroopListObj exportedList = 
+			new SerializableTroopListObj(JsonHandlingUtils.TroopListToSerializableTroopList(BakeIntoArmy()));
 
 		List<KeyValuePair<string, UnityAction>> exportOptions =
 			new List<KeyValuePair<string, UnityAction>>();

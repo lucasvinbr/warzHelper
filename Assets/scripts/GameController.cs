@@ -1007,36 +1007,7 @@ public class GameController : MonoBehaviour {
 		return returnedList;
 	}
 
-	/// <summary>
-	/// converts the troop number pairs to their serializable equivalents, using troop names instead of IDs,
-	/// optionally splitting entries that have too many troops (if the limit is 0, the default, or below 0,
-	/// there is no splitting limit).
-	/// should be used in order to make JSONs
-	/// </summary>
-	/// <param name="troopList"></param>
-	/// <returns></returns>
-	public static SerializableTroopList TroopListToSerializableTroopList(List<TroopNumberPair> troopList, int splitLargeTroopEntriesLimit = 0) {
-		SerializableTroopList exportedList = new SerializableTroopList();
 
-		foreach (TroopNumberPair tnp in troopList) {
-			if(splitLargeTroopEntriesLimit > 0 && tnp.troopAmount > splitLargeTroopEntriesLimit) {
-				int exportedAmount = 0;
-
-				while(exportedAmount < tnp.troopAmount) {
-					exportedList.troops.Add(new SerializedTroop
-						(GetTroopTypeByID(tnp.troopTypeID).name,
-						Mathf.Min(splitLargeTroopEntriesLimit, tnp.troopAmount - exportedAmount)));
-					exportedAmount += splitLargeTroopEntriesLimit;
-				}
-			}else {
-				exportedList.troops.Add(new SerializedTroop
-				(GetTroopTypeByID(tnp.troopTypeID).name, tnp.troopAmount));
-			}
-			
-		}
-
-		return exportedList;
-	}
 
 	/// <summary>
 	/// eliminates turn priority conflicts due to the same turn priority value

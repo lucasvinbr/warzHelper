@@ -19,6 +19,26 @@ public class GameInfo : TemplateInfo {
 	/// </summary>
 	public bool unifyBattlePhase = false;
 
+	/// <summary>
+	/// the last value entered when exporting battle info to JSON and setting the "split troops amount"
+	/// </summary>
+	public int lastEnteredExportTroopSplitAmt = 5;
+
+	/// <summary>
+	/// the last value for the variable name entered when exporting battle info to JSON with a custom "added variable"
+	/// </summary>
+	public string lastEnteredExportAddedVariable = "";
+
+	/// <summary>
+	/// the last value for the attackers' variable value entered when exporting battle info to JSON with a custom "added variable"
+	/// </summary>
+	public string lastEnteredExportAttackerVariable = "";
+
+	/// <summary>
+	/// the last value for the defenders' variable value entered when exporting battle info to JSON with a custom "added variable"
+	/// </summary>
+	public string lastEnteredExportDefenderVariable = "";
+
 	public GameFactionRelations factionRelations;
 
     public GameInfo(string name) : base(name)
@@ -33,6 +53,7 @@ public class GameInfo : TemplateInfo {
 		zones = baseData.zones;
 		troopTypes = baseData.troopTypes;
 		deployedCommanders = baseData.deployedCommanders;
+		mercCaravans = baseData.mercCaravans;
 		rules = baseData.rules;
 		this.isATemplate = false;
 		factionRelations = new GameFactionRelations();
@@ -44,6 +65,7 @@ public class GameInfo : TemplateInfo {
 		zones = baseData.zones;
 		troopTypes = baseData.troopTypes;
 		deployedCommanders = baseData.deployedCommanders;
+		mercCaravans = baseData.mercCaravans;
 		rules = baseData.rules;
 		this.isATemplate = false;
 		factionRelations = new GameFactionRelations();

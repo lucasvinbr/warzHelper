@@ -208,13 +208,15 @@ public class BattlePanel : GrowingOverlayPanel {
 
 		GameInterface GI = GameInterface.instance;
 
+		GameInfo gData = GameController.CurGameData;
+
 		//add export options now...
 
 		//JSON basic "all troops together" export!
 		exportOptions.Add(new KeyValuePair<string, UnityAction>("Basic Export to JSON (all troops in a simple list - don't use if both sides use the same troop type)", () => {
-			SerializableTroopList exportedList = GameController.TroopListToSerializableTroopList
+			SerializableTroopListObj exportedList = new SerializableTroopListObj(JsonHandlingUtils.TroopListToSerializableTroopList
 				(GameController.GetCombinedTroopsFromTwoLists
-				(attackerSide.sideArmy, defenderSide.sideArmy));
+				(attackerSide.sideArmy, defenderSide.sideArmy)));
 			string JSONContent = JsonUtility.ToJson(exportedList);
 			Debug.Log(JSONContent);
 			GI.textInputPanel.SetPanelInfo("JSON Export Result", "", JSONContent, "Copy to Clipboard", () => {
@@ -227,16 +229,18 @@ public class BattlePanel : GrowingOverlayPanel {
 		}));
 
 		//JSON basic "all troops together" export, splitting entries if troop amounts go above a certain limit!
-		exportOptions.Add(new KeyValuePair<string, UnityAction>("Basic Export to JSON, splitting large troop entries", () => {
+		exportOptions.Add(new KeyValuePair<string, UnityAction>("Basic Export to JSON, splitting large troop entries - don't use if both sides use the same troop type", () => {
 			GI.exportOpsPanel.gameObject.SetActive(false);
 
 			GI.customInputPanel.Open();
-			NumericInputFieldBtns numBtns = GI.customInputPanel.AddNumericInput("Split Limit", true, 1, 0, 9999, 5,
+			NumericInputFieldBtns numBtns = GI.customInputPanel.AddNumericInput("Split Limit", true, gData.lastEnteredExportTroopSplitAmt, 0, 9999, 5,
 				"Troop entries with more than this amount of troops will be divided in more than one JSON entry");
 			GI.customInputPanel.SetPanelInfo("Set Troop Entry Split Limit...", "Confirm", () => {
-				SerializableTroopList exportedList = GameController.TroopListToSerializableTroopList
-				(GameController.GetCombinedTroopsFromTwoLists
-				(attackerSide.sideArmy, defenderSide.sideArmy), int.Parse(numBtns.targetField.text));
+				int splitLimit = int.Parse(numBtns.targetField.text);
+				gData.lastEnteredExportTroopSplitAmt = splitLimit;
+				SerializableTroopListObj exportedList = new SerializableTroopListObj(JsonHandlingUtils.TroopListToSerializableTroopList
+					(GameController.GetCombinedTroopsFromTwoLists
+						(attackerSide.sideArmy, defenderSide.sideArmy), splitLimit));
 				string JSONContent = JsonUtility.ToJson(exportedList);
 				Debug.Log(JSONContent);
 				GI.textInputPanel.SetPanelInfo("JSON Export Result", "", JSONContent, "Copy to Clipboard", () => {
@@ -249,6 +253,55 @@ public class BattlePanel : GrowingOverlayPanel {
 			});
 		}));
 
+		//JSON export separating attackers from defenders with a user-defined "variable" AND splitting entries if troop amounts go above a certain limit!
+		exportOptions.Add(new KeyValuePair<string, UnityAction>("Export to JSON, splitting large troop entries and adding a different variable to attackers and defenders", () => {
+			GI.exportOpsPanel.gameObject.SetActive(false);
+			string JSONContent = "{ \"troops\":[";
+			GI.customInputPanel.Open();
+			NumericInputFieldBtns numBtns = GI.customInputPanel.AddNumericInput("Split Limit", true, gData.lastEnteredExportTroopSplitAmt, 0, 9999, 5,
+				"Troop entries with more than this amount of troops will be divided in more than one JSON entry");
+			InputField addedVarName = GI.customInputPanel.AddTextInput("Added Variable Name", gData.lastEnteredExportAddedVariable, "The name of the variable that will be added to all entries");
+			InputField varForAttackers = GI.customInputPanel.AddTextInput("Value for Attackers", gData.lastEnteredExportAttackerVariable, "The value of the added variable for all entries of the attacker army. Add quotes if necessary");
+			InputField varForDefenders = GI.customInputPanel.AddTextInput("Value for Defenders", gData.lastEnteredExportDefenderVariable, "The value of the added variable for all entries of the defender army. Add quotes if necessary");
+			GI.customInputPanel.SetPanelInfo("Set Options...", "Confirm", () => {
+				int splitLimit = int.Parse(numBtns.targetField.text);
+
+				gData.lastEnteredExportTroopSplitAmt = splitLimit;
+				gData.lastEnteredExportAddedVariable = addedVarName.text;
+				gData.lastEnteredExportAttackerVariable = varForAttackers.text;
+				gData.lastEnteredExportDefenderVariable = varForDefenders.text;
+
+				List<SerializedTroop> sTroopList = 
+					JsonHandlingUtils.TroopListToSerializableTroopList(attackerSide.sideArmy, splitLimit);
+
+				for(int i = 0; i < sTroopList.Count; i++) {
+					string tnpJson = JsonUtility.ToJson(sTroopList[i]);
+					JSONContent = string.Concat(JSONContent,
+						tnpJson.Insert(tnpJson.Length - 1, string.Concat(",\"", addedVarName.text, "\":", varForAttackers.text)),
+						",");
+				}
+
+				sTroopList =
+					JsonHandlingUtils.TroopListToSerializableTroopList(defenderSide.sideArmy, splitLimit);
+
+				for (int i = 0; i < sTroopList.Count; i++) {
+					string tnpJson = JsonUtility.ToJson(sTroopList[i]);
+					JSONContent = string.Concat(JSONContent,
+						tnpJson.Insert(tnpJson.Length - 1, string.Concat(",\"", addedVarName.text, "\":", varForDefenders.text)),
+						i < sTroopList.Count - 1 ? "," : "");
+				}
+
+				JSONContent += "]}";
+				Debug.Log(JSONContent);
+				GI.textInputPanel.SetPanelInfo("JSON Export Result", "", JSONContent, "Copy to Clipboard", () => {
+
+					GameInterface.CopyToClipboard(GI.textInputPanel.theInputField.text);
+
+				});
+				GI.customInputPanel.Close();
+				GI.textInputPanel.Open();
+			});
+		}));
 
 		//when done preparing options, open the export ops panel
 		GI.exportOpsPanel.Open("Remaining Armies: Export Options", exportOptions);

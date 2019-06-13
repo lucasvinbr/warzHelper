@@ -28,7 +28,8 @@ public class CustomInputPanel : InputPanel {
 	}
 
 
-	public InputField AddTextInput(string inputFieldPlaceholderText = "", string inputFieldInitialText = "", string inputFieldTooltip = "") {
+	public InputField AddTextInput(string inputFieldPlaceholderText = "", string inputFieldInitialText = "", 
+		string inputFieldTooltip = "") {
 		GameObject newInput = Instantiate(textInputPrefab, inputEntriesContainer);
 		InputField IF = newInput.GetComponent<InputField>();
 		(IF.placeholder as Text).text = inputFieldPlaceholderText;

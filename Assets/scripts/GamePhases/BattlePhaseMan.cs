@@ -13,6 +13,7 @@ public class BattlePhaseMan : GamePhaseManager {
 
 	public override void OnPhaseStart() {
 		base.OnPhaseStart();
+		battleZones.Clear();
 		//find battles, register them and open a resolution menu for each one
 		infoTxt.text = "Resolution of any battles started in the Command Phase";
 		GameInfo curGameData = GameController.CurGameData;

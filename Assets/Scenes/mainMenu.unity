@@ -43205,7 +43205,8 @@ MonoBehaviour:
   infoLabelText: {fileID: 1049709266}
   actionButtonText: {fileID: 1602423811}
   actionButton: {fileID: 1934047361}
-  textInputPrefab: {fileID: 0}
+  textInputPrefab: {fileID: 5371218852737609540, guid: fc31feec6dd4dc24eb360eb0b9e5ee85,
+    type: 3}
   numericInputPrefab: {fileID: 5371218852737609540, guid: a3cc05d979692964f9436739797cbb07,
     type: 3}
   inputEntriesContainer: {fileID: 2053769807}
