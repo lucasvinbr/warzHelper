@@ -26,7 +26,7 @@ public class ZoneEditOnClick : MonoBehaviour {
 			if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out hit, 100, 1 << 8)) {
 				ZoneSpot hitSpotScript = hit.transform.GetComponent<ZoneSpot>();
 				if (hitSpotScript) {
-					GameInterface.instance.EditZone(hitSpotScript.data, false);
+					GameInterface.instance.EditZone(hitSpotScript.data as Zone, false);
 				}
 			}
 		}

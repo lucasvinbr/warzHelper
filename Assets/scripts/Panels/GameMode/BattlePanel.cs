@@ -94,8 +94,8 @@ public class BattlePanel : GrowingOverlayPanel {
 	/// multiple mini-battles are made between randomized samples of each side's army
 	/// </summary>
 	public void AutocalcResolution() {
-		Debug.Log("---AUTOBATTLE START---");
-		Debug.Log(attackerSide.factionNameTxt.text + " VS " + defenderSide.factionNameTxt.text);
+		//Debug.Log("---AUTOBATTLE START---");
+		//Debug.Log(attackerSide.factionNameTxt.text + " VS " + defenderSide.factionNameTxt.text);
 
 		float winnerDmgMultiplier = GameController.instance.curData.rules.autoResolveWinnerDamageMultiplier;
 
@@ -107,7 +107,7 @@ public class BattlePanel : GrowingOverlayPanel {
 		}
 		while (attackerSide.curArmyPower > 0 && defenderSide.curArmyPower > 0);
 
-		Debug.Log("---AUTOBATTLE END---");
+		//Debug.Log("---AUTOBATTLE END---");
 	}
 
 	/// <summary>
@@ -133,16 +133,16 @@ public class BattlePanel : GrowingOverlayPanel {
 			defenderSampleSize = Mathf.RoundToInt(sampleSize / armyNumbersProportion);
 		}
 
-		Debug.Log("attacker sSize: " + attackerSampleSize);
-		Debug.Log("defender sSize: " + defenderSampleSize);
+		//Debug.Log("attacker sSize: " + attackerSampleSize);
+		//Debug.Log("defender sSize: " + defenderSampleSize);
 
 		float attackerAutoPower = GameController.
 			GetRandomBattleAutocalcPower(attackerSide.sideArmy, attackerSampleSize);
 		float defenderAutoPower = GameController.
 			GetRandomBattleAutocalcPower(defenderSide.sideArmy, defenderSampleSize);
 
-		Debug.Log("attacker auto power: " + attackerAutoPower);
-		Debug.Log("defender auto power: " + defenderAutoPower);
+		//Debug.Log("attacker auto power: " + attackerAutoPower);
+		//Debug.Log("defender auto power: " + defenderAutoPower);
 
 		//make the winner lose some power as well (or not, depending on the rules)
 		if (attackerAutoPower > defenderAutoPower) {
@@ -275,9 +275,8 @@ public class BattlePanel : GrowingOverlayPanel {
 					JsonHandlingUtils.TroopListToSerializableTroopList(attackerSide.sideArmy, splitLimit);
 
 				for(int i = 0; i < sTroopList.Count; i++) {
-					string tnpJson = JsonUtility.ToJson(sTroopList[i]);
 					JSONContent = string.Concat(JSONContent,
-						tnpJson.Insert(tnpJson.Length - 1, string.Concat(",\"", addedVarName.text, "\":", varForAttackers.text)),
+						JsonHandlingUtils.ToJsonWithExtraVariable(sTroopList[i], addedVarName.text, varForAttackers.text),
 						",");
 				}
 
@@ -285,9 +284,8 @@ public class BattlePanel : GrowingOverlayPanel {
 					JsonHandlingUtils.TroopListToSerializableTroopList(defenderSide.sideArmy, splitLimit);
 
 				for (int i = 0; i < sTroopList.Count; i++) {
-					string tnpJson = JsonUtility.ToJson(sTroopList[i]);
-					JSONContent = string.Concat(JSONContent,
-						tnpJson.Insert(tnpJson.Length - 1, string.Concat(",\"", addedVarName.text, "\":", varForDefenders.text)),
+				JSONContent = string.Concat(JSONContent,
+					JsonHandlingUtils.ToJsonWithExtraVariable(sTroopList[i], addedVarName.text, varForDefenders.text),
 						i < sTroopList.Count - 1 ? "," : "");
 				}
 

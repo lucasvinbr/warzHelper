@@ -523,17 +523,7 @@ public class GameController : MonoBehaviour {
 	/// <param name="targetFac"></param>
 	/// <returns></returns>
 	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, Faction targetFac) {
-		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
-		Faction curCmderFac = null;
-		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
-			curCmderFac = GetFactionByID(cmder.ownerFaction);
-			if (curCmderFac == targetFac || curCmderFac.GetStandingWith(targetFac) ==
-				GameFactionRelations.FactionStanding.ally) {
-				friendlyCommandersInTheZone.Add(cmder);
-			}
-		}
-
-		return friendlyCommandersInTheZone;
+		return GetCommandersOfFactionAndAlliesInZone(targetZone, targetFac.ID);
 	}
 
 	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, int targetFacID) {
@@ -592,7 +582,7 @@ public class GameController : MonoBehaviour {
 				TransformTweener.instance.GetAllTweensTargetingZone(targetZone.MyZoneSpot);
 			foreach(TransformTweener.TransformTween tween in tweens) {
 				Cmder3d tweeningCmder3d = tween.movingTrans.GetComponent<Cmder3d>();
-				if(tweeningCmder3d) cmdersInZone.Remove(tweeningCmder3d.data);
+				if(tweeningCmder3d) cmdersInZone.Remove(tweeningCmder3d.data as Commander);
 			}
 		}
 
@@ -640,16 +630,8 @@ public class GameController : MonoBehaviour {
 	/// <returns></returns>
 	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFactionAndAllies(Zone targetZone,
 		Faction targetFac, bool onlyCommanderArmies = false) {
-		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
-		if (targetZone.ownerFaction == targetFac.ID && !onlyCommanderArmies) {
-			returnedList.AddRange(targetZone.troopsContained);
-		}
-
-		foreach (Commander cmder in GetCommandersOfFactionAndAlliesInZone(targetZone, targetFac)) {
-			returnedList = cmder.GetCombinedTroops(returnedList);
-		}
-
-		return returnedList;
+		return GetCombinedTroopsInZoneFromFactionAndAllies
+			(targetZone, targetFac != null ? targetFac.ID : -1, onlyCommanderArmies);
 	}
 
 	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFactionAndAllies(Zone targetZone,
@@ -950,6 +932,15 @@ public class GameController : MonoBehaviour {
 		return false;
 	}
 
+	public static bool IsZoneLinkedToAnyZoneOfList(Zone z, List<Zone> targetList) {
+		foreach(Zone checkedZone in targetList){
+			if(checkedZone != z && AreZonesLinked(z, checkedZone)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/// <summary>
 	/// returns -1 if it can't find that ID
 	/// </summary>
@@ -1038,6 +1029,59 @@ public class GameController : MonoBehaviour {
 		return fac.OwnedCommanders.Count > 0 || fac.OwnedZones.Count > 0 || 
 			(lastFactionException && CurGameData.unifyBattlePhase &&
 			fac.ID == CurGameData.factions[CurGameData.factions.Count - 1].ID);
+	}
+
+	/// <summary>
+	/// if the modal is confirmed, tries to share all zones equally between all remaining factions.
+	/// the rest of the (zones / factions) division is set to neutral
+	/// </summary>
+	public void RandomizeZoneOwnerships() {
+		ModalPanel.Instance().YesNoBox("Randomize All Zones?", "Are you sure? All zones will be shared equally, with no regard for current ownerships, and some zones may become neutral. Commanders won't be moved.",
+			() => {
+				TemplateInfo curData = instance.curData;
+				//zones are first set to neutral, then shared; finally, their displays are reset
+				foreach(Zone z in curData.zones) {
+					z.ownerFaction = -1;
+				}
+				int zonesPerFaction = curData.zones.Count / curData.factions.Count;
+				if(zonesPerFaction <= 0) {
+					Debug.LogWarning("[RandomizeAllZones] There are more factions than zones! Some factions won't get zones");
+					zonesPerFaction = 1;
+				}
+
+				List<Zone> availableZones = new List<Zone>(curData.zones);
+				List<Zone> zonesGivenToCurFac = new List<Zone>();
+				Zone candidateZone;
+				foreach(Faction fac in curData.factions) {
+					zonesGivenToCurFac.Clear();
+					while(zonesGivenToCurFac.Count < zonesPerFaction && availableZones.Count > 0) {
+						candidateZone = null;
+						if(zonesGivenToCurFac.Count == 0) {
+							candidateZone = availableZones[Random.Range(0, availableZones.Count)];
+						}else {
+							//try to get zones close to each other
+							foreach(Zone z in availableZones) {
+								if(IsZoneLinkedToAnyZoneOfList(z, zonesGivenToCurFac)) {
+									candidateZone = z;
+									break;
+								}
+							}
+							//or just a random one if we fail
+							if (candidateZone == null) candidateZone = availableZones[Random.Range(0, availableZones.Count)];
+						}
+
+						candidateZone.ownerFaction = fac.ID;
+						zonesGivenToCurFac.Add(candidateZone);
+						availableZones.Remove(candidateZone);
+					}
+				}
+
+				//aaaand refresh all zones' displays
+				foreach (Zone z in curData.zones) {
+					z.MyZoneSpot.RefreshDataDisplay();
+				}
+
+			}, null);
 	}
 
 	/// <summary>

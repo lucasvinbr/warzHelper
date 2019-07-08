@@ -5,25 +5,16 @@ using UnityEngine;
 /// <summary>
 /// the representation of a zone in the 3d world
 /// </summary>
-public class ZoneSpot : MonoBehaviour {
-
-    public Zone data;
+public class ZoneSpot : TroopContainer3d {
 
     public GUIFollowerText myLabel;
 
     public Transform labelPoint;
 
-	public Renderer spotRenderer;
-
 	public const float CMDER_OFFSET = 0.75f;
 
 	public const int NUM_CMDERS_BEFORE_PILE = 8;
 
-
-    void Start()
-    {
-		RefreshDataDisplay();
-    }
 
     void OnDestroy()
     {
@@ -32,11 +23,6 @@ public class ZoneSpot : MonoBehaviour {
             FollowerTextCanvasRecycler.instance.PoolObj(myLabel);
         }
     }
-
-	public void DeleteThisSpot() {
-		Destroy(gameObject);
-
-	}
 
 	public void GuardMyLabel() {
 		if (!myLabel) {
@@ -48,18 +34,19 @@ public class ZoneSpot : MonoBehaviour {
 	/// <summary>
 	/// refreshes label text and the spot's 3d representation color
 	/// </summary>
-    public void RefreshDataDisplay()
+    public override void RefreshDataDisplay()
     {
 		GuardMyLabel();
         if(data != null)
         {
-            myLabel.SetText(data.name);
+			string zoneName = (data as Zone).name;
+            myLabel.SetText(zoneName);
 			Faction ownerFac = GameController.GetFactionByID(data.ownerFaction);
 			myLabel.myText.color = ownerFac != null ? ownerFac.color : Color.white;
-			spotRenderer.sharedMaterial = ownerFac != null ?
+			containerRenderer.sharedMaterial = ownerFac != null ?
 				GameController.instance.facMatsHandler.factionMaterialsDict[ownerFac.ID] :
 				GameController.instance.facMatsHandler.neutralZoneMaterial;
-			gameObject.name = data.name;
+			gameObject.name = zoneName;
         }
     }
 
@@ -68,7 +55,7 @@ public class ZoneSpot : MonoBehaviour {
 	/// </summary>
 	/// <returns></returns>
 	public Vector3 GetGoodSpotForCommander() {
-		return GetGoodSpotForCommander(GameController.GetCommandersInZone(data).Count);
+		return GetGoodSpotForCommander(GameController.GetCommandersInZone(data as Zone).Count);
 	}
 
 	/// <summary>

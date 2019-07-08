@@ -65,10 +65,15 @@ public class PostBattlePhaseMan : GamePhaseManager {
 	public void SolveConflictsAt(Zone confZone) {
 
 		List<Commander> cmdersInZone = GameController.GetCommandersInZone(confZone);
-		bool zoneWasTaken = false;
+		
 		Faction cmderFac = null, ownerFac = GameController.GetFactionByID(confZone.ownerFaction);
+		bool zoneWasTaken = false, 
+			zoneStillHasDefenders = GameController.GetTotalTroopAmountFromTroopList(
+				GameController.GetCombinedTroopsInZoneFromFactionAndAllies
+				(confZone, ownerFac)) > 0;
+
 		//"kill" all commanders with no troops
-		foreach(Commander c in cmdersInZone) {
+		foreach (Commander c in cmdersInZone) {
 			if(c.TotalTroopsContained == 0) {
 				StartCoroutine(KillCommanderRoutine(c));
 				//mark for tidying after all "dead" cmders have been removed
@@ -79,7 +84,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 				//allies won't take the zone for themselves even if the zone ends up with 0 garrison
 				cmderFac = GameController.GetFactionByID(c.ownerFaction);
 				if (cmderFac.GetStandingWith(ownerFac) != GameFactionRelations.FactionStanding.ally &&
-					!zoneWasTaken) {
+					!zoneWasTaken && !zoneStillHasDefenders) {
 
 					confZone.ownerFaction = c.ownerFaction;
 					//clear the points to avoid "insta-max-garrison"
@@ -92,9 +97,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 		}
 
 		if (!zoneWasTaken) {
-			if(GameController.GetTotalTroopAmountFromTroopList(
-				GameController.GetCombinedTroopsInZoneFromFactionAndAllies
-				(confZone, ownerFac)) == 0) {
+			if(!zoneStillHasDefenders) {
 				//the zone's been abandoned then
 				confZone.ownerFaction = -1;
 				confZone.MyZoneSpot.RefreshDataDisplay();

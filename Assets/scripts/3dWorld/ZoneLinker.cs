@@ -60,7 +60,7 @@ public class ZoneLinker : MonoBehaviour {
 						zoneHighlight.gameObject.SetActive(false);
 					}else {
 						if(World.GetLinkLineBetween(curSelectedSpot.data, hitSpotScript.data)) {
-							World.RemoveZoneLink(curSelectedSpot.data, hitSpotScript.data, true);
+							World.RemoveZoneLink(curSelectedSpot.data as Zone, hitSpotScript.data as Zone, true);
 						}else {
 							World.PlaceZoneLink(curSelectedSpot, hitSpotScript, true);
 						}

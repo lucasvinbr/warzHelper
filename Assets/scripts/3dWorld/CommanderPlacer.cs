@@ -64,7 +64,7 @@ public class CommanderPlacer : MonoBehaviour {
         {
             if(curHoveredValidZone != null)
             {
-				World.CreateNewCmderAtZone(curHoveredValidZone.data, GameModeHandler.instance.curPlayingFaction);
+				World.CreateNewCmderAtZone(curHoveredValidZone.data as Zone, GameModeHandler.instance.curPlayingFaction);
                 actionOnSpotSelect();
                 enabled = false;
             }

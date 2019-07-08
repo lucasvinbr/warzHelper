@@ -16,8 +16,7 @@ public class WorldCommandPhase : MonoBehaviour {
 
 	public Transform cmderHighlight;
 
-	[HideInInspector]
-	public Cmder3d curSelectedCmder;
+	public Commander curSelectedCmder = null;
 
 	[HideInInspector]
 	public List<Cmder3d> allowedCmders3d = new List<Cmder3d>();
@@ -48,7 +47,7 @@ public class WorldCommandPhase : MonoBehaviour {
 			return;
 		}
 
-		if (curSelectedCmder) {
+		if (curSelectedCmder != null) {
 			if (Input.GetButtonDown("Select")) {
 				if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out hit, 100)) {
 					ZoneSpot hitSpotScript = hit.transform.GetComponent<ZoneSpot>();
@@ -84,8 +83,8 @@ public class WorldCommandPhase : MonoBehaviour {
 	public void SelectCmder(Cmder3d cmd3d) {
 		cmderHighlight.gameObject.SetActive(true);
 		cmderHighlight.transform.position = cmd3d.transform.position;
-		curSelectedCmder = cmd3d;
-		cmdPhaseMan.OnCmderSelectedInWorld(cmd3d.data);
+		curSelectedCmder = cmd3d.data as Commander;
+		cmdPhaseMan.OnCmderSelectedInWorld(cmd3d.data as Commander);
 	}
 
 	/// <summary>
@@ -106,12 +105,20 @@ public class WorldCommandPhase : MonoBehaviour {
 		curSelectedCmder = null;
 	}
 
-
-	private void OnDisable() {
+	/// <summary>
+	/// deselects the currently selected cmder (if any),
+	/// disables the "zone grow" script
+	/// and clears "allowed" lists
+	/// </summary>
+	public void Cleanup() {
 		DeselectCmder();
-		if(zoneGrowScript) zoneGrowScript.enabled = false;
+		if (zoneGrowScript) zoneGrowScript.enabled = false;
 		allowedCmders3d.Clear();
 		allowedMoveSpots.Clear();
+	}
+
+	private void OnDisable() {
+		Cleanup();
 	}
 
 }

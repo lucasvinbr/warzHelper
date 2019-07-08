@@ -53,7 +53,7 @@ public class PersistenceHandler
     /// <typeparam name="T"></typeparam>
     /// <param name="directory"></param>
     /// <returns></returns>
-    public static List<T> LoadFromAllFilesInDirectory<T>(string directory)
+    public static List<T> LoadFromAllFilesInDirectory<T>(string directory, params string[] ignoredFileExtensions)
     {
         if (Directory.Exists(directory))
         {
@@ -61,7 +61,7 @@ public class PersistenceHandler
             List<T> returnedList = new List<T>();
             for(int i = 0; i < filesInDir.Length; i++)
             {
-                T dataFromFile = LoadFromFile<T>(filesInDir[i]);
+                T dataFromFile = LoadFromFile<T>(filesInDir[i], ignoredFileExtensions);
                 if(dataFromFile != null)
                 {
                     returnedList.Add(dataFromFile);
@@ -78,7 +78,7 @@ public class PersistenceHandler
         return null;
     }
 
-    public static T LoadFromFile<T>(string fileName)
+    public static T LoadFromFile<T>(string fileName, params string[] ignoredFileExtensions)
     {
         try
         {
@@ -86,6 +86,13 @@ public class PersistenceHandler
 
             if (File.Exists(fileName))
             {
+				if(ignoredFileExtensions.Length > 0) {
+					string fileExtension = Path.GetExtension(fileName);
+					foreach (string extension in ignoredFileExtensions) {
+						if (fileExtension == extension) return default(T);
+					}
+				}
+				
                 using (FileStream readStream = new FileStream(fileName, FileMode.Open))
                 {
                     try

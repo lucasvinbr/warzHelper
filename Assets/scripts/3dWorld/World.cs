@@ -48,6 +48,10 @@ public class World : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// toggles display of the "ground" used in templates and games
+	/// </summary>
+	/// <param name="active"></param>
     public static void ToggleWorldDisplay(bool active)
     {
         instance.ground.gameObject.SetActive(active);
@@ -74,12 +78,18 @@ public class World : MonoBehaviour {
 		instance.linkLines.Clear();
 	}
 
+	/// <summary>
+	/// Removes all cmder3ds
+	/// </summary>
 	public static void CleanCmders() {
 		while(instance.spawnedCmders.Count > 0) {
 			RemoveCmder3d(instance.spawnedCmders[0]);
 		}
 	}
 
+	/// <summary>
+	/// Removes all mercCaravan3ds
+	/// </summary>
 	public static void CleanMCaravans() {
 		while (instance.spawnedMCs.Count > 0) {
 			RemoveMercCaravan3d(instance.spawnedMCs[0]);
@@ -104,7 +114,7 @@ public class World : MonoBehaviour {
 
     public static void CreateNewZoneAtPoint(Vector3 point, bool autoOpenEditMenu = true)
     {
-        Zone newZone = new Zone("New Zone");		
+        Zone newZone = new Zone("New Zone", point);		
         GameObject newSpot = Instantiate(instance.zonePrefab, point, Quaternion.identity);
         newSpot.transform.parent = instance.zonesContainer;
 		ZoneSpot spotScript = newSpot.GetComponent<ZoneSpot>();
@@ -148,7 +158,7 @@ public class World : MonoBehaviour {
 
 	public static Cmder3d GetCmder3dForCommander(Commander theCmder) {
 		foreach(Cmder3d cmd3d in instance.spawnedCmders) {
-			if(cmd3d.data.ID == theCmder.ID) {
+			if((cmd3d.data as Commander).ID == theCmder.ID) {
 				return cmd3d;
 			}
 		}
@@ -246,13 +256,14 @@ public class World : MonoBehaviour {
 		}
 	}
 
-	public static void PlaceZoneLink(ZoneSpot z1, ZoneSpot z2, bool alsoUpdateTheirLinkedList = false) {
+	public static void PlaceZoneLink(ZoneSpot zs1, ZoneSpot zs2, bool alsoUpdateTheirLinkedList = false) {
 		LinkLine theLink = LinkLineRecycler.GetALine();
-		theLink.SetLink(z1, z2);
+		Zone z1 = zs1.data as Zone, z2 = zs2.data as Zone;
+		theLink.SetLink(zs1, zs2);
 		instance.linkLines.Add(theLink);
 		if (alsoUpdateTheirLinkedList) {
-			z1.data.linkedZones.Add(z2.data.ID);
-			z2.data.linkedZones.Add(z1.data.ID);
+			z1.linkedZones.Add(z2.ID);
+			z2.linkedZones.Add(z1.ID);
 		}
 	}
 
@@ -274,9 +285,9 @@ public class World : MonoBehaviour {
 
 
 
-	public static LinkLine GetLinkLineBetween(Zone z1, Zone z2) {
+	public static LinkLine GetLinkLineBetween(TroopContainer c1, TroopContainer c2) {
 		foreach(LinkLine line in instance.linkLines) {
-			if(line.LinksZone(z1) && line.LinksZone(z2)) {
+			if(line.LinksContainer(c1) && line.LinksContainer(c2)) {
 				return line;
 			}
 		}

@@ -108,10 +108,12 @@ public class Zone : TroopContainer {
 
 	public Zone() { }
 
-	public Zone(string name) {
+	public Zone(string name, Vector3 zonePos) {
 		this.ID = GameController.GetUnusedZoneID();
 		this.name = name;
 		this.ownerFaction = -1;
+		this.coords = new Vector2(zonePos.x,
+			zonePos.z);
 		troopsContained = new List<TroopNumberPair>();
 		linkedZones = new List<int>();
 		while (GameController.GetZoneByName(this.name) != null) {

@@ -62,7 +62,7 @@ public class TransformTweener : MonoBehaviour
 	IEnumerator TweenRoutine(TransformTween tween) {
 		Vector3 originalCmderPos = tween.movingTrans.transform.position;
 		tween.destPos = tween.cmderAdjusted ? tween.destSpot.GetGoodSpotForCommander(
-			GameController.GetCommandersInZone(tween.destSpot.data).Count - 1) : 
+			GameController.GetCommandersInZone(tween.destSpot.data as Zone).Count - 1) : 
 			tween.destSpot.transform.position;
 
 		while (tween.elapsedTweenTime < TWEEN_ANIM_MOVE_DURATION) {
@@ -88,7 +88,7 @@ public class TransformTweener : MonoBehaviour
 	/// <param name="spotWithChanges"></param>
 	public void AdjustTweensThatTargetZone(ZoneSpot spotWithChanges) {
 		int adjustmentCount = 1;
-		int cmdersInSpot = GameController.GetCommandersInZone(spotWithChanges.data).Count;
+		int cmdersInSpot = GameController.GetCommandersInZone(spotWithChanges.data as Zone).Count;
 		foreach (TransformTween tween in activeTweens) {
 			if (!tween.cmderAdjusted) continue;
 			if(tween.destSpot == spotWithChanges) {

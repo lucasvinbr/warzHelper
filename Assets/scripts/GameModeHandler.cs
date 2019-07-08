@@ -72,7 +72,7 @@ public class GameModeHandler : ModeUI {
 		World.SetupAllMercCaravansFromData();
 		World.SetupBoardDetails();
 		GameController.MakeFactionTurnPrioritiesUnique();
-		//give initial points to zones if this is a new game
+
 		GameInfo data = GameController.CurGameData;
 
 		if(data.factionRelations == null ||
@@ -81,16 +81,22 @@ public class GameModeHandler : ModeUI {
 			data.factionRelations.SetDefaultRelationsBetweenAllFactions();
 		}
 
+		//give initial points to zones if this is a new game
 		if (data.elapsedTurns == 0) {
 			AddInitialPointsToZones();
 			GameInterface.instance.gameOpsPanel.gameObject.SetActive(true);
-			GameInterface.instance.gameOpsPanel.GoToAIPanel();
 		}
 
 		StartCoroutine(StartTurnAfterPanelsClose(data.curTurnPhase));
 		
 	}
 
+	/// <summary>
+	/// waits until no panels are open (looking at the overlayLevel from GameInterface)
+	/// and then starts a new turn
+	/// </summary>
+	/// <param name="startingPhase"></param>
+	/// <returns></returns>
 	IEnumerator StartTurnAfterPanelsClose(TurnPhase startingPhase) {
 		while(GameInterface.openedPanelsOverlayLevel > 0) {
 			yield return null;
@@ -100,7 +106,10 @@ public class GameModeHandler : ModeUI {
 	}
 
 
-
+	/// <summary>
+	/// if zones have a "points given on game start" value,
+	/// that value is given (and spent) now
+	/// </summary>
 	public void AddInitialPointsToZones() {
 		foreach(Zone z in GameController.instance.curData.zones) {
 			z.pointsToSpend = z.pointsGivenAtGameStart;

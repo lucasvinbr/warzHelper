@@ -58,10 +58,10 @@ public class SaveListPanel : ListContainerPanel<TemplateInfo> {
 
 	public override void FillEntries() {
 		if (inGameMode) {
-			savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.gamesDirectory);
+			savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.gamesDirectory, ".meta");
 		}
 		else {
-			savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.templatesDirectory);
+			savesList = PersistenceHandler.LoadFromAllFilesInDirectory<TemplateInfo>(PersistenceHandler.templatesDirectory, ".meta");
 		}
 
 		if (savesList != null) {

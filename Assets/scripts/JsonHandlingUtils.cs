@@ -37,6 +37,12 @@ public class JsonHandlingUtils
 		return sTroops;
 	}
 
+	public static string ToJsonWithExtraVariable(object targetObj, string extraVarName, string extraVarValue) {
+		string returnedJson = JsonUtility.ToJson(targetObj);
+		returnedJson = returnedJson.Insert(returnedJson.Length - 1, string.Concat(",\"", extraVarName, "\":", extraVarValue));
+		return returnedJson;
+	}
+
 
 }
 

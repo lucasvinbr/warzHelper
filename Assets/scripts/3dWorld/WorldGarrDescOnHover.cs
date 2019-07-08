@@ -37,12 +37,12 @@ public class WorldGarrDescOnHover : MonoBehaviour {
 				ZoneSpot spotScript = curHoveredObj.GetComponent<ZoneSpot>();
 				if (spotScript) {
 					LayoutToolTip.Instance.ShowTooltipForZone
-						(spotScript.data, Input.mousePosition, 
+						(spotScript.data as Zone, Input.mousePosition, 
 						GameInterface.instance.curInterfaceMode == GameInterface.InterfaceMode.game);
 				}else {
 					Cmder3d cmderScript = curHoveredObj.GetComponent<Cmder3d>();
 					if (cmderScript) {
-						LayoutToolTip.Instance.ShowTooltipForCmder(cmderScript.data, Input.mousePosition);
+						LayoutToolTip.Instance.ShowTooltipForCmder(cmderScript.data as Commander, Input.mousePosition);
 					}
 				}
 			}

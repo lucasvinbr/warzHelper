@@ -9,17 +9,17 @@ public class AiPlayer {
 	/// how big is the influence of troops that aren't right on the spot, but can get to it quickly, in the AI's
 	/// decisions?
 	/// </summary>
-	public const float MIN_NEARBY_TROOPS_INFLUENCE = 0.2f, MAX_NEARBY_TROOPS_INFLUENCE = 0.4f;
+	public const float MIN_NEARBY_TROOPS_INFLUENCE = 0.12f, MAX_NEARBY_TROOPS_INFLUENCE = 0.35f;
 	/// <summary>
 	/// how big should the "move to zone" score be before we actually decide to move?
 	/// </summary>
-	public const float MIN_MOVE_SCORE_THRESHOLD = 0.1f, MAX_MOVE_SCORE_THRESHOLD = 0.35f;
+	public const float MIN_MOVE_SCORE_THRESHOLD = 0.1f, MAX_MOVE_SCORE_THRESHOLD = 0.2f;
 
 	/// <summary>
 	/// how much should the percentage of upgradeable-in-one-turn troops be
 	/// before we start considering training as a better option than recruiting/moving?
 	/// </summary>
-	public const float MIN_TRAIN_SCORE_THRESHOLD = 0.22f, MAX_TRAIN_SCORE_THRESHOLD = 0.39f;
+	public const float MIN_TRAIN_SCORE_THRESHOLD = 0.23f, MAX_TRAIN_SCORE_THRESHOLD = 0.39f;
 
 	/// <summary>
 	/// how much should a situation where there is no room for new commanders, 
@@ -33,7 +33,7 @@ public class AiPlayer {
 	/// how much should the presence of a friendly commander in a potential move target zone
 	/// make it more likely for more cmders to go to that zone as well?
 	/// </summary>
-	public const float FRIENDLY_CMDER_PRESENCE_MULT = 1.15f;
+	public const float FRIENDLY_CMDER_PRESENCE_MULT = 1.18f;
 
 	/// <summary>
 	/// if the ratio of spawned cmders / max cmders is below this value,
@@ -148,14 +148,14 @@ public class AiPlayer {
 				if (fallbackMoveDestZone == null) {
 					//get a good destination zone for the faction
 					fallbackMoveDestZone = FindInterestingZone(ourFac);
-					Debug.Log("Faction " + ourFac.name + " got " + fallbackMoveDestZone.name +
-						" as fallback moveDest zone");
+					//Debug.Log("Faction " + ourFac.name + " got " + fallbackMoveDestZone.name +
+					//	" as fallback moveDest zone");
 				}
 
 				moveDestZone = GetNextZoneInPathToZone(fallbackMoveDestZone, zoneCmderIsIn);
 				topMoveScore = MAX_MOVE_SCORE_THRESHOLD;
-				Debug.Log("when trying to go from " + zoneCmderIsIn.name + " to " +
-					fallbackMoveDestZone.name + ", cmder got " + moveDestZone.name + " as path");
+				//Debug.Log("when trying to go from " + zoneCmderIsIn.name + " to " +
+				//	fallbackMoveDestZone.name + ", cmder got " + moveDestZone.name + " as path");
 
 			}
 
@@ -173,7 +173,7 @@ public class AiPlayer {
 
 			if (!hasActed && topMoveScore > GetRandomMoveScoreThreshold()) {
 				if (moveDestZone.ID != zoneCmderIsIn.ID) {
-					phaseScript.MoveCommander(commandableCmders[i].MeIn3d, moveDestZone.MyZoneSpot, false);
+					phaseScript.MoveCommander(commandableCmders[i], moveDestZone.MyZoneSpot, false);
 					//refresh the empty zone list if we moved;
 					//that way, our other cmders may not "feel" the same need to move as this one did
 					emptyNewCmderZones = GameController.GetZonesForNewCmdersOfFaction(ourFac);
@@ -185,20 +185,12 @@ public class AiPlayer {
 				//if we decided to do nothing else, train troops
 				hasActed = commandableCmders[i].TrainTroops();
 
-				//try recruiting and moving again if we can't train!
+				//try recruiting again if we can't train!
 				if (!hasActed) {
 					hasActed = commandableCmders[i].RecruitTroops();
 				}
 
-				if (!hasActed) {
-					if (moveDestZone.ID != zoneCmderIsIn.ID) {
-						phaseScript.MoveCommander(commandableCmders[i].MeIn3d, moveDestZone.MyZoneSpot, false);
-						emptyNewCmderZones = GameController.GetZonesForNewCmdersOfFaction(ourFac);
-						hasActed = true;
-					}
-					//if we can't recruit nor train and staying is more interesting than moving...
-					//do nothing
-				}
+				//do nothing then
 			}
 
 
@@ -265,7 +257,7 @@ public class AiPlayer {
 
 		//we should add score if friendly commanders are already there,
 		//in order to make bigger armies
-		//(allied cmders shouldn't be considered here because they can't attack at the same time)
+		//(not checking for allied cmders, only our own)
 		foreach (Commander cmd in GameController.GetCommandersOfFactionInZone(targetZone, ourFac)) {
 			finalScore *= FRIENDLY_CMDER_PRESENCE_MULT;
 		}
@@ -274,7 +266,6 @@ public class AiPlayer {
 	}
 
 	/// <summary>
-	/// returns one of our zones that has the largest danger level.
 	/// looks for, in order:
 	/// -dangerous owned zone
 	/// -dangerous allied zone
@@ -411,7 +402,7 @@ public class AiPlayer {
 		}
 
 
-		Debug.Log("pathfinding... going to " + GameController.GetZoneByID(foundPath[1]).name);
+		//Debug.Log("pathfinding... going to " + GameController.GetZoneByID(foundPath[1]).name);
 		return GameController.GetZoneByID(foundPath[1]);
 	}
 
