@@ -2,28 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LinkLineRecycler : Recycler<LinkLine> {
+public class LinkLineRecycler : ScriptedPrefabRecyclerUser<LinkLine>  {
 
-    public static LinkLineRecycler instance;
+	public static LinkLineRecycler instance;
 
-    public GameObject linePrefab;
-
-    public Transform linesParent;
-
-    void Awake()
+    protected override void Awake()
     {
-        instance = this;
+		base.Awake();
+		instance = this;
     }
 
     public static LinkLine GetALine()
     {
-        return instance.GetAnObj();
-    }
-
-    public override LinkLine CreateNewObj()
-    {
-        GameObject newLine = GameObject.Instantiate(linePrefab);
-        newLine.transform.SetParent(linesParent);
-        return newLine.GetComponent<LinkLine>();
+        return instance.cycler.GetScriptedObj();
     }
 }

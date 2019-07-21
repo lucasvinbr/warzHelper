@@ -111,9 +111,9 @@ public class GameController : MonoBehaviour {
         GameInterface.instance.textInputPanel.Open();
     }
 
-	public void LoadDataAndStartGame(string gameName, bool isTemplate = false)
+	public void LoadDataAndStartGame(string fileName, bool isTemplate = false)
     {
-		string fileDir = (isTemplate ? PersistenceHandler.templatesDirectory : PersistenceHandler.gamesDirectory) + gameName + ".xml";
+		string fileDir = (isTemplate ? PersistenceHandler.templatesDirectory : PersistenceHandler.gamesDirectory) + fileName + ".xml";
         curData = PersistenceHandler.LoadFromFile<TemplateInfo>(fileDir);
 		if(curData != null) {
 			Debug.Log("loaded game/template: " + curData.gameName);

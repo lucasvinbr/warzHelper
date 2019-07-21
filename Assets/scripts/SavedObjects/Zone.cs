@@ -122,6 +122,13 @@ public class Zone : TroopContainer {
 		GameController.instance.curData.zones.Add(this);
 	}
 
+	/// <summary>
+	/// gets our zoneSpot's position and stores it as our new coords
+	/// </summary>
+	public void UpdateCoordsAccordingToSpotPosition() {
+		coords = new Vector2(MyZoneSpot.transform.localPosition.x,
+			MyZoneSpot.transform.localPosition.z);
+	}
 
 	/// <summary>
 	/// gets points according to our owner faction and our own factors

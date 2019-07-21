@@ -2,28 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FollowerTextCanvasRecycler : Recycler<GUIFollowerText> {
+public class FollowerTextCanvasRecycler : ScriptedPrefabRecyclerUser<GUIFollowerText> {
 
     public static FollowerTextCanvasRecycler instance;
 
-    public GameObject followerPrefab;
-
-    public Transform followerTextsParent;
-
-    void Awake()
+    protected override void Awake()
     {
+		base.Awake();
         instance = this;
     }
 
     public static GUIFollowerText GetAFollower()
     {
-        return instance.GetAnObj();
-    }
-
-    public override GUIFollowerText CreateNewObj()
-    {
-        GameObject newFollowerText = GameObject.Instantiate(followerPrefab);
-        newFollowerText.transform.SetParent(followerTextsParent);
-        return newFollowerText.GetComponent<GUIFollowerText>();
+        return instance.cycler.GetScriptedObj();
     }
 }

@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class LoggerBox : Recycler<LoggerBoxEntry>
+public class LoggerBox : ScriptedPrefabRecyclerUser<LoggerBoxEntry>
 {
-
-	public GameObject entryPrefab;
-
-	public Transform entriesContainer, inactivesContainer;
 
 	public static LoggerBox instance;
 
@@ -16,23 +12,30 @@ public class LoggerBox : Recycler<LoggerBoxEntry>
 
 	private WaitForSeconds waitForStayTime;
 
-	public void Awake() {
+	protected override void Awake() {
+		base.Awake();
 		instance = this;
 		waitForStayTime = new WaitForSeconds(LOGMSG_STAY_TIME);
 	}
 
 	public LoggerBoxEntry WriteText(string txt) {
-		LoggerBoxEntry newTxt = GetAnObj();
+		LoggerBoxEntry newTxt = GetAnEntry();
 		newTxt.SetContent(txt);
 		StartCoroutine(EntryStayRoutine(newTxt));
 		return newTxt;
 	}
 
 	public LoggerBoxEntry WriteText(string txt, Color txtColor) {
-		LoggerBoxEntry newTxt = GetAnObj();
+		LoggerBoxEntry newTxt = GetAnEntry();
 		newTxt.SetContent(txt, txtColor);
 		StartCoroutine(EntryStayRoutine(newTxt));
 		return newTxt;
+	}
+
+	public LoggerBoxEntry GetAnEntry() {
+		LoggerBoxEntry gotObj = cycler.GetScriptedObj();
+		gotObj.RestoreDefaultLooks();
+		return gotObj;
 	}
 
 	/// <summary>
@@ -52,23 +55,7 @@ public class LoggerBox : Recycler<LoggerBoxEntry>
 		}
 
 		entry.cg.alpha = 0.0f;
-		PoolObj(entry);
+		cycler.PoolObj(entry.gameObject);
 	}
 
-	public override LoggerBoxEntry CreateNewObj() {
-		GameObject newGO = Instantiate(entryPrefab);
-		return newGO.GetComponent<LoggerBoxEntry>();
-	}
-
-	public override LoggerBoxEntry GetAnObj() {
-		LoggerBoxEntry gotObj = base.GetAnObj();
-		gotObj.RestoreDefaultLooks();
-		gotObj.transform.SetParent(entriesContainer, false);
-		return gotObj;
-	}
-
-	public override void PoolObj(LoggerBoxEntry theObj) {
-		base.PoolObj(theObj);
-		theObj.transform.SetParent(inactivesContainer, false);
-	}
 }

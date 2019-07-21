@@ -78,8 +78,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 		dataBeingEdited.multMaxUnitsInGarrison = float.Parse(multMaxGarrInput.text, CultureInfo.InvariantCulture);
 		dataBeingEdited.pointsGivenAtGameStart = int.Parse(startPointsInput.text);
 		dataBeingEdited.ownerFaction = GameController.GetFactionIDByName(ownerFactionDropdown.captionText.text);
-		dataBeingEdited.coords = new Vector2(mySpot.transform.localPosition.x,
-			mySpot.transform.localPosition.z);
+		dataBeingEdited.UpdateCoordsAccordingToSpotPosition();
 		mySpot.RefreshDataDisplay();
 		gameObject.SetActive(false);
 		OnWindowIsClosing();
@@ -138,13 +137,7 @@ public class EditZonePanel : EditDataPanel<Zone> {
 			isDirty = true;
 			GameInterface.instance.RestoreOpenOverlayPanels();
 
-			MercCaravan localCaravan = GameController.GetMercCaravanInZone(dataBeingEdited.ID);
-			if (localCaravan != null) localCaravan.MeIn3d.InstantlyUpdatePosition();
-
-			foreach (int zoneID in dataBeingEdited.linkedZones) {
-				Zone linkedZone = GameController.GetZoneByID(zoneID);
-				World.GetLinkLineBetween(dataBeingEdited, linkedZone).UpdatePositions();
-			}
+			dataBeingEdited.MyZoneSpot.RefreshPositionRelatedStuff();
 		});
 	}
 

@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScheduledOrdersVisualFeedbacks : MonoBehaviour
+public class WorldVisualFeedbacks : MonoBehaviour
 {
+	public static WorldVisualFeedbacks instance;
 
-	public GameObject trainFeedbackPrefab, recruitFeedbackPrefab;
+	public SimplePrefabRecycler recruitFBCycler, trainingFBCycler, zoneHighlightCycler;
 
-	List<GameObject> activeTrainFeedbacks = new List<GameObject>();
-	List<GameObject> activeRecruitFeedbacks = new List<GameObject>();
 
+	private void Awake() {
+		instance = this;
+	}
 
 	//TODO all methods... like "addFeedback(orderType, cmder)", "clearAllFeedbacks()" - this one is useful for the 'action time' that comes after unified turns
 	//pooling for train and recruit feedbacks, linkLineRecycler should take care of the lines (make it handle colors if necessary)

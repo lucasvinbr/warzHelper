@@ -11,6 +11,8 @@ public class SavePanelListEntry : ListPanelEntry<TemplateInfo> {
 
     public Image backgroundImg;
 
+	public string saveFileName = "";
+
     void Start()
     {
         backgroundImg.color = GameInterface.instance.deselectedUIElementColor;

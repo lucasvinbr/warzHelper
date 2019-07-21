@@ -6,11 +6,14 @@ public class TemplateModeUI : ModeUI {
 
 	public GenericOverlayPanel tempSaveOptionsPanel;
 
-	public GameObject mainLowerHUD, zoneLinkingLowerHUD;
+	public GameObject mainLowerHUD, zoneLinkingLowerHUD, zoneLocEditingLowerHUD;
 
 	public override void Cleanup() {
 		if (World.instance.zoneLinkerScript.enabled) {
 			World.instance.zoneLinkerScript.DoneLinking();
+		}
+		if (World.instance.zoneMoverScript.enabled) {
+			World.instance.zoneMoverScript.DoneMoving();
 		}
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();

@@ -14,6 +14,8 @@ public class World : MonoBehaviour {
 
     public ZonePlacer zonePlacerScript;
 
+	public ZoneMover zoneMoverScript;
+
 	public ZoneLinker zoneLinkerScript;
 
 	public ZoneGrowOnHover zoneGrowScript;
@@ -71,9 +73,7 @@ public class World : MonoBehaviour {
 	/// destroys (pools) all zone links
 	/// </summary>
 	public static void CleanZoneLinks() {
-		foreach(LinkLine line in instance.linkLines) {
-			LinkLineRecycler.instance.PoolObj(line);
-		}
+		LinkLineRecycler.instance.cycler.PoolAllObjs();
 
 		instance.linkLines.Clear();
 	}
@@ -102,6 +102,10 @@ public class World : MonoBehaviour {
 
 	public static void BeginCustomZonePlacement(UnityAction actionOnConfirmPlacement) {
 		instance.zonePlacerScript.StartCustomPlacement(actionOnConfirmPlacement);
+	}
+
+	public static void BeginZoneMoving() {
+		instance.zoneMoverScript.StartSelectionProcedure();
 	}
 
 	public static void BeginZoneLinking(UnityAction actionOnDoneLinking) {
@@ -275,7 +279,7 @@ public class World : MonoBehaviour {
 	/// <param name="alsoUpdateTheirLinkedList"></param>
 	public static void RemoveZoneLink(Zone z1, Zone z2, bool alsoUpdateTheirLinkedList = false) {
 		LinkLine theLink = GetLinkLineBetween(z1, z2);
-		LinkLineRecycler.instance.PoolObj(theLink);
+		LinkLineRecycler.instance.cycler.PoolObj(theLink.gameObject);
 		instance.linkLines.Remove(theLink);
 		if (alsoUpdateTheirLinkedList) {
 			z1.linkedZones.Remove(z2.ID);
@@ -333,7 +337,7 @@ public class World : MonoBehaviour {
 	}
 
 	public static void RemoveCmder3d(Cmder3d target3d) {
-		Cmder3dRecycler.instance.PoolObj(target3d);
+		Cmder3dRecycler.instance.cycler.PoolObj(target3d.gameObject);
 		instance.spawnedCmders.Remove(target3d);
 		target3d.transform.localScale = Vector3.one;
 	}

@@ -14,6 +14,8 @@ public class CameraPanner : MonoBehaviour {
 	private float elapsedTweenTime, tweenDuration;
 	private bool tweening = false;
 
+	public const float DIST_TO_GROUND = 10.0f;
+
 	private void Awake() {
 		instance = this;	
 	}
@@ -21,6 +23,7 @@ public class CameraPanner : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         theGround = World.instance.ground;
+		transform.position = Vector3.up * DIST_TO_GROUND;
 	}
 	
 	// Update is called once per frame

@@ -27,4 +27,11 @@ public class ZonesPanel : ListContainerPanel<Zone> {
 		templateUI.SetDisplayedLowerHUD(templateUI.zoneLinkingLowerHUD);
 		World.BeginZoneLinking(null);
 	}
+
+	public void EditZoneLocations() {
+		gameObject.SetActive(false);
+		TemplateModeUI templateUI = GameInterface.instance.templateModeUI as TemplateModeUI;
+		templateUI.SetDisplayedLowerHUD(templateUI.zoneLocEditingLowerHUD);
+		World.BeginZoneMoving();
+	}
 }

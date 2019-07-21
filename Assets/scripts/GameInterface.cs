@@ -89,6 +89,17 @@ public class GameInterface : MonoBehaviour {
 		obj.SetActive(false);
 	}
 
+	/// <summary>
+	/// shows the obj if it's hidden and vice-versa
+	/// </summary>
+	/// <param name="obj"></param>
+	public void SwitchObjectDisplay(GameObject obj) {
+		if (obj.activeSelf) {
+			HideObject(obj);
+		}
+		else ShowObject(obj);
+	}
+
 	public void EditFaction(Faction targetFaction, bool isNewEntry) {
 		editFactionPanel.Open(targetFaction, isNewEntry);
 	}

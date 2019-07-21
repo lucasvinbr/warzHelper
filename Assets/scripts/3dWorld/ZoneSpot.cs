@@ -15,12 +15,37 @@ public class ZoneSpot : TroopContainer3d {
 
 	public const int NUM_CMDERS_BEFORE_PILE = 8;
 
+	private GameObject _highlight;
+
+	/// <summary>
+	/// creates, removes or checks if the zone has a child highlight
+	/// </summary>
+	public bool Highlighted
+	{
+		get
+		{
+			return _highlight;
+		}
+		set
+		{
+			if (value) {
+				if (!_highlight) {
+					_highlight = WorldVisualFeedbacks.instance.zoneHighlightCycler.PlaceObjAt(transform);
+				}
+			}else {
+				if (_highlight) {
+					WorldVisualFeedbacks.instance.zoneHighlightCycler.PoolObj(_highlight);
+					_highlight = null;
+				}
+			}
+		}
+	}
 
     void OnDestroy()
     {
         if (myLabel)
         {
-            FollowerTextCanvasRecycler.instance.PoolObj(myLabel);
+            FollowerTextCanvasRecycler.instance.cycler.PoolObj(myLabel.gameObject);
         }
     }
 
@@ -32,7 +57,8 @@ public class ZoneSpot : TroopContainer3d {
 	}
 
 	/// <summary>
-	/// refreshes label text and the spot's 3d representation color
+	/// refreshes label text and the spot's 3d representation color.
+	/// Does not update position-related stuff or links!
 	/// </summary>
     public override void RefreshDataDisplay()
     {
@@ -49,6 +75,21 @@ public class ZoneSpot : TroopContainer3d {
 			gameObject.name = zoneName;
         }
     }
+
+	/// <summary>
+	/// visually updates things that rely on the zone's position, like merc caravans and links
+	/// </summary>
+	public void RefreshPositionRelatedStuff() {
+		Zone thisZone = data as Zone;
+
+		MercCaravan localCaravan = GameController.GetMercCaravanInZone(thisZone.ID);
+		if (localCaravan != null) localCaravan.MeIn3d.InstantlyUpdatePosition();
+
+		foreach (int zoneID in thisZone.linkedZones) {
+			Zone linkedZone = GameController.GetZoneByID(zoneID);
+			World.GetLinkLineBetween(data, linkedZone).UpdatePositions();
+		}
+	}
 
 	/// <summary>
 	/// uses the number of cmders in this zone to find a new spot for a cmder

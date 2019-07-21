@@ -13,8 +13,6 @@ public class ZoneLinker : MonoBehaviour {
 
 	public ZoneSpot curSelectedSpot;
 
-	public Transform zoneHighlight;
-
     void Start()
     {
         cam = Camera.main;
@@ -49,16 +47,16 @@ public class ZoneLinker : MonoBehaviour {
 				if (!curSelectedSpot) {
 					//select zone if no zone was already selected
 					curSelectedSpot = hitSpotScript;
-					zoneHighlight.gameObject.SetActive(true);
-					zoneHighlight.transform.position = curSelectedSpot.transform.position;
+					hitSpotScript.Highlighted = true;
 				}
 				else {
 					//link/unlink to selected if one was already selected
 					//...or deselect, if it's the selected zone
 					if(curSelectedSpot == hitSpotScript) {
 						curSelectedSpot = null;
-						zoneHighlight.gameObject.SetActive(false);
-					}else {
+						hitSpotScript.Highlighted = false;
+					}
+					else {
 						if(World.GetLinkLineBetween(curSelectedSpot.data, hitSpotScript.data)) {
 							World.RemoveZoneLink(curSelectedSpot.data as Zone, hitSpotScript.data as Zone, true);
 						}else {
@@ -69,15 +67,15 @@ public class ZoneLinker : MonoBehaviour {
 			}
 			else {
 				//deselect
+				if(curSelectedSpot) curSelectedSpot.Highlighted = false;
 				curSelectedSpot = null;
-				zoneHighlight.gameObject.SetActive(false);
 			}
 		}
     }
 
 	private void OnDisable() {
+		if (curSelectedSpot) curSelectedSpot.Highlighted = false;
 		curSelectedSpot = null;
-		zoneHighlight.gameObject.SetActive(false);
 		actionOnDoneLinking = null;
 	}
 
