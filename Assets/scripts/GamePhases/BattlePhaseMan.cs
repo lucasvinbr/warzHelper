@@ -90,5 +90,10 @@ public class BattlePhaseMan : GamePhaseManager {
 		battlePanel.FullInterrupt();
 	}
 
+	public override void OnPhaseEnded() {
+		base.OnPhaseEnded();
+		infoTxt.text = string.Empty;
+	}
+
 
 }

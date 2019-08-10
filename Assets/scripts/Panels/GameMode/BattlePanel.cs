@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
+using System.Runtime.Serialization.Json;
 
 /// <summary>
 /// the battle panel!
@@ -312,7 +313,41 @@ public class BattlePanel : GrowingOverlayPanel {
 		GameInterface GI = GameInterface.instance;
 
 
-		//TODO some import options
+		importOptions.Add(new KeyValuePair<string, UnityAction>("JSON Array - Don't use if attackers and defenders share troop types", ()=> {
+			GI.textInputPanel.SetPanelInfo("JSON Text to Import", "insert the JSON string here", "", "Import", () => {
+
+				SerializedTroop[] readTroops = JsonHandlingUtils.JsonToSerializedTroopArray
+					(GI.textInputPanel.theInputField.text);
+				if(readTroops == null) {
+					ModalPanel.Instance().OkBox("Json Import Failed", "Please check your JSON string, it must be something like [{'name':'troop', 'amount':5}]");
+					return;
+				}
+
+				List<TroopNumberPair> attackersRemaining = new List<TroopNumberPair>(),
+					defendersRemaining = new List<TroopNumberPair>();
+
+				foreach(SerializedTroop tnp in readTroops) {
+					//Debug.Log("got this kvp: " + tnp.name + " : " + tnp.amount);
+
+					TroopNumberPair convertedTNP = JsonHandlingUtils.SerializedTroopToTroopNumberPair(tnp);
+					if(convertedTNP.troopAmount > 0) {
+						if(GameController.IndexOfTroopInTroopList(defenderSide.sideArmy, convertedTNP.troopTypeID) != -1) {
+							defendersRemaining.Add(convertedTNP);
+						}else if (GameController.IndexOfTroopInTroopList(attackerSide.sideArmy, convertedTNP.troopTypeID) != -1) {
+							attackersRemaining.Add(convertedTNP);
+						}
+					}
+				}
+
+				defenderSide.SetPostBattleArmyData_RemainingArmy(defendersRemaining);
+				attackerSide.SetPostBattleArmyData_RemainingArmy(attackersRemaining);
+
+				GI.textInputPanel.Close();
+
+			});
+			GI.textInputPanel.Open();
+			GI.exportOpsPanel.gameObject.SetActive(false);
+		}));
 
 
 		//when done preparing options, open the import ops panel

@@ -142,14 +142,24 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 	/// <param name="remainingArmy"></param>
 	public void SetPostBattleArmyData_RemainingArmy(List<TroopNumberPair> remainingArmy, bool depleteBarRoutine = true) {
 		float lossPercent = 0;
-		int initialTroopAmount = 0;
+		int newTroopAmount = 0;
 		int pointsLost = 0;
-		foreach(TroopNumberPair tnp in remainingArmy) {
-			initialTroopAmount = sideArmy[GameController.IndexOfTroopInTroopList
-				(sideArmy, tnp.troopTypeID)].troopAmount;
-			lossPercent = 1.0f - ((float) tnp.troopAmount / initialTroopAmount);
-			pointsLost += RemoveTroopByPercentageInAllConts(tnp.troopTypeID, initialTroopAmount,
-				lossPercent, tnp.troopAmount);
+		int troopIndexInRemainingArmy = -1;
+		foreach(TroopNumberPair tnp in sideArmy) {
+			troopIndexInRemainingArmy = GameController.IndexOfTroopInTroopList(remainingArmy, tnp.troopTypeID);
+			if(troopIndexInRemainingArmy != -1) {
+				newTroopAmount = remainingArmy[troopIndexInRemainingArmy].troopAmount;
+				lossPercent = 1.0f - ((float)newTroopAmount / tnp.troopAmount);
+				pointsLost += RemoveTroopByPercentageInAllConts(tnp.troopTypeID, tnp.troopAmount,
+					lossPercent, newTroopAmount);
+			}
+			else {
+				//if we can't find the type in the remaining army, we've lost all of them
+				lossPercent = 1.0f;
+				pointsLost += RemoveTroopByPercentageInAllConts(tnp.troopTypeID, tnp.troopAmount,
+					lossPercent, 0);
+			}
+			
 		}
 
 		pointsAwardedToVictor += Mathf.RoundToInt(pointsLost *

@@ -10,6 +10,7 @@ public class AiPlayer {
 	/// decisions?
 	/// </summary>
 	public const float MIN_NEARBY_TROOPS_INFLUENCE = 0.12f, MAX_NEARBY_TROOPS_INFLUENCE = 0.35f;
+
 	/// <summary>
 	/// how big should the "move to zone" score be before we actually decide to move?
 	/// </summary>
@@ -41,6 +42,10 @@ public class AiPlayer {
 	/// </summary>
 	public const float SHOULD_GET_MORE_CMDERS_THRESHOLD = 0.75f;
 
+	/// <summary>
+	/// the AI will avoid traveling to further locations if at least one of the nearby zones reaches this score
+	/// </summary>
+	public const float SHOULD_GO_DEFENSIVE_THRESHOLD = 0.2f;
 
 	/// <summary>
 	/// how much should a zone's danger score be taken into account
@@ -142,7 +147,7 @@ public class AiPlayer {
 				}
 			}
 
-			if (topMoveScore <= 0.0f) {
+			if (topMoveScore <= SHOULD_GO_DEFENSIVE_THRESHOLD) {
 				//we're "safe-landlocked"!
 				//we should find a path to danger then
 				if (fallbackMoveDestZone == null) {

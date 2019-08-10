@@ -187,10 +187,10 @@ public class Faction
 	/// <param name="addition"></param>
 	/// <returns></returns>
 	public float AddRelationWith(Faction targetFac, float addition, bool preventAutoAlly = false,
-		bool notifyRelationChange = false) {
+		bool notifyRelationChange = false, bool notifyStandingChange = false) {
 		return GameController.CurGameData.
 			factionRelations.AddRelationBetweenFactions
-				(ID, targetFac.ID, addition, preventAutoAlly, notifyRelationChange, notifyRelationChange);
+				(ID, targetFac.ID, addition, preventAutoAlly, notifyStandingChange, notifyRelationChange);
 	}
 
 	/// <summary>
@@ -201,10 +201,10 @@ public class Faction
 	/// <param name="addition"></param>
 	/// <returns></returns>
 	public float AddRelationWith(int targetFacID, float addition, bool preventAutoAlly = false,
-		bool notifyRelationChange = false) {
+		bool notifyRelationChange = false, bool notifyStandingChange = false) {
 		return GameController.CurGameData.
 			factionRelations.AddRelationBetweenFactions
-				(ID, targetFacID, addition, preventAutoAlly, notifyRelationChange, notifyRelationChange);
+				(ID, targetFacID, addition, preventAutoAlly, notifyStandingChange, notifyRelationChange);
 	}
 
 	/// <summary>
@@ -215,10 +215,10 @@ public class Faction
 	/// <param name="addition"></param>
 	/// <returns></returns>
 	public void AddRelationWith(List<int> targetFacsIDs, float addition, bool preventAutoAlly = false,
-		bool notifyRelationChange = false) {
+		bool notifyRelationChange = false, bool notifyStandingChange = false) {
 		GameController.CurGameData.
 			factionRelations.AddRelationBetweenFactions
-				(ID, targetFacsIDs, addition, preventAutoAlly, notifyRelationChange, notifyRelationChange);
+				(ID, targetFacsIDs, addition, preventAutoAlly, notifyStandingChange, notifyRelationChange);
 	}
 
 	public static int SortByTurnPriority(Faction x, Faction y) {

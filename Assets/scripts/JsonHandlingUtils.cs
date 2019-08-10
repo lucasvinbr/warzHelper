@@ -1,5 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using UnityEngine;
 
 public class JsonHandlingUtils
@@ -37,10 +42,37 @@ public class JsonHandlingUtils
 		return sTroops;
 	}
 
+	public static TroopNumberPair SerializedTroopToTroopNumberPair(SerializedTroop serialized) {
+		TroopType foundType = GameController.GetTroopTypeByName(serialized.name);
+
+		if(foundType != null) {
+			return new TroopNumberPair(foundType.ID, serialized.amount);
+		}
+
+		return default(TroopNumberPair);
+	}
+
 	public static string ToJsonWithExtraVariable(object targetObj, string extraVarName, string extraVarValue) {
 		string returnedJson = JsonUtility.ToJson(targetObj);
 		returnedJson = returnedJson.Insert(returnedJson.Length - 1, string.Concat(",\"", extraVarName, "\":", extraVarValue));
 		return returnedJson;
+	}
+
+	public static SerializedTroop[] JsonToSerializedTroopArray(string jsonString) {
+
+		try {
+			DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(SerializedTroop[]));
+
+			MemoryStream jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonString));
+
+			SerializedTroop[] readArray = (SerializedTroop[])serializer.ReadObject(jsonStream);
+
+			return readArray;
+
+		}catch(Exception e) {
+			Debug.LogWarning("[JSON to SerializedTroop array] json read failed: " + e.Message);
+			return null;
+		}
 	}
 
 
@@ -62,7 +94,10 @@ public class SerializableTroopListObj {
 
 [System.Serializable]
 public class SerializedTroop {
+	[DataMember]
 	public string name;
+
+	[DataMember]
 	public int amount;
 
 	public SerializedTroop(string name, int amount) {

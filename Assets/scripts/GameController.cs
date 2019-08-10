@@ -627,6 +627,7 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	/// <param name="targetZone"></param>
 	/// <param name="targetFac"></param>
+	/// <param name="onlyCommanderArmies"></param>
 	/// <returns></returns>
 	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFactionAndAllies(Zone targetZone,
 		Faction targetFac, bool onlyCommanderArmies = false) {
@@ -634,6 +635,14 @@ public class GameController : MonoBehaviour {
 			(targetZone, targetFac != null ? targetFac.ID : -1, onlyCommanderArmies);
 	}
 
+	/// <summary>
+	/// returns the combined troops of all forces from the target faction AND its allies in the zone,
+	/// both from the zone's garrison and from any commanders in the zone
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFacID"></param>
+	/// <param name="onlyCommanderArmies"></param>
+	/// <returns></returns>
 	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFactionAndAllies(Zone targetZone,
 		int targetFacID, bool onlyCommanderArmies = false) {
 		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
@@ -643,6 +652,35 @@ public class GameController : MonoBehaviour {
 
 		foreach (Commander cmder in GetCommandersOfFactionAndAlliesInZone(targetZone, targetFacID)) {
 			returnedList = cmder.GetCombinedTroops(returnedList);
+		}
+
+		return returnedList;
+	}
+
+	/// <summary>
+	/// returns the combined troops of all forces from the target faction AND its allies in the zone,
+	/// both from the zone's garrison and from any commanders in the zone,
+	/// excluding factions that also are allies from the specified enemy faction
+	/// (we don't get those that wouldn't take sides in a fight between targetFac and enemyFac)
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFacID"></param>
+	/// <param name="enemyFacID"></param>
+	/// <param name="onlyCommanderArmies"></param>
+	/// <returns></returns>
+	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFactionAndAllies(Zone targetZone,
+		int targetFacID, int enemyFacID, bool onlyCommanderArmies = false) {
+		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
+		if (targetZone.ownerFaction == targetFacID && !onlyCommanderArmies) {
+			returnedList.AddRange(targetZone.troopsContained);
+		}
+
+
+		GameFactionRelations relMan = CurGameData.factionRelations;
+		foreach (Commander cmder in GetCommandersOfFactionAndAlliesInZone(targetZone, targetFacID)) {
+			if(relMan.GetStandingBetweenFactions(cmder.ownerFaction, enemyFacID) != GameFactionRelations.FactionStanding.ally) {
+				returnedList = cmder.GetCombinedTroops(returnedList);
+			}
 		}
 
 		return returnedList;

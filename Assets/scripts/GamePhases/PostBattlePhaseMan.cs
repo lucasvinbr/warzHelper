@@ -67,6 +67,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 		List<Commander> cmdersInZone = GameController.GetCommandersInZone(confZone);
 		
 		Faction cmderFac = null, ownerFac = GameController.GetFactionByID(confZone.ownerFaction);
+
 		bool zoneWasTaken = false, 
 			zoneStillHasDefenders = GameController.GetTotalTroopAmountFromTroopList(
 				GameController.GetCombinedTroopsInZoneFromFactionAndAllies
@@ -82,16 +83,33 @@ public class PostBattlePhaseMan : GamePhaseManager {
 				}
 			}else {
 				//allies won't take the zone for themselves even if the zone ends up with 0 garrison
+				//...but if an ally of theirs is an enemy to the owner, they won't take a side
 				cmderFac = GameController.GetFactionByID(c.ownerFaction);
 				if (cmderFac.GetStandingWith(ownerFac) != GameFactionRelations.FactionStanding.ally &&
-					!zoneWasTaken && !zoneStillHasDefenders) {
+					!zoneWasTaken) {
+					//just take the zone if it's neutral, no more checks needed
+					if(ownerFac == null) {
+						confZone.ownerFaction = c.ownerFaction;
+						//clear the points to avoid "insta-max-garrison"
+						//when taking a zone that was piling points up
+						confZone.pointsToSpend = 0;
+						confZone.MyZoneSpot.RefreshDataDisplay();
+						zoneWasTaken = true;
+					}else {
+						//the check made for zoneStillHasDefenders is not enough in the
+						//"ally is also ally of my enemy" case
+						if (GameController.GetTotalTroopAmountFromTroopList(
+							GameController.GetCombinedTroopsInZoneFromFactionAndAllies
+							(confZone, ownerFac.ID, cmderFac.ID)) == 0) {
 
-					confZone.ownerFaction = c.ownerFaction;
-					//clear the points to avoid "insta-max-garrison"
-					//when taking a zone that was piling points up
-					confZone.pointsToSpend = 0; 
-					confZone.MyZoneSpot.RefreshDataDisplay();
-					zoneWasTaken = true;
+							confZone.ownerFaction = c.ownerFaction;
+							confZone.pointsToSpend = 0;
+							confZone.MyZoneSpot.RefreshDataDisplay();
+							zoneWasTaken = true;
+						}
+					}
+					
+					
 				}
 			}
 		}
@@ -159,5 +177,10 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 		commandersBeingDeleted.Remove(cmder);
 		GameController.RemoveCommander(cmder);
+	}
+
+	public override void OnPhaseEnded() {
+		base.OnPhaseEnded();
+		infoTxt.text = string.Empty;
 	}
 }
