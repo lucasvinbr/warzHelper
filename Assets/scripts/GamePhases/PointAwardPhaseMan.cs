@@ -10,15 +10,17 @@ public class PointAwardPhaseMan : GamePhaseManager {
 	public override void OnPhaseStart() {
 		base.OnPhaseStart();
 		//add points to all zones and cmders of the playing faction
+		//if in unified mode, this phase is skipped for all factions except the first one in turn order, in which everyone gets points
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
-		List<Commander> factionCmders = playerFac.OwnedCommanders;
-		List<Zone> factionZones = playerFac.OwnedZones;
+		GameInfo curGameData = GameController.CurGameData;
+		List<Commander> awardedCmders = curGameData.unifyBattlePhase ? curGameData.deployedCommanders : playerFac.OwnedCommanders;
+		List<Zone> awardedZones = curGameData.unifyBattlePhase ? curGameData.zones : playerFac.OwnedZones;
 		infoTxt.text = "Awarding points to each zone and commander; zones will auto-use them";
-		foreach(Commander cmd in factionCmders) {
+		foreach(Commander cmd in awardedCmders) {
 			cmd.GetPointAwardPoints();
 		}
 
-		foreach (Zone z in factionZones) {
+		foreach (Zone z in awardedZones) {
 			z.GetPointAwardPoints();
 			z.SpendPoints(true); //zones that actually do something with their points will emit some effects
 		}

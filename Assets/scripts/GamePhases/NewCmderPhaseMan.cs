@@ -65,4 +65,43 @@ public class NewCmderPhaseMan : GamePhaseManager {
 		World.instance.cmderPlacerScript.enabled = false;
 	}
 
+
+	/// <summary>
+	/// places the new commander right away or waits for the "unified action turn" to do it
+	/// </summary>
+	/// <param name="targetZoneID"></param>
+	/// <param name="targetFac"></param>
+	/// <returns></returns>
+	public static bool OrderPlaceNewCmder(int targetZoneID, Faction targetFac) {
+		Zone targetZone = GameController.GetZoneByID(targetZoneID);
+
+		if (targetZone == null) {
+			return false;
+		}
+
+		return OrderPlaceNewCmder(targetZone, targetFac);
+	}
+
+	/// <summary>
+	/// places the new commander right away or waits for the "unified action turn" to do it
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFac"></param>
+	/// <returns></returns>
+	public static bool OrderPlaceNewCmder(Zone targetZone, Faction targetFac) {
+
+		if (GameController.CurGameData.unifyBattlePhase) {
+			if (targetZone.ownerFaction == targetFac.ID) {
+				GameController.CurGameData.unifiedOrdersRegistry.RegisterOrder
+					(RegisteredCmderOrder.OrderType.createCmder, targetFac.ID, targetZone.ID, targetFac.isPlayer);
+				return true;
+			}
+			else return false;
+
+		}
+		else {
+			World.CreateNewCmderAtZone(targetZone, targetFac);
+			return true;
+		}
+	}
 }

@@ -82,6 +82,7 @@ public class GameFactionRelations
 	public float GetRelationBetweenFactions(int facID1, int facID2) {
 		if(facID1 == facID2) {
 			Debug.LogWarning("(FactionRelations) Attempted to get relation between faction and itself (probably wasn't meant to happen)");
+			return 1;
 		}
 		foreach (FactionRelation rel in relations) {
 			if (rel.relatedFacs[0] == facID1 || rel.relatedFacs[1] == facID1) {
@@ -95,15 +96,9 @@ public class GameFactionRelations
 	}
 
 	public FactionStanding GetStandingBetweenFactions(int facID1, int facID2) {
-		foreach (FactionRelation rel in relations) {
-			if (rel.relatedFacs[0] == facID1 || rel.relatedFacs[1] == facID1) {
-				if (rel.relatedFacs[0] == facID2 || rel.relatedFacs[1] == facID2) {
-					return RelationValueToStanding(rel.relationValue);
-				}
-			}
-		}
+		if (facID1 == facID2) return FactionStanding.ally;
 
-		return FactionStanding.neutral;
+		return RelationValueToStanding(GetRelationBetweenFactions(facID1, facID2));
 	}
 
 	public float AddRelationBetweenFactions(int facID1, int facID2, float addition,

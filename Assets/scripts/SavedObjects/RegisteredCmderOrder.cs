@@ -9,21 +9,20 @@ using UnityEngine;
 /// </summary>
 [System.Serializable]
 public class RegisteredCmderOrder {
-	public int orderedCmderID;
 
 	/// <summary>
-	/// if this order is of the "move" type,
-	/// the ID of the zone we should move to
+	/// the ID of the ordered Cmder or Faction (it's a faction if it's a "create cmder" order)
 	/// </summary>
-	public int zoneTarget;
+	public int orderedActorID;
 
 	/// <summary>
-	/// the points that will be used in this order.
-	/// Usually equal to how many points the commander had available when this order was issued
+	/// if this order is of the "move" or "create cmder" type,
+	/// the ID of the zone we should act on
 	/// </summary>
-	public int pointsInvested;
+	public int zoneTargetID;
 
 	public enum OrderType {
+		createCmder,
 		move,
 		train,
 		recruit
@@ -34,24 +33,45 @@ public class RegisteredCmderOrder {
 
 	public RegisteredCmderOrder() { }
 
-	public RegisteredCmderOrder(int orderedCmderID, OrderType orderType, int pointsInvested = 0, int zoneTarget = -1) {
-		this.orderedCmderID = orderedCmderID;
+	public RegisteredCmderOrder( OrderType orderType, int orderedCmderID = -1, int zoneTargetID = -1) {
+		this.orderedActorID = orderedCmderID;
 		this.orderType = orderType;
-		this.pointsInvested = pointsInvested;
-		this.zoneTarget = zoneTarget;
+		this.zoneTargetID = zoneTargetID;
 	}
 
+	/// <summary>
+	/// executes the order, but doesn't remove it from the registry
+	/// </summary>
+	/// <returns></returns>
 	public bool ExecuteOrder() {
-		Commander targetCmder = GameController.GetCmderByID(orderedCmderID);
+		Commander targetCmder = null; //if we're creating a cmder, we'll only get it later on
 
-		if(targetCmder == null) {
-			Debug.LogError("[RegisteredCmderOrder] Target Cmder Not Found! Cmder ID: " + orderedCmderID);
-			return false;
+		if (orderedActorID >= 0 && orderType != OrderType.createCmder) {
+			targetCmder = GameController.GetCmderByID(orderedActorID);
+
+			if (targetCmder == null) {
+				Debug.LogError("[RegisteredCmderOrder] Target Cmder Not Found! Cmder ID: " + orderedActorID);
+				return false;
+			}
 		}
-		//switch (orderType) {
-		//	case OrderType.move:
 
-		//}TODO actual order executions and stuff, considering the stored order data
+		switch (orderType) {
+			case OrderType.recruit:
+				return targetCmder.RecruitTroops();
+			case OrderType.train:
+				return targetCmder.TrainTroops();
+			case OrderType.move:
+				return targetCmder.MoveToZone(zoneTargetID);
+			case OrderType.createCmder:
+				Faction ownerFac = GameController.GetFactionByID(orderedActorID);
+				if (ownerFac == null) return false;
+
+				targetCmder = World.CreateNewCmderAtZone(zoneTargetID, ownerFac);
+				if (targetCmder == null) return false;
+				//create and recruit troops immediately
+				targetCmder.GetPointAwardPoints();
+				return targetCmder.RecruitTroops();
+		}
 
 		return false;
 	}

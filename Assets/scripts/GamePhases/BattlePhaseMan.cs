@@ -17,6 +17,7 @@ public class BattlePhaseMan : GamePhaseManager {
 		//find battles, register them and open a resolution menu for each one
 		infoTxt.text = "Resolution of any battles started in the Command Phase";
 		GameInfo curGameData = GameController.CurGameData;
+		//in unified mode, this phase should run only once, during the last faction's turn in turn order
 		List<Commander> potentialFighterCmders = curGameData.unifyBattlePhase ?
 			curGameData.deployedCommanders : GameModeHandler.instance.curPlayingFaction.OwnedCommanders;
 

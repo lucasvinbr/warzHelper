@@ -38,7 +38,7 @@ public class CommandPhaseMan : GamePhaseManager {
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
 		foreach(Commander cmder in factionCmders) {
 			if(cmder.troopsContained.Count == 0 && cmder.pointsToSpend > 0) {
-				cmder.RecruitTroops(); //if we don't recruit, we would just disappear at the end of the turn
+				cmder.OrderRecruitTroops(); //if we don't recruit, we would just disappear at the end of the turn
 			}else {
 				commandableCommanders.Add(cmder);
 			}
@@ -207,7 +207,7 @@ public class CommandPhaseMan : GamePhaseManager {
 			foreach (Commander cmd in GameController.GetCommandersOfFactionInZone
 				(GameController.GetZoneByID(worldCommandScript.curSelectedCmder.zoneIAmIn),
 				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
-				if (cmd.RecruitTroops()) {
+				if (cmd.OrderRecruitTroops()) {
 					actedCmders.Add(cmd);
 				}
 			}
@@ -220,7 +220,7 @@ public class CommandPhaseMan : GamePhaseManager {
 		}
 		else {
 			Commander curCmder = worldCommandScript.curSelectedCmder;
-			if (curCmder.RecruitTroops()) {
+			if (curCmder.OrderRecruitTroops()) {
 				CmderHasActed(curCmder);
 			}
 			else {
@@ -238,7 +238,7 @@ public class CommandPhaseMan : GamePhaseManager {
 			foreach (Commander cmd in GameController.GetCommandersOfFactionInZone
 				(GameController.GetZoneByID(worldCommandScript.curSelectedCmder.zoneIAmIn),
 				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
-				if (cmd.TrainTroops()) {
+				if (cmd.OrderTrainTroops()) {
 					actedCmders.Add(cmd);
 				}
 			}
@@ -251,7 +251,7 @@ public class CommandPhaseMan : GamePhaseManager {
 		}
 		else {
 			Commander curCmder = worldCommandScript.curSelectedCmder;
-			if (curCmder.TrainTroops()) {
+			if (curCmder.OrderTrainTroops()) {
 				CmderHasActed(curCmder);
 			}
 			else {
@@ -290,28 +290,25 @@ public class CommandPhaseMan : GamePhaseManager {
 	public void MoveCommander(Commander movingCmder, ZoneSpot destinationSpot, bool runHasActed = true) {
 		Zone ourOldZone = GameController.GetZoneByID(movingCmder.zoneIAmIn);
 
+		int targetZoneID = (destinationSpot.data as Zone).ID;
+
 		if (isMultiOrdering && runHasActed) {
 			List<Commander> actedCmders = new List<Commander>();
+
 
 			foreach (Commander cmd in GameController.GetCommandersOfFactionInZone
 				(ourOldZone,
 				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
-				cmd.zoneIAmIn = (destinationSpot.data as Zone).ID;
-				cmd.pointsToSpend = 0;
-				TransformTweener.instance.StartTween(cmd.MeIn3d.transform, destinationSpot, true);
+				cmd.OrderMoveToZone(targetZoneID);
 				actedCmders.Add(cmd);
 			}
 
-			World.TidyZone(ourOldZone);
+			//World.TidyZone(ourOldZone); not sure if this is still needed
 
 			CmderBatchHasActed(actedCmders);
 		}
 		else {
-			movingCmder.zoneIAmIn = (destinationSpot.data as Zone).ID;
-			movingCmder.pointsToSpend = 0;
-			//reset other cmders' positions after departing
-			World.TidyZone(ourOldZone);
-			TransformTweener.instance.StartTween(movingCmder.MeIn3d.transform, destinationSpot, true);
+			movingCmder.OrderMoveToZone(targetZoneID);
 			if (runHasActed) CmderHasActed(movingCmder);
 		}
 		

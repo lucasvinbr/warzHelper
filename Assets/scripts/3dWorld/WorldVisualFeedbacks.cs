@@ -6,13 +6,17 @@ public class WorldVisualFeedbacks : MonoBehaviour
 {
 	public static WorldVisualFeedbacks instance;
 
-	public SimplePrefabRecycler recruitFBCycler, trainingFBCycler, zoneHighlightCycler;
+	public SimplePrefabRecycler recruitFBCycler, trainingFBCycler, moveFBCycler, createCmderFBCycler, zoneHighlightCycler;
 
+	public void PoolAllOrderFeedbacks() {
+		recruitFBCycler.PoolAllObjs();
+		trainingFBCycler.PoolAllObjs();
+		moveFBCycler.PoolAllObjs();
+		createCmderFBCycler.PoolAllObjs();
+	}
 
 	private void Awake() {
 		instance = this;
 	}
 
-	//TODO all methods... like "addFeedback(orderType, cmder)", "clearAllFeedbacks()" - this one is useful for the 'action time' that comes after unified turns
-	//pooling for train and recruit feedbacks, linkLineRecycler should take care of the lines (make it handle colors if necessary)
 }

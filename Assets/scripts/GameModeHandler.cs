@@ -44,6 +44,7 @@ public class GameModeHandler : ModeUI {
 	}
 
 	public override void Cleanup() {
+		WorldVisualFeedbacks.instance.PoolAllOrderFeedbacks();
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
 		World.CleanCmders();
@@ -75,10 +76,16 @@ public class GameModeHandler : ModeUI {
 
 		GameInfo data = GameController.CurGameData;
 
-		if(data.factionRelations == null ||
-			data.factionRelations.relations.Count == 0) {
+		if (data.factionRelations == null) {
 			data.factionRelations = new GameFactionRelations();
+		}
+
+		if (data.factionRelations.relations.Count == 0) {
 			data.factionRelations.SetDefaultRelationsBetweenAllFactions();
+		}
+
+		if (data.unifiedOrdersRegistry == null) {
+			data.unifiedOrdersRegistry = new UnifiedOrdersRegistry();
 		}
 
 		//give initial points to zones if this is a new game
@@ -88,7 +95,7 @@ public class GameModeHandler : ModeUI {
 		}
 
 		StartCoroutine(StartTurnAfterPanelsClose(data.curTurnPhase));
-		
+
 	}
 
 	/// <summary>
@@ -98,7 +105,7 @@ public class GameModeHandler : ModeUI {
 	/// <param name="startingPhase"></param>
 	/// <returns></returns>
 	IEnumerator StartTurnAfterPanelsClose(TurnPhase startingPhase) {
-		while(GameInterface.openedPanelsOverlayLevel > 0) {
+		while (GameInterface.openedPanelsOverlayLevel > 0) {
 			yield return null;
 		}
 
@@ -111,7 +118,7 @@ public class GameModeHandler : ModeUI {
 	/// that value is given (and spent) now
 	/// </summary>
 	public void AddInitialPointsToZones() {
-		foreach(Zone z in GameController.instance.curData.zones) {
+		foreach (Zone z in GameController.instance.curData.zones) {
 			z.pointsToSpend = z.pointsGivenAtGameStart;
 			z.SpendPoints(false, true);
 		}
@@ -121,10 +128,10 @@ public class GameModeHandler : ModeUI {
 		//find out which faction turn it is now
 		GameInfo data = GameController.CurGameData;
 		curPlayingFaction = GameController.GetNextFactionInTurnOrder(data.lastTurnPriority);
-		
+
 		if (GameController.ShouldFactionGetATurn(curPlayingFaction)) {
 			currentTurnIsFast = (!curPlayingFaction.isPlayer && data.fastAiTurns);
-			if(!currentTurnIsFast)
+			if (!currentTurnIsFast)
 				bigAnnouncer.DoAnnouncement(curPlayingFaction.name + "\nTurn", curPlayingFaction.color);
 			whoseTurnTxt.text = curPlayingFaction.name;
 			whoseTurnTxt.color = curPlayingFaction.color;
@@ -132,15 +139,16 @@ public class GameModeHandler : ModeUI {
 			data.curTurnPhase = curPhase;
 			StartRespectivePhaseMan();
 			turnPhasesContentsBox.SetActive(curPlayingFaction.isPlayer);
+			data.unifiedOrdersRegistry.RefreshOrderFeedbacksVisibility();
 		}
-		else{
+		else {
 			data.lastTurnPriority = curPlayingFaction.turnPriority;
 			//kill this faction then!
 			KillFaction(curPlayingFaction);
 			StartNewTurn();
 			//TODO "game should end" checks
 		}
-		
+
 	}
 
 	public void StartRespectivePhaseMan() {
@@ -152,7 +160,7 @@ public class GameModeHandler : ModeUI {
 	/// Interrupts all phases, properly stopping their routines and anything else they had running
 	/// </summary>
 	public void StopAllPhaseMans() {
-		foreach(GamePhaseManager phaseMan in orderedPhaseManagers) {
+		foreach (GamePhaseManager phaseMan in orderedPhaseManagers) {
 			phaseMan.InterruptPhase();
 		}
 	}
@@ -160,8 +168,18 @@ public class GameModeHandler : ModeUI {
 	public void GoToNextTurnPhase() {
 		GameInfo curData = GameController.CurGameData;
 		if (curPhase != TurnPhase.postBattle) {
-			
+
 			curPhase++;
+			if (curPhase == TurnPhase.pointAward) {
+				//if in "unified" mode, skip the point award phase of all factions except the first one (it'll award points to all at once)
+				if (curData.unifyBattlePhase) {
+					if (curPlayingFaction.ID != curData.factions[0].ID) {
+						GoToNextTurnPhase();
+						return;
+					}
+				}
+			}
+
 			if (curPhase == TurnPhase.battle) {
 				//skip this battle and post-battle phases if we're in "unified" mode
 				//and it's not the last faction's turn
@@ -171,11 +189,16 @@ public class GameModeHandler : ModeUI {
 						GoToNextTurnPhase();
 						return;
 					}
+					else {
+						//before the "big battle phase", apply all registered orders!
+						curData.unifiedOrdersRegistry.RunAllOrders();
+					}
 				}
 			}
 			curData.curTurnPhase = curPhase;
 			StartRespectivePhaseMan();
-		}else {
+		}
+		else {
 			//move caravans if it's the "last faction"'s turn end
 			if (curPlayingFaction.ID == curData.factions[curData.factions.Count - 1].ID) {
 				MercCaravansPseudoTurn();
@@ -194,7 +217,7 @@ public class GameModeHandler : ModeUI {
 		//check for a special case:
 		//in "unified mode" last faction in turn order isn't killed right away
 		if (data.unifyBattlePhase && curPlayingFaction.ID == data.factions[data.factions.Count - 1].ID) {
-			if(!GameController.ShouldFactionGetATurn(curPlayingFaction, false)) {
+			if (!GameController.ShouldFactionGetATurn(curPlayingFaction, false)) {
 				KillFaction(curPlayingFaction);
 			}
 		}
@@ -208,7 +231,7 @@ public class GameModeHandler : ModeUI {
 		whoseTurnTxt.text = "MERC CARAVANS";
 		whoseTurnTxt.color = Color.white;
 
-		foreach(MercCaravan mc in GameController.CurGameData.mercCaravans) {
+		foreach (MercCaravan mc in GameController.CurGameData.mercCaravans) {
 			mc.CaravanThinkMove();
 		}
 	}

@@ -30,11 +30,18 @@ public class LinkLine : MonoBehaviour {
 		}
 	}
 
-	public void SetLink(TroopContainer3d c1, TroopContainer3d c2) {
+	public void SetLink(TroopContainer3d c1, TroopContainer3d c2, Color? color = null, float lineWidth = 0.1f) {
 		GuardSetup();
 		
 		linkedContainers[0] = c1;
 		linkedContainers[1] = c2;
+
+		line.startColor = color ?? Color.white;
+		line.endColor = color ?? Color.white;
+
+		line.startWidth = lineWidth;
+		line.endWidth = lineWidth;
+
 		UpdatePositions();
 	}
 
@@ -44,7 +51,7 @@ public class LinkLine : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// true if this link is connected to the target zone
+	/// true if this link is connected to the target container
 	/// </summary>
 	/// <param name="targetCont"></param>
 	/// <returns></returns>

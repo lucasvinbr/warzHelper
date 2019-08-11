@@ -57,6 +57,26 @@ public class Commander : TroopContainer {
 	}
 
 	/// <summary>
+	/// trains right away or registers the order for "action time" if we're playing in unified mode
+	/// </summary>
+	/// <returns></returns>
+	public bool OrderTrainTroops() {
+		if (GameController.CurGameData.unifyBattlePhase) {
+			if (GetPercentOfTroopsUpgradedIfTrained() > 0.0f) {
+				GameController.CurGameData.unifiedOrdersRegistry.RegisterOrder
+					(RegisteredCmderOrder.OrderType.train, ID, addVisualFeedbackNow: GameController.GetFactionByID(ownerFaction).isPlayer);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return TrainTroops();
+		}
+	}
+
+	/// <summary>
 	/// true if at least 1 troop was upgraded
 	/// </summary>
 	/// <returns></returns>
@@ -110,6 +130,26 @@ public class Commander : TroopContainer {
 	}
 
 	/// <summary>
+	/// recruits right away or registers the order for "action time" if we're playing in unified mode
+	/// </summary>
+	/// <returns></returns>
+	public bool OrderRecruitTroops() {
+		if (GameController.CurGameData.unifyBattlePhase) {
+			if (GetPercentOfNewTroopsIfRecruited() > 0.0f) {
+				GameController.CurGameData.unifiedOrdersRegistry.RegisterOrder
+					(RegisteredCmderOrder.OrderType.recruit, ID, addVisualFeedbackNow: GameController.GetFactionByID(ownerFaction).isPlayer);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return RecruitTroops();
+		}
+	}
+
+	/// <summary>
 	/// true if at least 1 troop was successfully recruited
 	/// </summary>
 	/// <returns></returns>
@@ -119,7 +159,7 @@ public class Commander : TroopContainer {
 		if (TotalTroopsContained < MaxTroopsCommanded && curZone.multRecruitmentPoints > 0) {
 			//recruitment!
 
-			TroopType recruitableTroopType = GetTroopTypeRecruitedHere(ownerFac);
+			TroopType recruitableTroopType = GetTroopTypeRecruitedWhereIAm(ownerFac);
 			if (recruitableTroopType == null) return false;
 
 			int troopRecruitmentCostHere =
@@ -143,6 +183,54 @@ public class Commander : TroopContainer {
 		}
 
 		return false;
+	}
+
+	/// <summary>
+	/// moves right now or registers it for the proper "unified action" turn
+	/// </summary>
+	/// <param name="zoneID"></param>
+	/// <returns></returns>
+	public bool OrderMoveToZone(int zoneID) {
+		Zone curZone = GameController.GetZoneByID(zoneIAmIn),
+			targetZone = GameController.GetZoneByID(zoneID);
+
+		if (targetZone == null) {
+			return false;
+		}
+
+		if (GameController.CurGameData.unifyBattlePhase) {
+			if (curZone != null && curZone.linkedZones.Contains(zoneID)) {
+				GameController.CurGameData.unifiedOrdersRegistry.RegisterOrder
+					(RegisteredCmderOrder.OrderType.move, ID, zoneID, GameController.GetFactionByID(ownerFaction).isPlayer);
+				return true;
+			}
+			else return false;
+
+		}
+		else {
+			return MoveToZone(zoneID);
+		}
+	}
+
+	/// <summary>
+	/// spends all points available to move to the 
+	/// </summary>
+	/// <param name="zoneID"></param>
+	/// <returns></returns>
+	public bool MoveToZone(int zoneID) {
+		Zone zoneWeWereIn = GameController.GetZoneByID(zoneIAmIn),
+			targetZone = GameController.GetZoneByID(zoneID);
+
+		//don't move if the destination doesn't exist or if it's no longer linked to where we are
+		if (targetZone == null || !zoneWeWereIn.linkedZones.Contains(zoneID)) return false;
+
+		zoneIAmIn = zoneID;
+		pointsToSpend = 0;
+		//reset other cmders' positions after departing
+		World.TidyZone(zoneWeWereIn);
+		TransformTweener.instance.StartTween(MeIn3d.transform, targetZone.MyZoneSpot, true);
+
+		return true;
 	}
 
 	/// <summary>
@@ -203,7 +291,7 @@ public class Commander : TroopContainer {
 			Faction cmderFac = GameController.GetFactionByID(ownerFaction);
 			int fakePointsToSpend = pointsToSpend;
 
-			TroopType recruitableTroopType = GetTroopTypeRecruitedHere(cmderFac);
+			TroopType recruitableTroopType = GetTroopTypeRecruitedWhereIAm(cmderFac);
 			if (recruitableTroopType == null) return 0.0f;
 
 			int troopRecruitmentCostHere =
@@ -230,8 +318,8 @@ public class Commander : TroopContainer {
 	/// or null, if there is no caravan and our faction has no troop types at all
 	/// </summary>
 	/// <returns></returns>
-	public TroopType GetTroopTypeRecruitedHere(Faction ownerFac = null) {
-		if(ownerFac == null) ownerFac = GameController.GetFactionByID(ownerFaction);
+	public TroopType GetTroopTypeRecruitedWhereIAm(Faction ownerFac = null) {
+		if (ownerFac == null) ownerFac = GameController.GetFactionByID(ownerFaction);
 
 		TroopType recruitableTroopType = null;
 

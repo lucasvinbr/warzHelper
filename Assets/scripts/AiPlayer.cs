@@ -56,7 +56,7 @@ public class AiPlayer {
 	public static void AiNewCmderPhase(Faction curFac, List<Zone> availableZones) {
 		if (availableZones.Count == 1) {
 			//not much thinking needed for the AI in this case
-			World.CreateNewCmderAtZone(availableZones[0], GameModeHandler.instance.curPlayingFaction);
+			NewCmderPhaseMan.OrderPlaceNewCmder(availableZones[0].ID, GameModeHandler.instance.curPlayingFaction);
 			return;
 		}
 
@@ -76,7 +76,7 @@ public class AiPlayer {
 
 		if (!GameModeHandler.instance.currentTurnIsFast)
 			CameraPanner.instance.JumpToSpot(topZone.MyZoneSpot.transform.position);
-		World.CreateNewCmderAtZone(topZone, GameModeHandler.instance.curPlayingFaction);
+		NewCmderPhaseMan.OrderPlaceNewCmder(topZone.ID, GameModeHandler.instance.curPlayingFaction);
 
 	}
 
@@ -169,11 +169,11 @@ public class AiPlayer {
 			//Debug.Log("rec chance: " + recruitChance + " topMove: " + topMoveScore);
 			if (trainChance > GetRandomTrainScoreThreshold() && trainChance > recruitChance &&
 				trainChance > topMoveScore) {
-				hasActed = commandableCmders[i].TrainTroops();
+				hasActed = commandableCmders[i].OrderTrainTroops();
 			}
 
 			if (!hasActed && recruitChance > topMoveScore) {
-				hasActed = commandableCmders[i].RecruitTroops();
+				hasActed = commandableCmders[i].OrderRecruitTroops();
 			}
 
 			if (!hasActed && topMoveScore > GetRandomMoveScoreThreshold()) {
@@ -188,11 +188,11 @@ public class AiPlayer {
 
 			if (!hasActed) {
 				//if we decided to do nothing else, train troops
-				hasActed = commandableCmders[i].TrainTroops();
+				hasActed = commandableCmders[i].OrderTrainTroops();
 
 				//try recruiting again if we can't train!
 				if (!hasActed) {
-					hasActed = commandableCmders[i].RecruitTroops();
+					hasActed = commandableCmders[i].OrderRecruitTroops();
 				}
 
 				//do nothing then

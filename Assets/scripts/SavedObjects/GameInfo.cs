@@ -41,10 +41,13 @@ public class GameInfo : TemplateInfo {
 
 	public GameFactionRelations factionRelations;
 
+	public UnifiedOrdersRegistry unifiedOrdersRegistry;
+
     public GameInfo(string name) : base(name)
     {
 		this.isATemplate = false;
 		factionRelations = new GameFactionRelations();
+		unifiedOrdersRegistry = new UnifiedOrdersRegistry();
 		lastTurnPriority = -1;
     }
 
@@ -57,6 +60,7 @@ public class GameInfo : TemplateInfo {
 		rules = baseData.rules;
 		this.isATemplate = false;
 		factionRelations = new GameFactionRelations();
+		unifiedOrdersRegistry = new UnifiedOrdersRegistry();
 		lastTurnPriority = -1;
 	}
 
@@ -69,6 +73,7 @@ public class GameInfo : TemplateInfo {
 		rules = baseData.rules;
 		this.isATemplate = false;
 		factionRelations = new GameFactionRelations();
+		unifiedOrdersRegistry = new UnifiedOrdersRegistry();
 		lastTurnPriority = -1;
 	}
 

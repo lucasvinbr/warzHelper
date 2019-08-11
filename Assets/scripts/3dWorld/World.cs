@@ -131,7 +131,17 @@ public class World : MonoBehaviour {
         } 
     }
 
-	public static void CreateNewCmderAtZone(Zone targetZone, Faction ownerFac) {
+	public static Commander CreateNewCmderAtZone(int targetZoneID, Faction ownerFac) {
+		Zone targetZone = GameController.GetZoneByID(targetZoneID);
+
+		if(targetZone != null) {
+			return CreateNewCmderAtZone(targetZone, ownerFac);
+		}
+
+		return null;
+	}
+
+	public static Commander CreateNewCmderAtZone(Zone targetZone, Faction ownerFac) {
 		Commander newCmder = new Commander(ownerFac.ID, targetZone.ID);
 		Cmder3d cmd3d = Cmder3dRecycler.GetACmderObj();
 		cmd3d.transform.position = targetZone.MyZoneSpot.
@@ -139,6 +149,8 @@ public class World : MonoBehaviour {
 		cmd3d.data = newCmder;
 		cmd3d.RefreshDataDisplay();
 		instance.spawnedCmders.Add(cmd3d);
+
+		return newCmder;
 	}
 
 	/// <summary>
@@ -240,6 +252,8 @@ public class World : MonoBehaviour {
 	/// won't overlap with those who stay if some switch zones
 	/// </summary>
 	public static void TidyZone(Zone targetZone) {
+		if (targetZone == null) return;
+
 		int resetCmders = 0;
 		//adjust positions for commanders that are visually in our zone already
 		foreach(Commander cmd in GameController.GetCommandersInZone(targetZone, true)) {

@@ -137,6 +137,8 @@ public class Zone : TroopContainer {
 		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
 		int basePoints = GameController.instance.curData.rules.baseZonePointAwardOnTurnStart;
 
+		if (ownerFac == null) return;
+
 		pointsToSpend += Mathf.RoundToInt(basePoints * ownerFac.multZonePointAwardOnTurnStart);
 	}
 
