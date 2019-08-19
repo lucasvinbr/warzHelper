@@ -271,6 +271,7 @@ public class Commander : TroopContainer {
 				}
 			}
 
+			//Debug.Log("GetPercentOfTroopsUpgradedIfTrained = " + ((float)totalTrainableTroops / MaxTroopsCommanded));
 			return (float)totalTrainableTroops / MaxTroopsCommanded;
 		}
 
@@ -306,6 +307,7 @@ public class Commander : TroopContainer {
 					MaxTroopsCommanded - TotalTroopsContained);
 			}
 
+			//Debug.Log("GetPercentOfNewTroopsIfRecruited = " + ((float)recruitableTroopsAmount / MaxTroopsCommanded));
 			return (float)recruitableTroopsAmount / MaxTroopsCommanded;
 		}
 

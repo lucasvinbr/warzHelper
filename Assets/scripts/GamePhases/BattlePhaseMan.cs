@@ -11,12 +11,31 @@ public class BattlePhaseMan : GamePhaseManager {
 
 	public BattlePanel battlePanel;
 
+	public Battle battleData;
+
 	public override void OnPhaseStart() {
 		base.OnPhaseStart();
 		battleZones.Clear();
+
+		if (battleData == null) battleData = new Battle();
+
 		//find battles, register them and open a resolution menu for each one
 		infoTxt.text = "Resolution of any battles started in the Command Phase";
 		GameInfo curGameData = GameController.CurGameData;
+
+		if (curGameData.unifyBattlePhase) {
+			if (GameModeHandler.instance.curPlayingFaction.ID != curGameData.factions[curGameData.factions.Count - 1].ID) {
+				//this phase is skipped if we're in "unified" mode and it's not the last faction's turn
+				OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
+				return;
+			}
+			else {
+				//this is the last faction's turn in the order: it's the "big action phase"!
+				//all scheduled orders are run at the same time and then we check for battles
+				curGameData.unifiedOrdersRegistry.RunAllOrders();
+			}
+		}
+
 		//in unified mode, this phase should run only once, during the last faction's turn in turn order
 		List<Commander> potentialFighterCmders = curGameData.unifyBattlePhase ?
 			curGameData.deployedCommanders : GameModeHandler.instance.curPlayingFaction.OwnedCommanders;
@@ -48,24 +67,65 @@ public class BattlePhaseMan : GamePhaseManager {
 		
 	}
 
-	public void OpenBattleResolutionPanelForZone(Zone targetZone) {
-		Faction attackerFaction = GameModeHandler.instance.curPlayingFaction,
-			defenderFaction = GameController.GetFactionByID(targetZone.ownerFaction);
-		if((GameController.CurGameData).unifyBattlePhase) {
-			foreach(Commander cmder in GameController.GetCommandersInZone(targetZone)) {
-				if(cmder.ownerFaction != defenderFaction.ID &&
-					defenderFaction.GetStandingWith(cmder.ownerFaction) != GameFactionRelations.FactionStanding.ally) {
-					attackerFaction = GameController.GetFactionByID(cmder.ownerFaction);
-					break;
-				}
+
+	/// <summary>
+	/// moves the cam to the target zone and opens the battle resolution panel
+	/// or does autocalc resolution... or both
+	/// </summary>
+	/// <param name="targetZone"></param>
+	public IEnumerator ResolveBattle(Zone targetZone) {
+		Faction	defenderFaction = GameController.GetFactionByID(targetZone.ownerFaction);
+		List<Commander> atkerCmders = new List<Commander>();
+
+		GameInfo curData = GameController.CurGameData;
+
+		foreach(Commander cmder in GameController.GetCommandersInZone(targetZone)) {
+			if(cmder.ownerFaction != defenderFaction.ID &&
+				defenderFaction.GetStandingWith(cmder.ownerFaction) != GameFactionRelations.FactionStanding.ally) {
+				atkerCmders.Add(cmder);
 			}
 		}
 
-		battlePanel.OpenWithFilledInfos(attackerFaction,
-			defenderFaction, targetZone);
+		battleData.FillInfo(atkerCmders, defenderFaction, targetZone);
+
+		//if the "always autocalc AI battles" option is active,
+		//we must check if the player's troops aren't participating
+		//before forcing autocalc resolution
+		if (curData.alwaysAutocalcAiBattles) {
+
+			foreach (TroopContainer tc in battleData.attackerSideInfo.ourContainers) {
+				if (GameController.GetFactionByID(tc.ownerFaction).isPlayer) {
+					yield return FocusOnBattle(targetZone);
+					battlePanel.OpenWithFilledInfo(battleData);
+					yield break;
+				}
+			}
+
+			foreach (TroopContainer tc in battleData.defenderSideInfo.ourContainers) {
+				if (GameController.GetFactionByID(tc.ownerFaction).isPlayer) {
+					yield return FocusOnBattle(targetZone);
+					battlePanel.OpenWithFilledInfo(battleData);
+					yield break;
+				}
+			}
+
+
+			if (curData.showBattleResolutionPanelForAutocalcAiBattles) {
+				yield return FocusOnBattle(targetZone);
+				battlePanel.OpenWithFilledInfo(battleData);
+			}else {
+				//a little waiting to avoid freezing and allowing to pause between battles
+				yield return WaitWhileNoOverlays(0.01f);
+				battleData.AutocalcResolution();
+				OnBattleResolved();
+			}
+			yield break;
+		}
+
+		battlePanel.OpenWithFilledInfo(battleData);
 	}
 
-	public void OnBattleResolved(Zone battleZone) {
+	public void OnBattleResolved() {
 		battleZones.RemoveAt(0);
 		if (battleZones.Count == 0) {
 			infoTxt.text = "No more battles to resolve!";
@@ -76,14 +136,14 @@ public class BattlePhaseMan : GamePhaseManager {
 		}
 	}
 
-	/// <summary>
-	/// jumps to the battle zone and, after a little while, opens the resolution panel for it
-	/// </summary>
-	/// <returns></returns>
-	public IEnumerator GoToNextBattle() {
-		CameraPanner.instance.TweenToSpot(battleZones[0].MyZoneSpot.transform.position);
+	public IEnumerator FocusOnBattle(Zone warZone) {
+		CameraPanner.instance.TweenToSpot(warZone.MyZoneSpot.transform.position);
 		yield return WaitWhileNoOverlays(0.35f);
-		OpenBattleResolutionPanelForZone(battleZones[0]);
+	}
+
+	
+	public IEnumerator GoToNextBattle() {
+		yield return ResolveBattle(battleZones[0]);
 	}
 
 	public override void InterruptPhase() {

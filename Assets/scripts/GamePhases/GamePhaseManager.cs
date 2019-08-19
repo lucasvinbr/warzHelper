@@ -29,7 +29,7 @@ public abstract class GamePhaseManager : MonoBehaviour {
 			yield return WaitWhileNoOverlays(0.01f);
 		}
 		else {
-			yield return WaitWhileNoOverlays(0.7f);
+			yield return WaitWhileNoOverlays(0.6f);
 		}
 		
 		GameModeHandler.instance.GoToNextTurnPhase();

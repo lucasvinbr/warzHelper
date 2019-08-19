@@ -11,7 +11,7 @@ public class GameInfo : TemplateInfo {
 
 	public GameModeHandler.TurnPhase curTurnPhase = GameModeHandler.TurnPhase.newCmder;
 
-	public bool fastAiTurns = true, alwaysAutocalcAiBattles = false;
+	public bool fastAiTurns = true, alwaysAutocalcAiBattles = false, showBattleResolutionPanelForAutocalcAiBattles = false;
 
 	/// <summary>
 	/// this makes the battle phase only happen after all factions took turns,

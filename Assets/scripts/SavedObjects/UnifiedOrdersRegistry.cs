@@ -43,6 +43,42 @@ public class UnifiedOrdersRegistry {
 		}
 	}
 
+	/// <summary>
+	/// checks all orders that aren't "create cmder" (since, in that case, the ID would be that of a faction)
+	/// and returns the one given to the target ID
+	/// </summary>
+	/// <param name="orderedCmderID"></param>
+	/// <returns></returns>
+	public RegisteredCmderOrder GetOrderGivenToCmder(int orderedCmderID) {
+		foreach(RegisteredCmderOrder order in registeredOrders) {
+			if(order.orderType != RegisteredCmderOrder.OrderType.createCmder &&
+				order.orderedActorID == orderedCmderID) {
+				return order;
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// returns all orders that have the target zone as destination,
+	/// optionally not considering "create cmder" orders
+	/// </summary>
+	/// <param name="targetZoneID"></param>
+	/// <returns></returns>
+	public List<RegisteredCmderOrder> GetOrdersTargetingZone(int targetZoneID, bool considerCreateCmderOrders = true) {
+		List<RegisteredCmderOrder> returnedOrders = new List<RegisteredCmderOrder>();
+
+		foreach (RegisteredCmderOrder order in registeredOrders) {
+			if ((considerCreateCmderOrders || order.orderType != RegisteredCmderOrder.OrderType.createCmder) &&
+				order.zoneTargetID == targetZoneID) {
+				returnedOrders.Add(order);
+			}
+		}
+
+		return returnedOrders;
+	}
+
 	public void AddFeedbackForOrder(RegisteredCmderOrder order) {
 		if(order.orderType == RegisteredCmderOrder.OrderType.createCmder ||
 			order.orderType == RegisteredCmderOrder.OrderType.move) {

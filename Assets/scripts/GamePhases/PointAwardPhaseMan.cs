@@ -13,6 +13,15 @@ public class PointAwardPhaseMan : GamePhaseManager {
 		//if in unified mode, this phase is skipped for all factions except the first one in turn order, in which everyone gets points
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
 		GameInfo curGameData = GameController.CurGameData;
+
+		if (curGameData.unifyBattlePhase) {
+			if (playerFac.ID != curGameData.factions[0].ID) {
+				infoTxt.text = "Unified Mode: Phase only runs in first faction's turn";
+				OnPhaseEnding(GameModeHandler.instance.currentTurnIsFast);
+				return;
+			}
+		}
+
 		List<Commander> awardedCmders = curGameData.unifyBattlePhase ? curGameData.deployedCommanders : playerFac.OwnedCommanders;
 		List<Zone> awardedZones = curGameData.unifyBattlePhase ? curGameData.zones : playerFac.OwnedZones;
 		infoTxt.text = "Awarding points to each zone and commander; zones will auto-use them";

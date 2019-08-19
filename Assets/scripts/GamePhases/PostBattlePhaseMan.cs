@@ -13,7 +13,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 	private List<Commander> commandersBeingDeleted = new List<Commander>();
 
-	public const float CMDER_DESTROY_TIME = 0.75f;
+	public const float CMDER_DESTROY_TIME = 0.45f;
 
 	public override void OnPhaseStart() {
 		base.OnPhaseStart();
@@ -139,7 +139,7 @@ public class PostBattlePhaseMan : GamePhaseManager {
 	public IEnumerator GoToNextConflict() {
 		if(!GameModeHandler.instance.currentTurnIsFast)
 			CameraPanner.instance.JumpToSpot(conflictZones[0].MyZoneSpot.transform.position);
-		yield return WaitWhileNoOverlays(0.35f);
+		yield return WaitWhileNoOverlays(0.1f);
 		SolveConflictsAt(conflictZones[0]);
 	}
 
@@ -154,10 +154,21 @@ public class PostBattlePhaseMan : GamePhaseManager {
 
 		zonesToCleanUp.Clear();
 
+		GameInfo gData = GameController.CurGameData;
+
+		//report relation changes...
+		gData.factionRelations.AnnounceAllRelationChanges();
+
+		//move caravans if it's the "last faction"'s turn end
+		if (GameModeHandler.instance.curPlayingFaction.ID == gData.factions[gData.factions.Count - 1].ID) {
+			GameModeHandler.instance.MercCaravansPseudoTurn();
+		}
+
+
 		if (noWait) {
 			yield return null;
 		}else {
-			yield return WaitWhileNoOverlays(0.4f); //some extra wait, since it's the turn's end
+			yield return WaitWhileNoOverlays(0.25f); //some extra wait, since it's the turn's end
 		}
 		
 		yield return base.ProceedToNextPhaseRoutine(noWait);

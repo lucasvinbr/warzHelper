@@ -55,6 +55,11 @@ public class NewCmderPhaseMan : GamePhaseManager {
 		OnPhaseEnding();
 	}
 
+	public override void OnPhaseEnding(bool noWait = false) {
+		World.instance.cmderPlacerScript.enabled = false;
+		base.OnPhaseEnding(noWait);
+	}
+
 	public override IEnumerator ProceedToNextPhaseRoutine(bool noWait = false) {
 		skipBtn.interactable = false;
 		yield return base.ProceedToNextPhaseRoutine(noWait);

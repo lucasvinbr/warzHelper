@@ -26,8 +26,13 @@ public class BattleResolutionManualPanel : GenericOverlayPanel {
 	}
 
 	public void OnConfirm() {
-		bPanel.attackerSide.SetPostBattleArmyData_RemainingArmy(attackerPanel.BakeIntoArmy());
-		bPanel.defenderSide.SetPostBattleArmyData_RemainingArmy(defenderPanel.BakeIntoArmy());
+		bPanel.battlePhase.battleData.attackerSideInfo.SetPostBattleArmyData_RemainingArmy(attackerPanel.BakeIntoArmy());
+		bPanel.battlePhase.battleData.defenderSideInfo.SetPostBattleArmyData_RemainingArmy(defenderPanel.BakeIntoArmy());
+		if (!bPanel.battlePhase.battleData.BattleEndCheck()) {
+			//we only need to update side info displays if the battle hasn't ended yet, 
+			//because the delegate would take care of it otherwise
+			bPanel.UpdateArmyDisplays();
+		}
 	}
 
 }

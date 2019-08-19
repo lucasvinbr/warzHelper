@@ -34,4 +34,13 @@ public class TabToggleGroup : MonoBehaviour {
 	public void ToggleTabIndex(int tabIndex) {
 		theToggleTabHeaders[tabIndex].isOn = true;
 	}
+
+	/// <summary>
+	/// all tabs "isOn" are set to false
+	/// </summary>
+	public void SetAllTabsOff() {
+		foreach(Toggle t in theToggleTabHeaders) {
+			t.isOn = false;
+		}
+	}
 }

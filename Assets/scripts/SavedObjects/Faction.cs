@@ -186,11 +186,10 @@ public class Faction
 	/// <param name="targetFac"></param>
 	/// <param name="addition"></param>
 	/// <returns></returns>
-	public float AddRelationWith(Faction targetFac, float addition, bool preventAutoAlly = false,
-		bool notifyRelationChange = false, bool notifyStandingChange = false) {
+	public float AddRelationWith(Faction targetFac, float addition, bool preventAutoAlly = false) {
 		return GameController.CurGameData.
 			factionRelations.AddRelationBetweenFactions
-				(ID, targetFac.ID, addition, preventAutoAlly, notifyStandingChange, notifyRelationChange);
+				(ID, targetFac.ID, addition, preventAutoAlly);
 	}
 
 	/// <summary>
@@ -200,11 +199,10 @@ public class Faction
 	/// <param name="targetFacID"></param>
 	/// <param name="addition"></param>
 	/// <returns></returns>
-	public float AddRelationWith(int targetFacID, float addition, bool preventAutoAlly = false,
-		bool notifyRelationChange = false, bool notifyStandingChange = false) {
+	public float AddRelationWith(int targetFacID, float addition, bool preventAutoAlly = false) {
 		return GameController.CurGameData.
 			factionRelations.AddRelationBetweenFactions
-				(ID, targetFacID, addition, preventAutoAlly, notifyStandingChange, notifyRelationChange);
+				(ID, targetFacID, addition, preventAutoAlly);
 	}
 
 	/// <summary>
@@ -214,11 +212,10 @@ public class Faction
 	/// <param name="targetFacsIDs"></param>
 	/// <param name="addition"></param>
 	/// <returns></returns>
-	public void AddRelationWith(List<int> targetFacsIDs, float addition, bool preventAutoAlly = false,
-		bool notifyRelationChange = false, bool notifyStandingChange = false) {
+	public void AddRelationWith(List<int> targetFacsIDs, float addition, bool preventAutoAlly = false) {
 		GameController.CurGameData.
 			factionRelations.AddRelationBetweenFactions
-				(ID, targetFacsIDs, addition, preventAutoAlly, notifyStandingChange, notifyRelationChange);
+				(ID, targetFacsIDs, addition, preventAutoAlly);
 	}
 
 	public static int SortByTurnPriority(Faction x, Faction y) {

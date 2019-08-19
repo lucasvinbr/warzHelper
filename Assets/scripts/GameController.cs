@@ -5,9 +5,9 @@ using UnityEngine.Events;
 
 public class GameController : MonoBehaviour {
 
-    public TemplateInfo curData;
+	public TemplateInfo curData;
 
-    public static GameController instance;
+	public static GameController instance;
 
 	public GameMaterialsHandler facMatsHandler;
 
@@ -32,9 +32,9 @@ public class GameController : MonoBehaviour {
 	{
 		get
 		{
-			if(m_lastRelevantTType == null || !curData.troopTypes.Contains(m_lastRelevantTType)) {
+			if (m_lastRelevantTType == null || !curData.troopTypes.Contains(m_lastRelevantTType)) {
 				//get the first troop from the available ones... or create a new one if no troops exist at all
-				if(curData.troopTypes.Count > 0) {
+				if (curData.troopTypes.Count > 0) {
 					m_lastRelevantTType = curData.troopTypes[0];
 				}
 				else {
@@ -51,76 +51,65 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
-    void Awake()
-    {
-        instance = this;
-    }
+	void Awake() {
+		instance = this;
+	}
 
-    public void StartNewGame(bool isTemplate)
-    {
-        GameInterface.instance.textInputPanel.SetPanelInfo("Please provide a name for this save", "Confirm", () =>
-        {
-            string gameName = GameInterface.instance.textInputPanel.theInputField.text;
-            if (!PersistenceHandler.IsAValidFilename(gameName))
-            {
-                ModalPanel.Instance().OkBox("Invalid name",
-                    "The name provided is invalid for a save. The name must follow the same rules that apply when you create a file.");
-                return;
-            }
+	public void StartNewGame(bool isTemplate) {
+		GameInterface.instance.textInputPanel.SetPanelInfo("Please provide a name for this save", "Confirm", () => {
+			string gameName = GameInterface.instance.textInputPanel.theInputField.text;
+			if (!PersistenceHandler.IsAValidFilename(gameName)) {
+				ModalPanel.Instance().OkBox("Invalid name",
+					"The name provided is invalid for a save. The name must follow the same rules that apply when you create a file.");
+				return;
+			}
 
-            TemplateInfo existingData = null;
+			TemplateInfo existingData = null;
 
-            if (isTemplate)
-            {
-                existingData = PersistenceHandler.LoadFromFile<TemplateInfo>(PersistenceHandler.templatesDirectory + gameName + ".xml");
-            }
-            else
-            {
-                existingData = PersistenceHandler.LoadFromFile<TemplateInfo>(PersistenceHandler.gamesDirectory + gameName + ".xml");
-            }
+			if (isTemplate) {
+				existingData = PersistenceHandler.LoadFromFile<TemplateInfo>(PersistenceHandler.templatesDirectory + gameName + ".xml");
+			}
+			else {
+				existingData = PersistenceHandler.LoadFromFile<TemplateInfo>(PersistenceHandler.gamesDirectory + gameName + ".xml");
+			}
 
-            if(existingData != null)
-            {
-                ModalPanel.Instance().YesNoBox("Save Exists", "A save with the same name already exists. Overwrite?", null, () => { existingData = null; });
-            }
+			if (existingData != null) {
+				ModalPanel.Instance().YesNoBox("Save Exists", "A save with the same name already exists. Overwrite?", null, () => { existingData = null; });
+			}
 
-            //even if there actually is data, we pretend there isn't in case we plan to overwrite
-            if (existingData == null)
-            {
-                if (isTemplate)
-                {
-                    curData = new TemplateInfo(gameName);
+			//even if there actually is data, we pretend there isn't in case we plan to overwrite
+			if (existingData == null) {
+				if (isTemplate) {
+					curData = new TemplateInfo(gameName);
 					PersistenceHandler.CreateDirIfNotExists(PersistenceHandler.templatesDirectory);
-                    PersistenceHandler.SaveToFile(curData, PersistenceHandler.templatesDirectory + gameName + ".xml");
-                    Debug.Log("saved new template");
+					PersistenceHandler.SaveToFile(curData, PersistenceHandler.templatesDirectory + gameName + ".xml");
+					Debug.Log("saved new template");
 					GameInterface.instance.SwitchInterface(GameInterface.InterfaceMode.template);
 				}
-                else
-                {
-                    curData = new GameInfo(gameName);
+				else {
+					curData = new GameInfo(gameName);
 					GameInterface.instance.OpenLoadTemplateForNewGame();
 
-                }
+				}
 
-                GameInterface.instance.textInputPanel.Close();
+				GameInterface.instance.textInputPanel.Close();
 
 			}
 
 
-        });
-        GameInterface.instance.textInputPanel.Open();
-    }
+		});
+		GameInterface.instance.textInputPanel.Open();
+	}
 
-	public void LoadDataAndStartGame(string fileName, bool isTemplate = false)
-    {
+	public void LoadDataAndStartGame(string fileName, bool isTemplate = false) {
 		string fileDir = (isTemplate ? PersistenceHandler.templatesDirectory : PersistenceHandler.gamesDirectory) + fileName + ".xml";
-        curData = PersistenceHandler.LoadFromFile<TemplateInfo>(fileDir);
-		if(curData != null) {
+		curData = PersistenceHandler.LoadFromFile<TemplateInfo>(fileDir);
+		if (curData != null) {
 			Debug.Log("loaded game/template: " + curData.gameName);
 			GameInterface.instance.HideObject(GameInterface.instance.saveListPanel.gameObject);
 			GameInterface.instance.SwitchInterface(isTemplate ? GameInterface.InterfaceMode.template : GameInterface.InterfaceMode.game);
 		}
-    }
+	}
 
 	/// <summary>
 	/// gets a template's data and uses it in the creation of a new game.
@@ -152,10 +141,9 @@ public class GameController : MonoBehaviour {
 		return PersistenceHandler.LoadFromFile<TemplateInfo>(fileDir);
 	}
 
-    public void SaveGame()
-    {
-        PersistenceHandler.SaveToFile(curData, (curData.isATemplate ? PersistenceHandler.templatesDirectory : PersistenceHandler.gamesDirectory) + curData.gameName + ".xml", true);
-    }
+	public void SaveGame() {
+		PersistenceHandler.SaveToFile(curData, (curData.isATemplate ? PersistenceHandler.templatesDirectory : PersistenceHandler.gamesDirectory) + curData.gameName + ".xml", true);
+	}
 
 	public void SaveAs() {
 		bool isTemplate = curData.isATemplate;
@@ -201,15 +189,13 @@ public class GameController : MonoBehaviour {
 
 
 
-	public void GoToTemplate(TemplateInfo templateData)
-    {
-        GameInterface.instance.SwitchInterface(GameInterface.InterfaceMode.template);
-    }
+	public void GoToTemplate(TemplateInfo templateData) {
+		GameInterface.instance.SwitchInterface(GameInterface.InterfaceMode.template);
+	}
 
-    void OnGameStart()
-    {
+	void OnGameStart() {
 
-    }
+	}
 
 
 	#region game data removal
@@ -218,14 +204,14 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	/// <param name="targetFaction"></param>
 	public static void RemoveFaction(Faction targetFaction) {
-		foreach(Zone z in targetFaction.OwnedZones) {
+		foreach (Zone z in targetFaction.OwnedZones) {
 			z.ownerFaction = -1;
 			z.MyZoneSpot.RefreshDataDisplay();
 		}
 		instance.curData.factions.Remove(targetFaction);
 		GameInterface.factionDDownsAreStale = true;
 		GameInfo gData = CurGameData;
-		if(gData != null) {
+		if (gData != null) {
 			gData.factionRelations.RemoveAllRelationEntriesWithFaction(targetFaction.ID);
 		}
 	}
@@ -240,7 +226,7 @@ public class GameController : MonoBehaviour {
 		MercCaravan localCaravan = GetMercCaravanInZone(targetZone.ID);
 		if (localCaravan != null) RemoveMercCaravan(localCaravan);
 
-		instance.curData.zones.Remove(targetZone);		
+		instance.curData.zones.Remove(targetZone);
 	}
 
 	public static void RemoveMercCaravan(MercCaravan MC) {
@@ -258,8 +244,8 @@ public class GameController : MonoBehaviour {
 		GameInterface.troopDDownsAreStale = true;
 		//remove all references to this type
 		foreach (Faction f in instance.curData.factions) {
-			for(int i = 0; i < f.troopLine.Count; i++) {
-				if(f.troopLine[i] == targetTroop.ID) {
+			for (int i = 0; i < f.troopLine.Count; i++) {
+				if (f.troopLine[i] == targetTroop.ID) {
 					f.troopLine[i] = instance.LastRelevantTType.ID;
 				}
 			}
@@ -272,7 +258,7 @@ public class GameController : MonoBehaviour {
 
 	public static int GetUnusedFactionID() {
 		int freeID = 0;
-		while(GetFactionByID(freeID) != null) {
+		while (GetFactionByID(freeID) != null) {
 			freeID++;
 		}
 
@@ -371,33 +357,27 @@ public class GameController : MonoBehaviour {
 		return null;
 	}
 
-	public static Faction GetFactionByName(string factionName)
-    {
-        List<Faction> factionList = instance.curData.factions;
-        for (int i = 0; i < factionList.Count; i++)
-        {
-            if(factionList[i].name == factionName)
-            {
-                return factionList[i];
-            }
-        }
+	public static Faction GetFactionByName(string factionName) {
+		List<Faction> factionList = instance.curData.factions;
+		for (int i = 0; i < factionList.Count; i++) {
+			if (factionList[i].name == factionName) {
+				return factionList[i];
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    public static Zone GetZoneByName(string zoneName)
-    {
-        List<Zone> zoneList = instance.curData.zones;
-        for (int i = 0; i < zoneList.Count; i++)
-        {
-            if (zoneList[i].name == zoneName)
-            {
-                return zoneList[i];
-            }
-        }
+	public static Zone GetZoneByName(string zoneName) {
+		List<Zone> zoneList = instance.curData.zones;
+		for (int i = 0; i < zoneList.Count; i++) {
+			if (zoneList[i].name == zoneName) {
+				return zoneList[i];
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
 	public static TroopType GetTroopTypeByName(string troopTypeName) {
 		if (GuardGameDataExist()) {
@@ -408,7 +388,7 @@ public class GameController : MonoBehaviour {
 				}
 			}
 		}
-		
+
 
 		return null;
 	}
@@ -454,10 +434,10 @@ public class GameController : MonoBehaviour {
 	public static Faction GetNextFactionInTurnOrder(int turnPriotity) {
 		Faction returnedFac = null;
 
-		foreach(Faction f in instance.curData.factions) {
-			if(f.turnPriority > turnPriotity) {
-				if(returnedFac != null) {
-					if(returnedFac.turnPriority > f.turnPriority) {
+		foreach (Faction f in instance.curData.factions) {
+			if (f.turnPriority > turnPriotity) {
+				if (returnedFac != null) {
+					if (returnedFac.turnPriority > f.turnPriority) {
 						returnedFac = f;
 					}
 				}
@@ -467,7 +447,7 @@ public class GameController : MonoBehaviour {
 			}
 		}
 
-		if(returnedFac == null) {
+		if (returnedFac == null) {
 			returnedFac = GetNextFactionInTurnOrder(-99999999);
 		}
 
@@ -521,23 +501,43 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	/// <param name="targetZone"></param>
 	/// <param name="targetFac"></param>
+	/// <param name="useProjectedAllyPositions">if in "unified" mode, only get a commander's troops 
+	/// if they won't move out of the targetZone in the action phase</param>
 	/// <returns></returns>
-	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, Faction targetFac) {
-		return GetCommandersOfFactionAndAlliesInZone(targetZone, targetFac.ID);
-	}
-
-	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, int targetFacID) {
+	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, Faction targetFac, bool useProjectedAllyPositions = false) {
 		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
-		Faction curCmderFac = null;
-		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
-			curCmderFac = GetFactionByID(cmder.ownerFaction);
-			if (curCmderFac.ID == targetFacID || curCmderFac.GetStandingWith(targetFacID) ==
-				GameFactionRelations.FactionStanding.ally) {
-				friendlyCommandersInTheZone.Add(cmder);
+
+		if (targetFac == null) return friendlyCommandersInTheZone;
+
+		if (useProjectedAllyPositions) {
+			friendlyCommandersInTheZone.AddRange(GetProjectedCommandersInZone(targetZone, targetFac));
+		}
+		else {
+			friendlyCommandersInTheZone.AddRange(GetCommandersInZone(targetZone));
+		}
+
+
+		for (int i = friendlyCommandersInTheZone.Count - 1; i >= 0; i--) {
+			if (targetFac.ID != friendlyCommandersInTheZone[i].ownerFaction &&
+				targetFac.GetStandingWith(friendlyCommandersInTheZone[i].ownerFaction) != GameFactionRelations.FactionStanding.ally) {
+				friendlyCommandersInTheZone.RemoveAt(i);
 			}
 		}
 
+
 		return friendlyCommandersInTheZone;
+	}
+
+	/// <summary>
+	/// gets both the target faction's cmders and any cmders from allied factions
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFacID"></param>
+	/// <param name="useProjectedAllyPositions">if in "unified" mode, only get a commander's troops 
+	/// if they won't move out of the targetZone in the action phase</param>
+	/// <returns></returns>
+	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, int targetFacID, bool useProjectedAllyPositions = false) {
+		return GetCommandersOfFactionAndAlliesInZone(targetZone, GetFactionByID(targetFacID), useProjectedAllyPositions);
 	}
 
 	/// <summary>
@@ -549,11 +549,14 @@ public class GameController : MonoBehaviour {
 	/// <returns></returns>
 	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, Faction targetFac, Faction enemyFac) {
 		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
+
+		if (targetFac == null) return friendlyCommandersInTheZone; //neutral zones should have no allies
+
 		Faction curCmderFac = null;
 		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
 			curCmderFac = GetFactionByID(cmder.ownerFaction);
 			if (curCmderFac == targetFac || (curCmderFac.GetStandingWith(targetFac) ==
-				GameFactionRelations.FactionStanding.ally && 
+				GameFactionRelations.FactionStanding.ally &&
 				curCmderFac.GetStandingWith(enemyFac) != GameFactionRelations.FactionStanding.ally)) {
 				friendlyCommandersInTheZone.Add(cmder);
 			}
@@ -580,19 +583,83 @@ public class GameController : MonoBehaviour {
 		if (dontGetTweeningCommanders) {
 			List<TransformTweener.TransformTween> tweens =
 				TransformTweener.instance.GetAllTweensTargetingZone(targetZone.MyZoneSpot);
-			foreach(TransformTweener.TransformTween tween in tweens) {
+			foreach (TransformTweener.TransformTween tween in tweens) {
 				Cmder3d tweeningCmder3d = tween.movingTrans.GetComponent<Cmder3d>();
-				if(tweeningCmder3d) cmdersInZone.Remove(tweeningCmder3d.data as Commander);
+				if (tweeningCmder3d) cmdersInZone.Remove(tweeningCmder3d.data as Commander);
 			}
 		}
 
 		return cmdersInZone;
 	}
 
+	/// <summary>
+	/// returns the commanders that, after the next "action phase" in unified mode, will be in the targetZone. 
+	/// Only commanders friendly to the referenceFac and whose command phase has already passed
+	/// will be "projected".
+	/// This works just like GetCommandersInZone if not in unified mode
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="referenceFacID"></param>
+	/// <returns></returns>
+	public static List<Commander> GetProjectedCommandersInZone(Zone targetZone, int referenceFacID) {
+		return GetProjectedCommandersInZone(targetZone, GetFactionByID(referenceFacID));
+	}
+
+	/// <summary>
+	/// returns the commanders that, after the next "action phase" in unified mode, will be in the targetZone. 
+	/// Only commanders friendly to the referenceFac and whose command phase has already passed
+	/// will be "projected".
+	/// This works just like GetCommandersInZone if not in unified mode
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="referenceFac"></param>
+	/// <returns></returns>
+	public static List<Commander> GetProjectedCommandersInZone(Zone targetZone, Faction referenceFac) {
+		GameInfo curData = CurGameData;
+		List<Commander> returnedCmders = GetCommandersInZone(targetZone);
+		if (!curData.unifyBattlePhase || referenceFac == null) return returnedCmders;
+
+		RegisteredCmderOrder checkedOrder = null;
+
+		for (int i = returnedCmders.Count - 1; i >= 0; i--) {
+			if (returnedCmders[i].ownerFaction == referenceFac.ID ||
+				referenceFac.GetStandingWith(returnedCmders[i].ownerFaction) == GameFactionRelations.FactionStanding.ally) {
+				//check their plans to see if they're going to stay
+				checkedOrder = curData.unifiedOrdersRegistry.GetOrderGivenToCmder(returnedCmders[i].ID);
+
+				if (checkedOrder != null && checkedOrder.orderType == RegisteredCmderOrder.OrderType.move) {
+					returnedCmders.RemoveAt(i);
+				}
+			}
+			else {
+				//since we don't know what they'll do,
+				//we assume they'll stay
+				continue;
+			}
+		}
+
+		Commander checkedCmder = null;
+
+		//check all orders targeting the targetZone as well
+		//so that we can add cmders that will move to it
+		//(only add allied ones to prevent "cheating")
+		foreach (RegisteredCmderOrder order in curData.unifiedOrdersRegistry.GetOrdersTargetingZone(targetZone.ID, false)) {
+			checkedCmder = GetCmderByID(order.orderedActorID);
+			if (checkedCmder == null) continue;
+
+			if (referenceFac.ID == checkedCmder.ownerFaction ||
+				referenceFac.GetStandingWith(checkedCmder.ownerFaction) == GameFactionRelations.FactionStanding.ally) {
+				returnedCmders.Add(checkedCmder);
+			}
+		}
+
+		return returnedCmders;
+	}
+
 	public static MercCaravan GetMercCaravanInZone(int targetZoneID) {
 
-		foreach(MercCaravan mc in instance.curData.mercCaravans) {
-			if(mc.zoneIAmIn == targetZoneID) {
+		foreach (MercCaravan mc in instance.curData.mercCaravans) {
+			if (mc.zoneIAmIn == targetZoneID) {
 				return mc;
 			}
 		}
@@ -614,7 +681,7 @@ public class GameController : MonoBehaviour {
 			returnedList.AddRange(targetZone.troopsContained);
 		}
 
-		foreach(Commander cmder in GetCommandersOfFactionInZone(targetZone, targetFac)) {
+		foreach (Commander cmder in GetCommandersOfFactionInZone(targetZone, targetFac)) {
 			returnedList = cmder.GetCombinedTroops(returnedList);
 		}
 
@@ -628,11 +695,25 @@ public class GameController : MonoBehaviour {
 	/// <param name="targetZone"></param>
 	/// <param name="targetFac"></param>
 	/// <param name="onlyCommanderArmies"></param>
+	/// <param name="useProjectedAllyPositions">if in "unified" mode, only get a commander's troops 
+	/// if they won't move out of the targetZone in the action phase</param>
 	/// <returns></returns>
 	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFactionAndAllies(Zone targetZone,
-		Faction targetFac, bool onlyCommanderArmies = false) {
-		return GetCombinedTroopsInZoneFromFactionAndAllies
-			(targetZone, targetFac != null ? targetFac.ID : -1, onlyCommanderArmies);
+		Faction targetFac, bool onlyCommanderArmies = false, bool useProjectedAllyPositions = false) {
+
+
+		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
+		if (!onlyCommanderArmies && ((targetZone.ownerFaction < 0 && targetFac == null) ||
+			targetZone.ownerFaction == targetFac.ID ||
+			targetFac.GetStandingWith(targetZone.ownerFaction) == GameFactionRelations.FactionStanding.ally)) {
+			returnedList.AddRange(targetZone.troopsContained);
+		}
+
+		foreach (Commander cmder in GetCommandersOfFactionAndAlliesInZone(targetZone, targetFac, useProjectedAllyPositions)) {
+			returnedList = cmder.GetCombinedTroops(returnedList);
+		}
+
+		return returnedList;
 	}
 
 	/// <summary>
@@ -642,19 +723,14 @@ public class GameController : MonoBehaviour {
 	/// <param name="targetZone"></param>
 	/// <param name="targetFacID"></param>
 	/// <param name="onlyCommanderArmies"></param>
+	/// <param name="useProjectedAllyPositions">if in "unified" mode, only get a commander's troops 
+	/// if they won't move out of the targetZone in the action phase</param>
 	/// <returns></returns>
 	public static List<TroopNumberPair> GetCombinedTroopsInZoneFromFactionAndAllies(Zone targetZone,
-		int targetFacID, bool onlyCommanderArmies = false) {
-		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
-		if (targetZone.ownerFaction == targetFacID && !onlyCommanderArmies) {
-			returnedList.AddRange(targetZone.troopsContained);
-		}
+		int targetFacID, bool onlyCommanderArmies = false, bool useProjectedAllyPositions = false) {
 
-		foreach (Commander cmder in GetCommandersOfFactionAndAlliesInZone(targetZone, targetFacID)) {
-			returnedList = cmder.GetCombinedTroops(returnedList);
-		}
-
-		return returnedList;
+		return GetCombinedTroopsInZoneFromFactionAndAllies
+			(targetZone, GetFactionByID(targetFacID), onlyCommanderArmies, useProjectedAllyPositions);
 	}
 
 	/// <summary>
@@ -678,7 +754,7 @@ public class GameController : MonoBehaviour {
 
 		GameFactionRelations relMan = CurGameData.factionRelations;
 		foreach (Commander cmder in GetCommandersOfFactionAndAlliesInZone(targetZone, targetFacID)) {
-			if(relMan.GetStandingBetweenFactions(cmder.ownerFaction, enemyFacID) != GameFactionRelations.FactionStanding.ally) {
+			if (relMan.GetStandingBetweenFactions(cmder.ownerFaction, enemyFacID) != GameFactionRelations.FactionStanding.ally) {
 				returnedList = cmder.GetCombinedTroops(returnedList);
 			}
 		}
@@ -702,7 +778,7 @@ public class GameController : MonoBehaviour {
 		}
 
 		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
-			if(cmder.ownerFaction != targetFac.ID) {
+			if (cmder.ownerFaction != targetFac.ID) {
 				returnedList = cmder.GetCombinedTroops(returnedList);
 			}
 		}
@@ -732,7 +808,7 @@ public class GameController : MonoBehaviour {
 				if (curCheckedFac == null || curCheckedFac.ID != cmder.ownerFaction)
 					curCheckedFac = GetFactionByID(cmder.ownerFaction);
 
-				if(curCheckedFac.GetStandingWith(targetFac) != GameFactionRelations.FactionStanding.ally) {
+				if (curCheckedFac.GetStandingWith(targetFac) != GameFactionRelations.FactionStanding.ally) {
 					returnedList = cmder.GetCombinedTroops(returnedList);
 				}
 			}
@@ -808,6 +884,7 @@ public class GameController : MonoBehaviour {
 
 	/// <summary>
 	/// returns a list with all zones owned by the faction that don't already have a commander in them
+	/// (or won't have one after actions are taken, if in unified mode)
 	/// and have a recruitment point multiplier greater than 0
 	/// </summary>
 	/// <param name="fac"></param>
@@ -817,16 +894,46 @@ public class GameController : MonoBehaviour {
 		if (availableZones.Count > 0) {
 			bool zoneIsOccupied = false;
 			List<Commander> factionCmders = fac.OwnedCommanders;
+			GameInfo curData = CurGameData;
+			RegisteredCmderOrder order = null;
+
 			for (int i = availableZones.Count - 1; i >= 0; i--) {
-				zoneIsOccupied = false;
-				foreach (Commander cmd in factionCmders) {
-					if (cmd.zoneIAmIn == availableZones[i].ID) {
-						zoneIsOccupied = true;
-						break;
+				zoneIsOccupied = availableZones[i].multRecruitmentPoints <= 0;
+
+				if (!zoneIsOccupied) {
+					foreach (Commander cmd in factionCmders) {
+						if (cmd.zoneIAmIn == availableZones[i].ID) {
+
+							if (curData.unifyBattlePhase) {
+								//check if cmder will move away
+								order = curData.unifiedOrdersRegistry.GetOrderGivenToCmder(cmd.ID);
+								if (order != null) {
+									if (order.orderType == RegisteredCmderOrder.OrderType.move) {
+										continue; //he'll disoccupy the zone
+									}
+								}
+							}
+
+							zoneIsOccupied = true;
+							break;
+						}
+						else {
+							if (curData.unifyBattlePhase) {
+								//check if this cmder will move to the checked zone
+								order = curData.unifiedOrdersRegistry.GetOrderGivenToCmder(cmd.ID);
+								if (order != null) {
+									if (order.orderType == RegisteredCmderOrder.OrderType.move &&
+										order.zoneTargetID == availableZones[i].ID) {
+										zoneIsOccupied = true;
+										break;
+									}
+								}
+							}
+						}
 					}
 				}
 
-				if (zoneIsOccupied || availableZones[i].multRecruitmentPoints <= 0) {
+				if (zoneIsOccupied) {
 					availableZones.RemoveAt(i);
 				}
 			}
@@ -844,12 +951,13 @@ public class GameController : MonoBehaviour {
 		List<int> foundAlliedFacIDs = new List<int>();
 		List<Zone> alliedZones = new List<Zone>();
 
-		foreach(Zone z in instance.curData.zones) {
-			if(z.ownerFaction != fac.ID && z.ownerFaction >= 0) {
+		foreach (Zone z in instance.curData.zones) {
+			if (z.ownerFaction != fac.ID && z.ownerFaction >= 0) {
 				if (foundAlliedFacIDs.Contains(z.ownerFaction)) {
 					alliedZones.Add(z);
-				}else {
-					if(fac.GetStandingWith(GetFactionByID(z.ownerFaction)) ==
+				}
+				else {
+					if (fac.GetStandingWith(GetFactionByID(z.ownerFaction)) ==
 						GameFactionRelations.FactionStanding.ally) {
 						alliedZones.Add(z);
 						foundAlliedFacIDs.Add(z.ownerFaction);
@@ -907,22 +1015,23 @@ public class GameController : MonoBehaviour {
 	/// <param name="baseArmy"></param>
 	/// <returns></returns>
 	public static List<TroopNumberPair> GetRandomSampleArmyFromArmy(List<TroopNumberPair> baseArmy, int sampleSize) {
-		if(sampleSize > 0 && GetTotalTroopAmountFromTroopList(baseArmy) > sampleSize) {
+		if (sampleSize > 0 && GetTotalTroopAmountFromTroopList(baseArmy) > sampleSize) {
 			List<TroopNumberPair> returnedSample = new List<TroopNumberPair>();
 			int addedTroops = 0;
 			int randomTroopID = -1, randomTroopIndex;
 			TroopNumberPair randomTNP;
 
-			while(addedTroops < sampleSize) {
+			while (addedTroops < sampleSize) {
 				//get random troop, add to returned sample.
 				//let the same troop be picked any number of times,
 				//no matter how many of them there are in the base army,
 				//for that extra (bad) luck factor
 				randomTroopID = baseArmy[Random.Range(0, baseArmy.Count)].troopTypeID;
 				randomTroopIndex = IndexOfTroopInTroopList(returnedSample, randomTroopID);
-				if(randomTroopIndex < 0) {
+				if (randomTroopIndex < 0) {
 					returnedSample.Add(new TroopNumberPair(randomTroopID, 1));
-				}else {
+				}
+				else {
 					randomTNP = returnedSample[randomTroopIndex];
 					randomTNP.troopAmount++;
 					returnedSample[randomTroopIndex] = randomTNP;
@@ -933,7 +1042,8 @@ public class GameController : MonoBehaviour {
 
 
 			return returnedSample;
-		}else {
+		}
+		else {
 			return baseArmy;
 		}
 	}
@@ -947,7 +1057,7 @@ public class GameController : MonoBehaviour {
 	public static float GetRandomBattleAutocalcPower(List<TroopNumberPair> baseArmy, int sampleSizeLimit = -1) {
 		List<TroopNumberPair> sampleArmy = GetRandomSampleArmyFromArmy(baseArmy, sampleSizeLimit);
 
-		return GetTotalAutocalcPowerFromTroopList(sampleArmy) * 
+		return GetTotalAutocalcPowerFromTroopList(sampleArmy) *
 			Random.Range(1.0f, instance.curData.rules.autoResolveBattleDieSides);
 
 	}
@@ -955,8 +1065,8 @@ public class GameController : MonoBehaviour {
 	#endregion
 
 	public static bool AreZonesLinked(Zone z1, Zone z2) {
-		foreach(int i in z1.linkedZones) {
-			if(GetZoneByID(i) == z2) {
+		foreach (int i in z1.linkedZones) {
+			if (GetZoneByID(i) == z2) {
 				return true;
 			}
 		}
@@ -971,8 +1081,8 @@ public class GameController : MonoBehaviour {
 	}
 
 	public static bool IsZoneLinkedToAnyZoneOfList(Zone z, List<Zone> targetList) {
-		foreach(Zone checkedZone in targetList){
-			if(checkedZone != z && AreZonesLinked(z, checkedZone)) {
+		foreach (Zone checkedZone in targetList) {
+			if (checkedZone != z && AreZonesLinked(z, checkedZone)) {
 				return true;
 			}
 		}
@@ -988,7 +1098,7 @@ public class GameController : MonoBehaviour {
 	public static int IndexOfTroopInTroopList(List<TroopNumberPair> troopList, int troopID) {
 
 		for (int i = 0; i < troopList.Count; i++) {
-			if(troopList[i].troopTypeID == troopID) {
+			if (troopList[i].troopTypeID == troopID) {
 				return i;
 			}
 		}
@@ -1004,7 +1114,7 @@ public class GameController : MonoBehaviour {
 	public static List<ZoneSpot> ZonesToZoneSpots(List<Zone> zones) {
 		List<ZoneSpot> returnedList = new List<ZoneSpot>();
 
-		foreach(Zone z in zones) {
+		foreach (Zone z in zones) {
 			returnedList.Add(z.MyZoneSpot);
 		}
 
@@ -1046,8 +1156,8 @@ public class GameController : MonoBehaviour {
 		List<Faction> facList = instance.curData.factions;
 		facList.Sort(Faction.SortByTurnPriority);
 		int curComparedTP = facList[0].turnPriority;
-		for(int i = 1; i < facList.Count; i++) {
-			if(facList[i].turnPriority <= curComparedTP) {
+		for (int i = 1; i < facList.Count; i++) {
+			if (facList[i].turnPriority <= curComparedTP) {
 				curComparedTP++;
 				facList[i].turnPriority = curComparedTP;
 			}
@@ -1064,7 +1174,7 @@ public class GameController : MonoBehaviour {
 	/// <param name="fac"></param>
 	/// <returns></returns>
 	public static bool ShouldFactionGetATurn(Faction fac, bool lastFactionException = true) {
-		return fac.OwnedCommanders.Count > 0 || fac.OwnedZones.Count > 0 || 
+		return fac.OwnedCommanders.Count > 0 || fac.OwnedZones.Count > 0 ||
 			(lastFactionException && CurGameData.unifyBattlePhase &&
 			fac.ID == CurGameData.factions[CurGameData.factions.Count - 1].ID);
 	}
@@ -1078,11 +1188,11 @@ public class GameController : MonoBehaviour {
 			() => {
 				TemplateInfo curData = instance.curData;
 				//zones are first set to neutral, then shared; finally, their displays are reset
-				foreach(Zone z in curData.zones) {
+				foreach (Zone z in curData.zones) {
 					z.ownerFaction = -1;
 				}
 				int zonesPerFaction = curData.zones.Count / curData.factions.Count;
-				if(zonesPerFaction <= 0) {
+				if (zonesPerFaction <= 0) {
 					Debug.LogWarning("[RandomizeAllZones] There are more factions than zones! Some factions won't get zones");
 					zonesPerFaction = 1;
 				}
@@ -1090,16 +1200,17 @@ public class GameController : MonoBehaviour {
 				List<Zone> availableZones = new List<Zone>(curData.zones);
 				List<Zone> zonesGivenToCurFac = new List<Zone>();
 				Zone candidateZone;
-				foreach(Faction fac in curData.factions) {
+				foreach (Faction fac in curData.factions) {
 					zonesGivenToCurFac.Clear();
-					while(zonesGivenToCurFac.Count < zonesPerFaction && availableZones.Count > 0) {
+					while (zonesGivenToCurFac.Count < zonesPerFaction && availableZones.Count > 0) {
 						candidateZone = null;
-						if(zonesGivenToCurFac.Count == 0) {
+						if (zonesGivenToCurFac.Count == 0) {
 							candidateZone = availableZones[Random.Range(0, availableZones.Count)];
-						}else {
+						}
+						else {
 							//try to get zones close to each other
-							foreach(Zone z in availableZones) {
-								if(IsZoneLinkedToAnyZoneOfList(z, zonesGivenToCurFac)) {
+							foreach (Zone z in availableZones) {
+								if (IsZoneLinkedToAnyZoneOfList(z, zonesGivenToCurFac)) {
 									candidateZone = z;
 									break;
 								}
@@ -1127,7 +1238,7 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	/// <returns></returns>
 	public static bool GuardGameDataExist() {
-		if(instance.curData != null) {
+		if (instance.curData != null) {
 			return true;
 		}
 		else {

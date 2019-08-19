@@ -9,18 +9,40 @@ public class AiPlayer {
 	/// how big is the influence of troops that aren't right on the spot, but can get to it quickly, in the AI's
 	/// decisions?
 	/// </summary>
-	public const float MIN_NEARBY_TROOPS_INFLUENCE = 0.12f, MAX_NEARBY_TROOPS_INFLUENCE = 0.35f;
+	public const float MIN_NEARBY_TROOPS_INFLUENCE = 0.52f, MAX_NEARBY_TROOPS_INFLUENCE = 0.88f;
 
 	/// <summary>
 	/// how big should the "move to zone" score be before we actually decide to move?
 	/// </summary>
-	public const float MIN_MOVE_SCORE_THRESHOLD = 0.1f, MAX_MOVE_SCORE_THRESHOLD = 0.2f;
+	public const float MIN_MOVE_SCORE_THRESHOLD = 0.3f, MAX_MOVE_SCORE_THRESHOLD = 0.37f;
+
+	/// <summary>
+	/// multiplies the base recruitment chance to make recruiting more important than training
+	/// </summary>
+	public const float RECRUIT_CHANCE_ENCOURAGEMENT = 1.35f;
 
 	/// <summary>
 	/// how much should the percentage of upgradeable-in-one-turn troops be
 	/// before we start considering training as a better option than recruiting/moving?
 	/// </summary>
-	public const float MIN_TRAIN_SCORE_THRESHOLD = 0.23f, MAX_TRAIN_SCORE_THRESHOLD = 0.39f;
+	public const float MIN_TRAIN_SCORE_THRESHOLD = 0.22f, MAX_TRAIN_SCORE_THRESHOLD = 0.35f;
+
+	/// <summary>
+	/// if the enemies have the allies' power times this value in a zone, the AI should be disencouraged to move or stay there
+	/// </summary>
+	public const float MIN_FRIENDLY_ZONE_TOO_DANGEROUS_THRESHOLD = 2.5f, MAX_FRIENDLY_ZONE_TOO_DANGEROUS_THRESHOLD = 3.5f;
+
+	/// <summary>
+	/// divisor applied to move scores to keep training and recruiting relevant
+	/// </summary>
+	public const float DANGER_SCORE_DIVISOR = 1.55f;
+
+	/// <summary>
+	/// the AI is "discouraged" to attack factions that are neutral to them by these multipliers:
+	/// they multiply the move score of those neutral zones, reducing them if these values are below 1.
+	/// the smaller the value, the more "discouragement" is applied
+	/// </summary>
+	public const float MIN_DISENCOURAGE_ATK_ON_NEUTRAL_FAC_MULT = 0.35f, MAX_DISENCOURAGE_ATK_ON_NEUTRAL_FAC_MULT = 0.6f;
 
 	/// <summary>
 	/// how much should a situation where there is no room for new commanders, 
@@ -34,7 +56,7 @@ public class AiPlayer {
 	/// how much should the presence of a friendly commander in a potential move target zone
 	/// make it more likely for more cmders to go to that zone as well?
 	/// </summary>
-	public const float FRIENDLY_CMDER_PRESENCE_MULT = 1.18f;
+	public const float FRIENDLY_CMDER_PRESENCE_MULT = 1.08f;
 
 	/// <summary>
 	/// if the ratio of spawned cmders / max cmders is below this value,
@@ -45,13 +67,13 @@ public class AiPlayer {
 	/// <summary>
 	/// the AI will avoid traveling to further locations if at least one of the nearby zones reaches this score
 	/// </summary>
-	public const float SHOULD_GO_DEFENSIVE_THRESHOLD = 0.2f;
+	public const float SHOULD_GO_DEFENSIVE_THRESHOLD = 0.43f;
 
 	/// <summary>
 	/// how much should a zone's danger score be taken into account
 	/// when choosing where to spawn a new cmder?
 	/// </summary>
-	public const float NEW_CMDER_ZONE_DANGER_INFLUENCE = 0.65f;
+	public const float NEW_CMDER_ZONE_DANGER_INFLUENCE = 0.35f;
 
 	public static void AiNewCmderPhase(Faction curFac, List<Zone> availableZones) {
 		if (availableZones.Count == 1) {
@@ -64,10 +86,14 @@ public class AiPlayer {
 		float topScore = 0;
 		float candidateScore = 0;
 
+
 		//zones with higher recruit factors are better for new cmders
 		//also give more score to zones which might be in danger
 		foreach (Zone z in availableZones) {
-			candidateScore = z.multRecruitmentPoints + GetZoneDangerScore(z, curFac) * NEW_CMDER_ZONE_DANGER_INFLUENCE;
+			candidateScore = GetZoneDangerScore(z, curFac);
+			//too much danger is bad!
+			if (candidateScore >= GetRandomFriendlyTooDangerousThreshold()) candidateScore = GetRandomMoveScoreThreshold();
+			candidateScore = z.multRecruitmentPoints + candidateScore * NEW_CMDER_ZONE_DANGER_INFLUENCE;
 			if (candidateScore >= topScore) {
 				topScore = candidateScore;
 				topZone = z;
@@ -94,19 +120,23 @@ public class AiPlayer {
 
 		float recruitChance, topMoveScore, scoreCheckScore, trainChance;
 		bool hasActed = false;
+		bool plansOnStayingInCurZone = false;
 
 		for (int i = commandableCmders.Count - 1; i >= 0; i--) {
 			zoneCmderIsIn = GameController.GetZoneByID(commandableCmders[i].zoneIAmIn);
 
 			//recruit chance might be more than 100%, but it's ok as it will do something else
 			//if it can't recruit
-			recruitChance = commandableCmders[i].GetPercentOfNewTroopsIfRecruited() * 1.35f;
+			recruitChance = commandableCmders[i].GetPercentOfNewTroopsIfRecruited() * RECRUIT_CHANCE_ENCOURAGEMENT;
 
 			trainChance = commandableCmders[i].GetPercentOfTroopsUpgradedIfTrained();
 
 			moveDestZone = zoneCmderIsIn;
 			//if no zone beats this score, we stay
 			topMoveScore = GetZoneDangerScore(zoneCmderIsIn, ourFac);
+
+			//but too much danger is bad and should reduce our chances of staying
+			if (topMoveScore >= GetRandomFriendlyTooDangerousThreshold()) topMoveScore = GetRandomMoveScoreThreshold();
 
 			if (factionCmderAmountRatio < SHOULD_GET_MORE_CMDERS_THRESHOLD &&
 				emptyNewCmderZones.Count == 0) {
@@ -132,7 +162,7 @@ public class AiPlayer {
 						if (emptyNewCmderZones.Count == 1 &&
 							emptyNewCmderZones[0] == scoreCheckZone) {
 							//better not move to this spot, it's the only place for a new cmder
-							scoreCheckScore *= factionCmderAmountRatio;
+							scoreCheckScore *= factionCmderAmountRatio * factionCmderAmountRatio;
 						}
 						else if (emptyNewCmderZones.Count == 0) {
 							//make it more likely to move to this spot then
@@ -148,6 +178,7 @@ public class AiPlayer {
 			}
 
 			if (topMoveScore <= SHOULD_GO_DEFENSIVE_THRESHOLD) {
+				//Debug.Log("safe-landlocked! move score is " + topMoveScore);
 				//we're "safe-landlocked"!
 				//we should find a path to danger then
 				if (fallbackMoveDestZone == null) {
@@ -165,19 +196,20 @@ public class AiPlayer {
 			}
 
 			hasActed = false;
+			plansOnStayingInCurZone = moveDestZone.ID == zoneCmderIsIn.ID;
 
-			//Debug.Log("rec chance: " + recruitChance + " topMove: " + topMoveScore);
-			if (trainChance > GetRandomTrainScoreThreshold() && trainChance > recruitChance &&
-				trainChance > topMoveScore) {
+
+			if (trainChance > recruitChance &&
+				(plansOnStayingInCurZone || trainChance > topMoveScore)) {
 				hasActed = commandableCmders[i].OrderTrainTroops();
 			}
 
-			if (!hasActed && recruitChance > topMoveScore) {
+			if (!hasActed && (plansOnStayingInCurZone || recruitChance > topMoveScore)) {
 				hasActed = commandableCmders[i].OrderRecruitTroops();
 			}
 
 			if (!hasActed && topMoveScore > GetRandomMoveScoreThreshold()) {
-				if (moveDestZone.ID != zoneCmderIsIn.ID) {
+				if (!plansOnStayingInCurZone) {
 					phaseScript.MoveCommander(commandableCmders[i], moveDestZone.MyZoneSpot, false);
 					//refresh the empty zone list if we moved;
 					//that way, our other cmders may not "feel" the same need to move as this one did
@@ -196,6 +228,9 @@ public class AiPlayer {
 				}
 
 				//do nothing then
+				//Debug.Log("commander from " + ourFac.name + " at " + zoneCmderIsIn.name +
+				//	" decided to do nothing. Move score: " + topMoveScore + ", rec score: " + recruitChance +
+				//	", train score: " + trainChance);
 			}
 
 
@@ -207,17 +242,18 @@ public class AiPlayer {
 	#region getters
 	/// <summary>
 	/// gets forces in and around the zone and compares them.
-	/// The closer to 1, the more enemies are nearby compared to allied forces
+	/// 1 = enemies and allies have equal power, closer to 0 = fewer enemies, bigger than 1 = allies at disadvantage.
+	/// value meanings are flipped if getSafetyScoreInstead is true
 	/// </summary>
 	/// <param name="targetZone"></param>
 	/// <param name="ourFac"></param>
 	/// <returns></returns>
-	public static float GetZoneDangerScore(Zone targetZone, Faction ourFac) {
+	public static float GetZoneDangerScore(Zone targetZone, Faction ourFac, bool getSafetyScoreInstead = false) {
 		Zone nearbyZone = null;
 		float potentialAlliedPower = 0, potentialEnemyPower = 0;
 
 		potentialAlliedPower = GameController.GetTotalAutocalcPowerFromTroopList
-		(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(targetZone, ourFac));
+		(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(targetZone, ourFac, useProjectedAllyPositions: true));
 
 		potentialEnemyPower = GameController.GetTotalAutocalcPowerFromTroopList
 		(GameController.GetCombinedTroopsInZoneNotAlliedToFaction(targetZone, ourFac));
@@ -225,13 +261,14 @@ public class AiPlayer {
 
 		foreach (int nearbyZoneID in targetZone.linkedZones) {
 			nearbyZone = GameController.GetZoneByID(nearbyZoneID);
-			if (nearbyZone.ownerFaction == ourFac.ID) {
+			if (nearbyZone.ownerFaction == ourFac.ID || 
+				ourFac.GetStandingWith(nearbyZone.ownerFaction) == GameFactionRelations.FactionStanding.ally) {
 				//nearby allies have less meaning than nearby enemies
 				//because they may not arrive in time to help...
 				//or choose to not help at all
 				potentialAlliedPower += GameController.GetTotalAutocalcPowerFromTroopList
 					(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(nearbyZone, ourFac, true)) *
-					GetRandomNearbyTroopInfluenceFactor() / 1.5f;
+					GetRandomNearbyTroopInfluenceFactor();
 			}
 			else {
 				potentialEnemyPower += GameController.GetTotalAutocalcPowerFromTroopList
@@ -241,8 +278,7 @@ public class AiPlayer {
 		}
 		//Debug.Log("pot enemy: " + potentialEnemyPower + " pot ally: " + potentialAlliedPower);
 
-		return Mathf.Max(0, (potentialEnemyPower - potentialAlliedPower) /
-			Mathf.Max(1, potentialEnemyPower));
+		return getSafetyScoreInstead ? potentialAlliedPower / Mathf.Max(1, potentialEnemyPower) : potentialEnemyPower / Mathf.Max(1, potentialAlliedPower);
 	}
 
 	/// <summary>
@@ -253,19 +289,34 @@ public class AiPlayer {
 	/// <param name="ourFac"></param>
 	/// <returns></returns>
 	public static float GetZoneMoveScore(Zone targetZone, Faction ourFac) {
-		float finalScore = GetZoneDangerScore(targetZone, ourFac);
+		float finalScore;
 
 		//if the zone is hostile, the less danger the better
 		if (targetZone.CanBeTakenBy(ourFac)) {
-			finalScore = 1 - finalScore;
+			finalScore = GetZoneDangerScore(targetZone, ourFac, true);
+
+			//discourage attacks vs. neutral factions to prevent us from getting a lot of enemies too fast
+			if(targetZone.ownerFaction >= 0 && 
+				ourFac.GetStandingWith(targetZone.ownerFaction) == GameFactionRelations.FactionStanding.neutral) {
+				finalScore *= GetRandomAtkOnNeutralFactionDiscouragement();
+			}
+		}else {
+			finalScore = GetZoneDangerScore(targetZone, ourFac);
+
+			//if an allied zone is TOO dangerous, maybe we shouldn't go there
+			if(finalScore >= GetRandomFriendlyTooDangerousThreshold()) {
+				finalScore = GetRandomMoveScoreThreshold();
+			}
 		}
 
 		//we should add score if friendly commanders are already there,
 		//in order to make bigger armies
-		//(not checking for allied cmders, only our own)
-		foreach (Commander cmd in GameController.GetCommandersOfFactionInZone(targetZone, ourFac)) {
+		foreach (Commander cmd in GameController.GetCommandersOfFactionAndAlliesInZone(targetZone, ourFac, true)) {
 			finalScore *= FRIENDLY_CMDER_PRESENCE_MULT;
 		}
+
+		//we divide by the SCORE DIVISOR to avoid getting too high scores compared to recruit and train
+		finalScore /= DANGER_SCORE_DIVISOR;
 
 		return finalScore;
 	}
@@ -436,6 +487,22 @@ public class AiPlayer {
 	/// <returns></returns>
 	public static float GetRandomTrainScoreThreshold() {
 		return Random.Range(MIN_TRAIN_SCORE_THRESHOLD, MAX_TRAIN_SCORE_THRESHOLD);
+	}
+
+	/// <summary>
+	/// gets a factor between the min and max
+	/// </summary>
+	/// <returns></returns>
+	public static float GetRandomAtkOnNeutralFactionDiscouragement() {
+		return Random.Range(MIN_DISENCOURAGE_ATK_ON_NEUTRAL_FAC_MULT, MAX_DISENCOURAGE_ATK_ON_NEUTRAL_FAC_MULT);
+	}
+
+	/// <summary>
+	/// gets a factor between the min and max
+	/// </summary>
+	/// <returns></returns>
+	public static float GetRandomFriendlyTooDangerousThreshold() {
+		return Random.Range(MIN_FRIENDLY_ZONE_TOO_DANGEROUS_THRESHOLD, MAX_FRIENDLY_ZONE_TOO_DANGEROUS_THRESHOLD);
 	}
 
 	#endregion

@@ -36,17 +36,23 @@ public class CommandPhaseMan : GamePhaseManager {
 		worldCommandScript.Cleanup();
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
+		GameInfo gData = GameController.CurGameData;
+
 		foreach(Commander cmder in factionCmders) {
 			if(cmder.troopsContained.Count == 0 && cmder.pointsToSpend > 0) {
 				cmder.OrderRecruitTroops(); //if we don't recruit, we would just disappear at the end of the turn
 			}else {
-				commandableCommanders.Add(cmder);
+				if (!gData.unifyBattlePhase ||
+						(gData.unifyBattlePhase && gData.unifiedOrdersRegistry.GetOrderGivenToCmder(cmder.ID) == null)) {
+					commandableCommanders.Add(cmder);
+				}
 			}
 		}
 		if(commandableCommanders.Count > 0) {
+			//sort commanders by zone so that the player's focus jumps around less often
+			//(this should also help the AI)
+			commandableCommanders.Sort(Commander.SortByZoneIAmIn);
 			if (playerFac.isPlayer) {
-				//sort commanders by zone so that the player's focus jumps around less often
-				commandableCommanders.Sort(Commander.SortByZoneIAmIn);
 				worldCommandScript.allowedCmders3d = GameController.CmdersToCmder3ds(commandableCommanders);
 				worldCommandScript.enabled = true;
 				curCmderInfoBox.gameObject.SetActive(true);

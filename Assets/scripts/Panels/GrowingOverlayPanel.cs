@@ -14,6 +14,9 @@ public class GrowingOverlayPanel : GenericOverlayPanel {
 
 	protected float elapsedTime;
 
+	/// <summary>
+	/// are we growing or shrinking?
+	/// </summary>
 	protected bool transitioning = false;
 
 	public override void OnEnable() {

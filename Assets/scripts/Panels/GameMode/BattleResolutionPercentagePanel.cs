@@ -26,8 +26,14 @@ public class BattleResolutionPercentagePanel : GenericOverlayPanel {
 	}
 
 	public void OnConfirmPercentages() {
-		bPanel.attackerSide.SetPostBattleArmyData_RemainingPercent(attackerBox.sliderGroup.theSlider.value);
-		bPanel.defenderSide.SetPostBattleArmyData_RemainingPercent(defenderBox.sliderGroup.theSlider.value);
+		bPanel.battlePhase.battleData.attackerSideInfo.SetPostBattleArmyData_RemainingPercent(attackerBox.sliderGroup.theSlider.value);
+		bPanel.battlePhase.battleData.defenderSideInfo.SetPostBattleArmyData_RemainingPercent(defenderBox.sliderGroup.theSlider.value);
+
+		if (!bPanel.battlePhase.battleData.BattleEndCheck()) {
+			//we only need to update side info displays if the battle hasn't ended yet, 
+			//because the delegate would take care of it otherwise
+			bPanel.UpdateArmyDisplays();
+		}
 	}
 
 }

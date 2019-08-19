@@ -304,8 +304,7 @@ public class Zone : TroopContainer {
 	/// <returns></returns>
 	public bool CanBeTakenBy(Faction targetFac) {
 		return ((ownerFaction != targetFac.ID) && (ownerFaction < 0 ||
-			GameController.GetFactionByID(ownerFaction).GetStandingWith(targetFac) !=
-				GameFactionRelations.FactionStanding.ally));
+			targetFac.GetStandingWith(ownerFaction) != GameFactionRelations.FactionStanding.ally));
 	}
 
 	/// <summary>

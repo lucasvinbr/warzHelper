@@ -33,24 +33,30 @@ public class BattlePanel : GrowingOverlayPanel {
 
 	public CanvasGroup resolutionBtnsGroup;
 
-	public void OpenWithFilledInfos(Faction attackerFaction, Faction defenderFaction, Zone warZone) {
+	/// <summary>
+	/// sets the info displays to what's in the battle data
+	/// (the battle data must be filled before this is called)
+	/// </summary>
+	/// <param name="battleData"></param>
+	public void OpenWithFilledInfo(Battle battleData) {
 		gameObject.SetActive(true);
 		
-		curWarzone = warZone;
+		curWarzone = battleData.warZone;
 
-		attackerSide.SetContent(attackerFaction);
-		attackerSide.SetArmyData(null,
-			GameController.CmdersToTroopContainers
-			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, attackerFaction, defenderFaction)));
+		attackerSide.sideInfo = battleData.attackerSideInfo;
+		attackerSide.SetContent(battleData.attackerSideInfo.leadingFaction);
+		attackerSide.SetArmyDataDisplay(null);
 
-		defenderSide.SetContent(defenderFaction);
-		defenderSide.SetArmyData(warZone,
-			GameController.CmdersToTroopContainers
-			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, defenderFaction, attackerFaction)));
+		defenderSide.sideInfo = battleData.defenderSideInfo;
+		defenderSide.SetContent(battleData.defenderSideInfo.leadingFaction);
+		defenderSide.SetArmyDataDisplay(battleData.warZone);
+
+		//runs the bar depleting animations once a side has been defeated
+		battlePhase.battleData.onBattleEnded += UpdateArmyDisplays;
 
 		//zone info...
-		zoneNameTxt.text = warZone.name;
-		if (string.IsNullOrEmpty(warZone.pictureFilePath)) {
+		zoneNameTxt.text = battleData.warZone.name;
+		if (string.IsNullOrEmpty(battleData.warZone.pictureFilePath)) {
 			zoneImg.gameObject.SetActive(false);
 		}
 		else {
@@ -60,27 +66,6 @@ public class BattlePanel : GrowingOverlayPanel {
 
 		ResetUI();
 
-
-		//if the "always autocalc AI battles" option is active,
-		//we must check if the player's troops aren't participating
-		//before forcing autocalc resolution
-		if (GameController.CurGameData.alwaysAutocalcAiBattles) {
-
-			foreach(TroopContainer tc in attackerSide.ourContainers) {
-				if (GameController.GetFactionByID(tc.ownerFaction).isPlayer) {
-					return;
-				}
-			}
-
-			foreach (TroopContainer tc in defenderSide.ourContainers) {
-				if (GameController.GetFactionByID(tc.ownerFaction).isPlayer) {
-					return;
-				}
-			}
-
-			AutocalcResolution();
-		}
-
 	}
 
 	public void OpenPercentageResolution() {
@@ -88,78 +73,19 @@ public class BattlePanel : GrowingOverlayPanel {
 	}
 
 	public void OpenManualResolution() {
-		manualPanel.SetupAndOpen(attackerSide.sideArmy, defenderSide.sideArmy);
+		manualPanel.SetupAndOpen(battlePhase.battleData.attackerSideInfo.sideArmy, battlePhase.battleData.defenderSideInfo.sideArmy);
 	}
 
 	/// <summary>
-	/// multiple mini-battles are made between randomized samples of each side's army
+	/// tells the battleData to run autocalc
 	/// </summary>
 	public void AutocalcResolution() {
-		//Debug.Log("---AUTOBATTLE START---");
-		//Debug.Log(attackerSide.factionNameTxt.text + " VS " + defenderSide.factionNameTxt.text);
-
-		float winnerDmgMultiplier = GameController.instance.curData.rules.autoResolveWinnerDamageMultiplier;
-
-		int baseSampleSize = GameController.instance.curData.rules.autoResolveBattleSampleSize;
-		int maxArmyForProportions = GameController.instance.curData.rules.autoResolveBattleMaxArmyForProportion;
-
-		do {
-			DoMiniBattle(baseSampleSize, winnerDmgMultiplier, maxArmyForProportions);
-		}
-		while (attackerSide.curArmyPower > 0 && defenderSide.curArmyPower > 0);
-
-		//Debug.Log("---AUTOBATTLE END---");
+		battlePhase.battleData.AutocalcResolution();
 	}
 
-	/// <summary>
-	/// makes the involved factions "fight each other" once, returning True if the conflict is over
-	/// </summary>
-	public void DoMiniBattle(int baseSampleSize, float winnerDmgMultiplier, int maxArmyForProportions) {
-		int sampleSize = Mathf.Min(attackerSide.curArmyNumbers, defenderSide.curArmyNumbers, baseSampleSize);
-
-		int attackerSampleSize = sampleSize;
-		int defenderSampleSize = sampleSize;
-
-		float armyNumbersProportion = (float)Mathf.Min(attackerSide.curArmyNumbers, maxArmyForProportions) / Mathf.Min(defenderSide.curArmyNumbers, maxArmyForProportions);
-		//Debug.Log("army num proportion: " + armyNumbersProportion);
-		//the size with a bigger army gets a bigger sample...
-		//but not a simple proportion because the more targets you've got,
-		//the easier it is to randomly hit a target hahaha
-		if (armyNumbersProportion > 1.0f) {
-			armyNumbersProportion = Mathf.Max(0.1f + ((armyNumbersProportion * sampleSize) / (armyNumbersProportion + baseSampleSize)), 1.0f);
-			attackerSampleSize = Mathf.RoundToInt(sampleSize * armyNumbersProportion);
-		}
-		else {
-			armyNumbersProportion = ((armyNumbersProportion * baseSampleSize) / (armyNumbersProportion + baseSampleSize));
-			defenderSampleSize = Mathf.RoundToInt(sampleSize / armyNumbersProportion);
-		}
-
-		//Debug.Log("attacker sSize: " + attackerSampleSize);
-		//Debug.Log("defender sSize: " + defenderSampleSize);
-
-		float attackerAutoPower = GameController.
-			GetRandomBattleAutocalcPower(attackerSide.sideArmy, attackerSampleSize);
-		float defenderAutoPower = GameController.
-			GetRandomBattleAutocalcPower(defenderSide.sideArmy, defenderSampleSize);
-
-		//Debug.Log("attacker auto power: " + attackerAutoPower);
-		//Debug.Log("defender auto power: " + defenderAutoPower);
-
-		//make the winner lose some power as well (or not, depending on the rules)
-		if (attackerAutoPower > defenderAutoPower) {
-			defenderAutoPower *= winnerDmgMultiplier;
-		}
-		else {
-			attackerAutoPower *= winnerDmgMultiplier;
-		}
-
-		//animate the power bars if the conflict is over
-		bool shouldAnimateBars = attackerAutoPower >= defenderSide.curArmyPower ||
-			defenderAutoPower >= attackerSide.curArmyPower;
-
-		defenderSide.SetPostBattleArmyData_PowerLost(attackerAutoPower, shouldAnimateBars);
-		attackerSide.SetPostBattleArmyData_PowerLost(defenderAutoPower, shouldAnimateBars);
-
+	public void UpdateArmyDisplays() {
+		attackerSide.UpdatePostBattleArmyDisplay(true);
+		defenderSide.UpdatePostBattleArmyDisplay(true);
 	}
 
 	/// <summary>
@@ -172,17 +98,14 @@ public class BattlePanel : GrowingOverlayPanel {
 		}
 	}
 
-	public void OnBattleResolved(BattlePanelFactionSideInfo loserSide) {
-		if(loserSide == attackerSide) {
-			defenderSide.SharePointsBetweenConts(loserSide.pointsAwardedToVictor);
-		}else {
-			attackerSide.SharePointsBetweenConts(loserSide.pointsAwardedToVictor);
+	public void BattleResolved(BattlePanelFactionSideInfo loserSide) {
+		if (!transitioning) {
+			Shrink(TellPhaseManAboutResolution);
 		}
-		Shrink(TellPhaseManAboutResolution);
 	}
 
 	public void TellPhaseManAboutResolution() {
-		battlePhase.OnBattleResolved(curWarzone);
+		battlePhase.OnBattleResolved();
 	}
 
 	/// <summary>
@@ -217,7 +140,7 @@ public class BattlePanel : GrowingOverlayPanel {
 		exportOptions.Add(new KeyValuePair<string, UnityAction>("Basic Export to JSON (all troops in a simple list - don't use if both sides use the same troop type)", () => {
 			SerializableTroopListObj exportedList = new SerializableTroopListObj(JsonHandlingUtils.TroopListToSerializableTroopList
 				(GameController.GetCombinedTroopsFromTwoLists
-				(attackerSide.sideArmy, defenderSide.sideArmy)));
+				(battlePhase.battleData.attackerSideInfo.sideArmy, battlePhase.battleData.defenderSideInfo.sideArmy)));
 			string JSONContent = JsonUtility.ToJson(exportedList);
 			Debug.Log(JSONContent);
 			GI.textInputPanel.SetPanelInfo("JSON Export Result", "", JSONContent, "Copy to Clipboard", () => {
@@ -241,7 +164,7 @@ public class BattlePanel : GrowingOverlayPanel {
 				gData.lastEnteredExportTroopSplitAmt = splitLimit;
 				SerializableTroopListObj exportedList = new SerializableTroopListObj(JsonHandlingUtils.TroopListToSerializableTroopList
 					(GameController.GetCombinedTroopsFromTwoLists
-						(attackerSide.sideArmy, defenderSide.sideArmy), splitLimit));
+						(battlePhase.battleData.attackerSideInfo.sideArmy, battlePhase.battleData.defenderSideInfo.sideArmy), splitLimit));
 				string JSONContent = JsonUtility.ToJson(exportedList);
 				Debug.Log(JSONContent);
 				GI.textInputPanel.SetPanelInfo("JSON Export Result", "", JSONContent, "Copy to Clipboard", () => {
@@ -273,7 +196,7 @@ public class BattlePanel : GrowingOverlayPanel {
 				gData.lastEnteredExportDefenderVariable = varForDefenders.text;
 
 				List<SerializedTroop> sTroopList = 
-					JsonHandlingUtils.TroopListToSerializableTroopList(attackerSide.sideArmy, splitLimit);
+					JsonHandlingUtils.TroopListToSerializableTroopList(battlePhase.battleData.attackerSideInfo.sideArmy, splitLimit);
 
 				for(int i = 0; i < sTroopList.Count; i++) {
 					JSONContent = string.Concat(JSONContent,
@@ -282,7 +205,7 @@ public class BattlePanel : GrowingOverlayPanel {
 				}
 
 				sTroopList =
-					JsonHandlingUtils.TroopListToSerializableTroopList(defenderSide.sideArmy, splitLimit);
+					JsonHandlingUtils.TroopListToSerializableTroopList(battlePhase.battleData.defenderSideInfo.sideArmy, splitLimit);
 
 				for (int i = 0; i < sTroopList.Count; i++) {
 				JSONContent = string.Concat(JSONContent,
@@ -331,16 +254,22 @@ public class BattlePanel : GrowingOverlayPanel {
 
 					TroopNumberPair convertedTNP = JsonHandlingUtils.SerializedTroopToTroopNumberPair(tnp);
 					if(convertedTNP.troopAmount > 0) {
-						if(GameController.IndexOfTroopInTroopList(defenderSide.sideArmy, convertedTNP.troopTypeID) != -1) {
+						if(GameController.IndexOfTroopInTroopList(battlePhase.battleData.defenderSideInfo.sideArmy, convertedTNP.troopTypeID) != -1) {
 							defendersRemaining.Add(convertedTNP);
-						}else if (GameController.IndexOfTroopInTroopList(attackerSide.sideArmy, convertedTNP.troopTypeID) != -1) {
+						}else if (GameController.IndexOfTroopInTroopList(battlePhase.battleData.attackerSideInfo.sideArmy, convertedTNP.troopTypeID) != -1) {
 							attackersRemaining.Add(convertedTNP);
 						}
 					}
 				}
 
-				defenderSide.SetPostBattleArmyData_RemainingArmy(defendersRemaining);
-				attackerSide.SetPostBattleArmyData_RemainingArmy(attackersRemaining);
+				battlePhase.battleData.defenderSideInfo.SetPostBattleArmyData_RemainingArmy(defendersRemaining);
+				battlePhase.battleData.attackerSideInfo.SetPostBattleArmyData_RemainingArmy(attackersRemaining);
+
+				if (!battlePhase.battleData.BattleEndCheck()) {
+					//we only need to update side info displays if the battle hasn't ended yet, 
+					//because the delegate would take care of it otherwise
+					UpdateArmyDisplays();
+				}
 
 				GI.textInputPanel.Close();
 

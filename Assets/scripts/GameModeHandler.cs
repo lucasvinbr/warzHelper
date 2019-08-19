@@ -152,6 +152,8 @@ public class GameModeHandler : ModeUI {
 	}
 
 	public void StartRespectivePhaseMan() {
+		//set all tabs to Off to circumvent issues that may be caused by phases being skipped
+		phasesTabGroup.SetAllTabsOff();
 		phasesTabGroup.ToggleTabIndex((int)curPhase);
 		orderedPhaseManagers[(int)curPhase].OnPhaseStart();
 	}
@@ -168,49 +170,20 @@ public class GameModeHandler : ModeUI {
 	public void GoToNextTurnPhase() {
 		GameInfo curData = GameController.CurGameData;
 		if (curPhase != TurnPhase.postBattle) {
-
 			curPhase++;
-			if (curPhase == TurnPhase.pointAward) {
-				//if in "unified" mode, skip the point award phase of all factions except the first one (it'll award points to all at once)
-				if (curData.unifyBattlePhase) {
-					if (curPlayingFaction.ID != curData.factions[0].ID) {
-						GoToNextTurnPhase();
-						return;
-					}
-				}
-			}
-
-			if (curPhase == TurnPhase.battle) {
-				//skip this battle and post-battle phases if we're in "unified" mode
-				//and it's not the last faction's turn
-				if (curData.unifyBattlePhase) {
-					if (curPlayingFaction.ID != curData.factions[curData.factions.Count - 1].ID) {
-						curPhase = TurnPhase.postBattle;
-						GoToNextTurnPhase();
-						return;
-					}
-					else {
-						//before the "big battle phase", apply all registered orders!
-						curData.unifiedOrdersRegistry.RunAllOrders();
-					}
-				}
-			}
 			curData.curTurnPhase = curPhase;
 			StartRespectivePhaseMan();
 		}
 		else {
-			//move caravans if it's the "last faction"'s turn end
-			if (curPlayingFaction.ID == curData.factions[curData.factions.Count - 1].ID) {
-				MercCaravansPseudoTurn();
-			}
-
 			TurnFinished();
 		}
 	}
 
 
 	public void TurnFinished() {
+		
 		GameInfo data = GameController.CurGameData;
+
 		data.lastTurnPriority = curPlayingFaction.turnPriority;
 		data.elapsedTurns++;
 		//TODO victory check

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Xml.Serialization;
 using UnityEngine;
 
 /// <summary>
@@ -35,8 +36,27 @@ public class GameFactionRelations
 	/// </summary>
 	public bool alliedVictory = true;
 
-
 	public List<FactionRelation> relations = new List<FactionRelation>();
+
+	public enum RelationChangeReportLevel {
+		none,
+		onlyPlayerFaction,
+		allFactions
+	}
+
+	public RelationChangeReportLevel relationChangeReportLevel = RelationChangeReportLevel.onlyPlayerFaction;
+
+	public RelationChangeReportLevel standingChangeReportLevel = RelationChangeReportLevel.allFactions;
+
+	[XmlIgnore]
+	/// <summary>
+	/// whenever a faction relation crosses one of the relation change limits,
+	/// it's added to this dict, so that, in the end of the turn, we can
+	/// report this change only once (or not report it at all if it changed and then was restored
+	/// to what it was when the turn began).
+	/// we store the relation itself and the relation value before the first change in the turn
+	/// </summary>
+	public Dictionary<FactionRelation, float> reportedRelationChanges = new Dictionary<FactionRelation, float>();
 
 	/// <summary>
 	/// factions will be enemies if their relation value goes below this
@@ -102,8 +122,7 @@ public class GameFactionRelations
 	}
 
 	public float AddRelationBetweenFactions(int facID1, int facID2, float addition,
-		bool preventBecomingAllies = false, bool notifyIfFactionStandingChanged = false,
-		bool announceRelationChange = false) {
+		bool preventBecomingAllies = false) {
 		foreach (FactionRelation rel in relations) {
 			if (rel.relatedFacs[0] == facID1 || rel.relatedFacs[1] == facID1) {
 				if (rel.relatedFacs[0] == facID2 || rel.relatedFacs[1] == facID2) {
@@ -111,15 +130,9 @@ public class GameFactionRelations
 					rel.relationValue = 
 						Mathf.Clamp(rel.relationValue + addition, MIN_RELATIONS, preventBecomingAllies ? CONSIDER_ALLY_THRESHOLD : MAX_RELATIONS);
 
-					if (announceRelationChange) {
-						LoggerAnnounceRelationChange(facID1, facID2, rel.relationValue, 
-							relationsBeforeChange);
-					}
-
-					if(notifyIfFactionStandingChanged && 
-						RelationValueToStanding(relationsBeforeChange) != 
-						RelationValueToStanding(rel.relationValue)) {
-						LoggerAnnounceStandingChange(facID1, facID2, RelationValueToStanding(rel.relationValue));
+					//register this relation for later announcement of changes
+					if (!reportedRelationChanges.ContainsKey(rel)) {
+						reportedRelationChanges.Add(rel, relationsBeforeChange);
 					}
 
 					return rel.relationValue;
@@ -141,12 +154,10 @@ public class GameFactionRelations
 	/// <param name="announceRelationChange"></param>
 	/// <returns></returns>
 	public void AddRelationBetweenFactions(int facID1, List<int> targetFacs, float addition,
-		bool preventBecomingAllies = false, bool notifyIfFactionStandingChanged = false,
-		bool announceRelationChange = false) {
+		bool preventBecomingAllies = false) {
 
 		foreach (int targetFac in targetFacs) {
-			AddRelationBetweenFactions(facID1, targetFac, addition, preventBecomingAllies,
-				notifyIfFactionStandingChanged, announceRelationChange);
+			AddRelationBetweenFactions(facID1, targetFac, addition, preventBecomingAllies);
 		}
 
 	}
@@ -173,6 +184,35 @@ public class GameFactionRelations
 		}
 	}
 
+
+	public void AnnounceAllRelationChanges() {
+		foreach(KeyValuePair<FactionRelation, float> kvp in reportedRelationChanges) {
+			if(kvp.Key.relationValue != kvp.Value) {
+				if(relationChangeReportLevel != RelationChangeReportLevel.none) {
+					if(relationChangeReportLevel == RelationChangeReportLevel.allFactions ||
+						(GameController.GetFactionByID(kvp.Key.relatedFacs[0]).isPlayer ||
+						GameController.GetFactionByID(kvp.Key.relatedFacs[1]).isPlayer)) {
+						LoggerAnnounceRelationChange
+							(kvp.Key.relatedFacs[0], kvp.Key.relatedFacs[1], kvp.Key.relationValue, kvp.Value);
+					}
+				}
+
+				if(standingChangeReportLevel != RelationChangeReportLevel.none) {
+					if(RelationValueToStanding(kvp.Value) != RelationValueToStanding(kvp.Key.relationValue)) {
+						if (standingChangeReportLevel == RelationChangeReportLevel.allFactions ||
+						(GameController.GetFactionByID(kvp.Key.relatedFacs[0]).isPlayer ||
+						GameController.GetFactionByID(kvp.Key.relatedFacs[1]).isPlayer)) {
+							LoggerAnnounceStandingChange
+								(kvp.Key.relatedFacs[0], kvp.Key.relatedFacs[1],
+								RelationValueToStanding(kvp.Key.relationValue));
+						}
+					}
+				}
+			}
+		}
+
+		reportedRelationChanges.Clear();
+	}
 
 	public void LoggerAnnounceRelationChange(int facID1, int facID2, float newValue, float oldValue) {
 		if (newValue == oldValue) return; //yeah, no reporting if nothing changed

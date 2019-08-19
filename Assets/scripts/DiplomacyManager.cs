@@ -50,23 +50,6 @@ public class DiplomacyManager {
 	public const float MIN_RELPERCENT_REQUIRED_ALLIANCE = 0.75f;
 
 	/// <summary>
-	/// the attacked should get angry with the attacker;
-	/// all who aren't allied to the attackers get a little relation decrease with them,
-	/// just enough to make allies and enemies form up eventually
-	/// </summary>
-	/// <param name="attackerFac"></param>
-	/// <param name="attackedFac"></param>
-	public static void GlobalReactToAttack(Faction attackerFac, Faction attackedFac) {
-		GameInfo gData = GameController.CurGameData;
-		if (!gData.factionRelations.lockRelations) {
-			foreach (Faction fac in gData.factions) {
-				FacReactToAttack(fac, attackerFac, attackedFac);
-			}
-		}
-		
-	}
-
-	/// <summary>
 	/// gets attackers and defenders according to the zone owner's diplomacy.
 	/// the attacked should get angry with the attacker;
 	/// everyone gets a little relation decrease with the attacker as well...
@@ -101,18 +84,18 @@ public class DiplomacyManager {
 	/// <param name="attackedFac"></param>
 	public static void FacReactToAttack(Faction ourFac, Faction attackerFac, Faction attackedFac) {
 		if(ourFac == attackedFac) {
-			ourFac.AddRelationWith(attackerFac, GetRelDmgAttacked(), notifyRelationChange: ourFac.isPlayer, notifyStandingChange: true);
+			ourFac.AddRelationWith(attackerFac, GetRelDmgAttacked());
 		}else if (attackedFac != null && ourFac != attackerFac) {
 			
 			GameFactionRelations.FactionStanding standingWithAttacked = 
 				attackedFac.GetStandingWith(ourFac);
 			if (standingWithAttacked == GameFactionRelations.FactionStanding.enemy) {
-				ourFac.AddRelationWith(attackerFac, GetRelGainEnemyAttacked(), true, false, true);
+				ourFac.AddRelationWith(attackerFac, GetRelGainEnemyAttacked());
 			}else if(standingWithAttacked == GameFactionRelations.FactionStanding.ally) {
-				ourFac.AddRelationWith(attackerFac, GetRelDmgAllyAttacked(), true, false, true);
+				ourFac.AddRelationWith(attackerFac, GetRelDmgAllyAttacked());
 			}
 			//and worsen relations
-			ourFac.AddRelationWith(attackerFac, GetRelDmgAggressiveBehaviour(), true, false, true);
+			ourFac.AddRelationWith(attackerFac, GetRelDmgAggressiveBehaviour());
 		}
 	}
 
@@ -130,7 +113,7 @@ public class DiplomacyManager {
 
 		if (ourFacID == attackedFacID) {
 			gData.factionRelations.AddRelationBetweenFactions(ourFacID, attackerFacs, GetRelDmgAttacked(),
-				false, true, ourFac.isPlayer);
+				false);
 		}
 		else if (attackedFacID >= 0) {
 			if (!attackerFacs.Contains(ourFacID)) {
@@ -138,17 +121,17 @@ public class DiplomacyManager {
 				GameFactionRelations.FactionStanding standingWithAttacked =
 					attackedFac.GetStandingWith(ourFacID);
 				if (standingWithAttacked == GameFactionRelations.FactionStanding.enemy) {
-					ourFac.AddRelationWith(attackerFacs, GetRelGainEnemyAttacked(), notifyRelationChange: ourFac.isPlayer, notifyStandingChange: true);
+					ourFac.AddRelationWith(attackerFacs, GetRelGainEnemyAttacked());
 				}
 				else if (standingWithAttacked == GameFactionRelations.FactionStanding.ally) {
-					ourFac.AddRelationWith(attackerFacs, GetRelDmgAllyAttacked(), notifyRelationChange: ourFac.isPlayer, notifyStandingChange: true);
+					ourFac.AddRelationWith(attackerFacs, GetRelDmgAllyAttacked());
 				}
 				//and worsen relations
-				ourFac.AddRelationWith(attackerFacs, GetRelDmgAggressiveBehaviour(), notifyStandingChange: true);
+				ourFac.AddRelationWith(attackerFacs, GetRelDmgAggressiveBehaviour());
 			}else {
 				foreach(int atkerFacID in attackerFacs) {
 					if(atkerFacID != ourFacID) {
-						ourFac.AddRelationWith(atkerFacID, GetRelGainJoinAttack(), notifyRelationChange: ourFac.isPlayer, notifyStandingChange: true);
+						ourFac.AddRelationWith(atkerFacID, GetRelGainJoinAttack());
 					}
 				}
 			}
