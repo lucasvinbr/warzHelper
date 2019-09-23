@@ -11,7 +11,9 @@ public class Battle {
 
 	public OnBattleEnded onBattleEnded;
 	/// <summary>
-	/// fills armies' data and resets "on lost" delegates to the default "reward the other side" method only
+	/// fills armies' data.
+	/// Attackers are picked elsewhere, we just decide who's going to "represent" the attacker group here.
+	/// 
 	/// </summary>
 	/// <param name="attackerCmders"></param>
 	/// <param name="defenderFaction"></param>
@@ -48,7 +50,7 @@ public class Battle {
 
 		defenderSideInfo.SetArmyData(defenderFaction, warZone,
 			GameController.CmdersToTroopContainers
-			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, defenderFaction)));
+			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, defenderFaction, attackerFactionsCmdersDict.Keys)));
 	}
 
 	/// <summary>

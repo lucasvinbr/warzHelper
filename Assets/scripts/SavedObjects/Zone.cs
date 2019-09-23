@@ -208,7 +208,7 @@ public class Zone : TroopContainer {
 		if (TotalTroopsContained < MaxTroopsInGarrison && multRecruitmentPoints > 0) {
 			//recruitment!
 
-			TroopType recruitableTroopType = GameController.GetTroopTypeByID(ownerFac.troopLine[0]);
+			TroopType recruitableTroopType = null;
 
 			MercCaravan localCaravan = GameController.GetMercCaravanInZone(ID);
 
@@ -217,6 +217,8 @@ public class Zone : TroopContainer {
 			}
 			else if (ownerFac.troopLine.Count == 0) {
 				return false; //maybe this is some kind of special faction that only relies on mercs?
+			}else {
+				recruitableTroopType = GameController.GetTroopTypeByID(ownerFac.troopLine[0]);
 			}
 
 			int troopRecruitmentCostHere =

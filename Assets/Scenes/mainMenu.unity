@@ -67548,7 +67548,7 @@ MonoBehaviour:
   downBtn: {fileID: 1945125386}
   targetField: {fileID: 1943855141}
   addEventToBtnsOnStart: 1
-  minValue: 1
+  minValue: 0
   maxValue: 99
   stepSize: 0.1
 --- !u!114 &1283893352

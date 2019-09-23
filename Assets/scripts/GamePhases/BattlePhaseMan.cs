@@ -19,7 +19,6 @@ public class BattlePhaseMan : GamePhaseManager {
 
 		if (battleData == null) battleData = new Battle();
 
-		//find battles, register them and open a resolution menu for each one
 		infoTxt.text = "Resolution of any battles started in the Command Phase";
 		GameInfo curGameData = GameController.CurGameData;
 
@@ -120,9 +119,12 @@ public class BattlePhaseMan : GamePhaseManager {
 				OnBattleResolved();
 			}
 			yield break;
+		}else {
+			yield return FocusOnBattle(targetZone);
+			battlePanel.OpenWithFilledInfo(battleData);
 		}
 
-		battlePanel.OpenWithFilledInfo(battleData);
+		
 	}
 
 	public void OnBattleResolved() {

@@ -566,6 +566,44 @@ public class GameController : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// gets both the target faction's cmders and any cmders from allied factions
+	/// that aren't also allied to any the provided enemy factions (if we're allied to at least one, we won't be added)
+	/// </summary>
+	/// <param name="targetZone"></param>
+	/// <param name="targetFac"></param>
+	/// <returns></returns>
+	public static List<Commander> GetCommandersOfFactionAndAlliesInZone(Zone targetZone, Faction targetFac, IEnumerable<int> enemyFacIDs) {
+		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
+
+		if (targetFac == null) return friendlyCommandersInTheZone; //neutral zones should have no allies
+
+		Faction curCmderFac = null;
+		bool shouldAdd = false;
+		foreach (Commander cmder in GetCommandersInZone(targetZone)) {
+			curCmderFac = GetFactionByID(cmder.ownerFaction);
+			shouldAdd = true;
+			if(curCmderFac != targetFac) {
+				if (curCmderFac.GetStandingWith(targetFac) == GameFactionRelations.FactionStanding.ally) {
+					foreach (int enemyFacID in enemyFacIDs) {
+						if (curCmderFac.GetStandingWith(enemyFacID) == GameFactionRelations.FactionStanding.ally) {
+							shouldAdd = false;
+							break;
+						}
+					}
+				}
+				else {
+					shouldAdd = false;
+				}
+			}
+			if (shouldAdd) {
+				friendlyCommandersInTheZone.Add(cmder);
+			}
+		}
+
+		return friendlyCommandersInTheZone;
+	}
+
+	/// <summary>
 	/// gets all commanders in the zone, optionally not getting commanders that are still tweening towards it
 	/// (those already count as in the zone for gameplay purposes, but haven't visually arrived there yet)
 	/// </summary>
