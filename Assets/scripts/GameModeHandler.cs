@@ -91,7 +91,13 @@ public class GameModeHandler : ModeUI {
 		//give initial points to zones if this is a new game
 		if (data.elapsedTurns == 0) {
 			AddInitialPointsToZones();
+			//open the gameOptions panel to allow the player to make additional arrangements before the game actually starts
 			GameInterface.instance.gameOpsPanel.gameObject.SetActive(true);
+		}
+
+		//check if all existing factions have entries in the relations list
+		if (!data.factionRelations.CheckRelationListIntegrity()) {
+			data.factionRelations.AddAnyMissingFacEntries();
 		}
 
 		StartCoroutine(StartTurnAfterPanelsClose(data.curTurnPhase));

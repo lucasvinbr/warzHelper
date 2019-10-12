@@ -313,6 +313,27 @@ public class GameController : MonoBehaviour {
 		return null;
 	}
 
+	/// <summary>
+	/// converts a list of faction IDs to a list of Factions.
+	/// invalid IDs are not added to the list
+	/// </summary>
+	/// <param name="factionIDs"></param>
+	/// <returns></returns>
+	public static List<Faction> GetFactionsByIDs(List<int> factionIDs) {
+		List<Faction> returnedList = new List<Faction>();
+
+		Faction retrievedFac = null;
+
+		foreach(int facID in factionIDs) {
+			retrievedFac = GetFactionByID(facID);
+			if(retrievedFac != null) {
+				returnedList.Add(retrievedFac);
+			}
+		}
+
+		return returnedList;
+	}
+
 	public static Zone GetZoneByID(int zoneID) {
 		List<Zone> zoneList = instance.curData.zones;
 		for (int i = 0; i < zoneList.Count; i++) {
@@ -567,7 +588,7 @@ public class GameController : MonoBehaviour {
 
 	/// <summary>
 	/// gets both the target faction's cmders and any cmders from allied factions
-	/// that aren't also allied to any the provided enemy factions (if we're allied to at least one, we won't be added)
+	/// that aren't also allied to any of the provided enemy factions (if we're allied to at least one, we won't be added)
 	/// </summary>
 	/// <param name="targetZone"></param>
 	/// <param name="targetFac"></param>

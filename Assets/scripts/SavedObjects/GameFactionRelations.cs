@@ -87,15 +87,46 @@ public class GameFactionRelations
 		}
 	}
 
-	public float GetRelationBetweenFactions(Faction fac1, Faction fac2) {
+	/// <summary>
+	/// returns true if the number of entries in the relation list is correct according to the number of factions in the game
+	/// </summary>
+	/// <returns></returns>
+	public bool CheckRelationListIntegrity() {
+		int facsCount = GameController.instance.curData.factions.Count;
+
+		return relations.Count == ((facsCount - 1) * facsCount / 2);
+	}
+
+	/// <summary>
+	/// goes through the factions list checking if relations between every pair of facs exist, adding one if it doesn't
+	/// </summary>
+	public void AddAnyMissingFacEntries() {
+		List<Faction> factions = GameController.instance.curData.factions;
+
+		bool relationExists = false;
+
+		for (int i = 0; i < factions.Count - 1; i++) {
+			for (int j = i + 1; j < factions.Count; j++) {
+				GetRelationBetweenFactions(factions[i], factions[j], out relationExists);
+
+				if (!relationExists) {
+					relations.Add(new FactionRelation(factions[i], factions[j]));
+				}
+			}
+		}
+	}
+
+	public float GetRelationBetweenFactions(Faction fac1, Faction fac2, out bool relationEntryExists) {
 		foreach(FactionRelation rel in relations) {
 			if(rel.relatedFacs[0] == fac1.ID || rel.relatedFacs[1] == fac1.ID) {
 				if(rel.relatedFacs[0] == fac2.ID || rel.relatedFacs[1] == fac2.ID) {
+					relationEntryExists = true;
 					return rel.relationValue;
 				}
 			}
 		}
 
+		relationEntryExists = false;
 		return 0;
 	}
 

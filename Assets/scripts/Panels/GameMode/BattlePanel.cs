@@ -43,12 +43,10 @@ public class BattlePanel : GrowingOverlayPanel {
 		
 		curWarzone = battleData.warZone;
 
-		attackerSide.sideInfo = battleData.attackerSideInfo;
-		attackerSide.SetContent(battleData.attackerSideInfo.leadingFaction);
+		attackerSide.SetContent(battleData.attackerSideInfo);
 		attackerSide.SetArmyDataDisplay(null);
 
-		defenderSide.sideInfo = battleData.defenderSideInfo;
-		defenderSide.SetContent(battleData.defenderSideInfo.leadingFaction);
+		defenderSide.SetContent(battleData.defenderSideInfo);
 		defenderSide.SetArmyDataDisplay(battleData.warZone);
 
 		//runs the bar depleting animations once a side has been defeated

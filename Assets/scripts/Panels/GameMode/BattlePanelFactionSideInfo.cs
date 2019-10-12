@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UI.Extensions;
 using TMPro;
 using System.Globalization;
 
-public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
+public class BattlePanelFactionSideInfo : ListPanelEntry<BattleFactionSideInfo> {
 
     public TMP_Text factionNameTxt, factionForcesDescTxt, factionTroopNumbersTxt, factionAutocalcPowerTxt;
+
+	public TooltipTrigger facNamesTooltipTrigger;
 
     public Image factionImg;
 
@@ -21,23 +24,56 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 
 	public const float BAR_DEPLETION_TIME = 0.8f, SIDE_DEFEATED_FADE_TIME = 0.6f, SIDE_DEFEATED_NOTIFY_DELAY = 0.4f;
 
-	public BattleFactionSideInfo sideInfo;
-
-	public override void SetContent(Faction theContent)
+	public override void SetContent(BattleFactionSideInfo theContent)
     {
         base.SetContent(theContent);
 
-        factionNameTxt.text = theContent.name;
-		factionPowerBarContent.color = theContent.color;
-		factionPowerBarContent.fillAmount = 1.0f;
-		ourGroup.alpha = 1.0f;
-		if (string.IsNullOrEmpty(theContent.iconPath)) {
-			factionImg.gameObject.SetActive(false);
+		//TODO figure out the main attacking faction by picking the one with the most cmders or something like that?
+		Faction baseSideFaction = theContent.sideFactions.Count > 0 ? theContent.sideFactions[0] : null;
+
+		if(baseSideFaction != null) {
+			factionNameTxt.text = baseSideFaction.name;
+
+			if (theContent.sideFactions.Count > 1) {
+				factionImg.gameObject.SetActive(false);
+
+				factionNameTxt.text = string.Concat(factionNameTxt.text, "\n + ",
+					(theContent.sideFactions.Count - 1).ToString(), " other(s)");
+
+				facNamesTooltipTrigger.enabled = true;
+				facNamesTooltipTrigger.text = "";
+
+				for(int i = 1; i < theContent.sideFactions.Count; i++) {
+					facNamesTooltipTrigger.text = string.Concat
+						(facNamesTooltipTrigger.text, theContent.sideFactions[i].name,
+						i < theContent.sideFactions.Count - 1 ? "\n" : "");
+				}
+			}
+			else {
+				facNamesTooltipTrigger.enabled = false;
+
+				if (string.IsNullOrEmpty(baseSideFaction.iconPath)) {
+					factionImg.gameObject.SetActive(false);
+				}
+				else {
+					factionImg.gameObject.SetActive(true);
+					//TODO set image and all that
+				}
+			}
+
+			factionPowerBarContent.color = baseSideFaction.color;
 		}
 		else {
-			factionImg.gameObject.SetActive(true);
-			//TODO set image and all that
+			factionNameTxt.text = Rules.NO_FACTION_NAME;
+			factionPowerBarContent.color = Color.white;
+			factionImg.gameObject.SetActive(false);
+			facNamesTooltipTrigger.enabled = false;
 		}
+
+        
+		factionPowerBarContent.fillAmount = 1.0f;
+		ourGroup.alpha = 1.0f;
+		
 	}
 
 	/// <summary>
@@ -55,15 +91,15 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 		string forceDescription = "";
 		
 
-		armyCmders = sideInfo.ourContainers.Count;
+		armyCmders = myContent.ourContainers.Count;
 
 		if (ourZone != null) {
 			forceDescription = "Garrison";
 			armyCmders--; //prevents counting the zone as a commander
 		}
 
-		armyNumbers = sideInfo.curArmyNumbers;
-		armyPower = sideInfo.curArmyPower;
+		armyNumbers = myContent.curArmyNumbers;
+		armyPower = myContent.curArmyPower;
 
 		if(armyCmders > 0) {
 
@@ -89,11 +125,11 @@ public class BattlePanelFactionSideInfo : ListPanelEntry<Faction> {
 	/// </summary>
 	/// <param name="startDepletePowerBarRoutine"></param>
 	public void UpdatePostBattleArmyDisplay(bool startDepletePowerBarRoutine = true) { 
-		factionTroopNumbersTxt.text = sideInfo.curArmyNumbers.ToString() + " Troops";
-		factionAutocalcPowerTxt.text = "Power: " + sideInfo.curArmyPower.ToString("0.00", CultureInfo.InvariantCulture);
+		factionTroopNumbersTxt.text = myContent.curArmyNumbers.ToString() + " Troops";
+		factionAutocalcPowerTxt.text = "Power: " + myContent.curArmyPower.ToString("0.00", CultureInfo.InvariantCulture);
 
-		if(startDepletePowerBarRoutine || sideInfo.curArmyPower <= 0)
-			StartCoroutine(DepletePowerBarAccordingToPower(sideInfo.initialArmyPower, sideInfo.curArmyPower));
+		if(startDepletePowerBarRoutine || myContent.curArmyPower <= 0)
+			StartCoroutine(DepletePowerBarAccordingToPower(myContent.initialArmyPower, myContent.curArmyPower));
 	}
 
 	/// <summary>

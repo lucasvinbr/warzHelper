@@ -21,36 +21,33 @@ public class Battle {
 	public void FillInfo(List<Commander> attackerCmders, Faction defenderFaction, Zone warZone) {
 		this.warZone = warZone;
 
-		//find out which is the "main" attacker faction by checking how many cmders of each faction are there
-		Faction mainAtkerFaction = null;
+		List<int> attackerFactionIDs = new List<int>();
+		List<int> defenderFactionIDs = new List<int>();
 
-		Dictionary<int, int> attackerFactionsCmdersDict = new Dictionary<int, int>();
-		int greatestCmderAmount = 0, greatestAtkerFacID = -1;
+		defenderFactionIDs.Add(defenderFaction.ID);
 
 		foreach (Commander cmder in attackerCmders) {
-			if (!attackerFactionsCmdersDict.ContainsKey(cmder.ownerFaction)) {
-				attackerFactionsCmdersDict.Add(cmder.ownerFaction, 1);
-			}
-			else {
-				attackerFactionsCmdersDict[cmder.ownerFaction]++;
+			if (!attackerFactionIDs.Contains(cmder.ownerFaction)) {
+				attackerFactionIDs.Add(cmder.ownerFaction);
 			}
 		}
 
-		foreach (KeyValuePair<int, int> kvp in attackerFactionsCmdersDict) {
-			if (kvp.Value > greatestCmderAmount) {
-				greatestCmderAmount = kvp.Value;
-				greatestAtkerFacID = kvp.Key;
+		//defender cmders are filtered because some might be allied to both an attacker and the defender;
+		//in that case, they won't help defend
+		List<Commander> defenderCmders = GameController.GetCommandersOfFactionAndAlliesInZone
+			(warZone, defenderFaction, attackerFactionIDs);
+
+		foreach (Commander cmder in defenderCmders) {
+			if (!defenderFactionIDs.Contains(cmder.ownerFaction)) {
+				defenderFactionIDs.Add(cmder.ownerFaction);
 			}
 		}
 
-		mainAtkerFaction = GameController.GetFactionByID(greatestAtkerFacID);
-
-		attackerSideInfo.SetArmyData(mainAtkerFaction, null,
+		attackerSideInfo.SetArmyData(GameController.GetFactionsByIDs(attackerFactionIDs), null,
 			GameController.CmdersToTroopContainers(attackerCmders));
 
-		defenderSideInfo.SetArmyData(defenderFaction, warZone,
-			GameController.CmdersToTroopContainers
-			(GameController.GetCommandersOfFactionAndAlliesInZone(warZone, defenderFaction, attackerFactionsCmdersDict.Keys)));
+		defenderSideInfo.SetArmyData(GameController.GetFactionsByIDs(defenderFactionIDs), warZone,
+			GameController.CmdersToTroopContainers(defenderCmders));
 	}
 
 	/// <summary>
@@ -170,7 +167,7 @@ public class Battle {
 
 public class BattleFactionSideInfo {
 
-	public Faction leadingFaction;
+	public List<Faction> sideFactions;
 
 	/// <summary>
 	/// combined army of all containers of this side in the battle
@@ -199,15 +196,15 @@ public class BattleFactionSideInfo {
 	/// providing the zone separated from the rest of our containers will affect the description
 	/// of forces only
 	/// </summary>
-	/// <param name="leadingFaction"></param>
+	/// <param name="sideFactions"></param>
 	/// <param name="ourZone"></param>
 	/// <param name="containers"></param>
 	/// <param name="postBattle"></param>
-	public void SetArmyData(Faction leadingFaction, Zone ourZone, List<TroopContainer> containers) {
+	public void SetArmyData(List<Faction> sideFactions, Zone ourZone, List<TroopContainer> containers) {
 		ourContainers.Clear();
 		ourContainers.AddRange(containers);
 		sideArmy.Clear();
-		this.leadingFaction = leadingFaction;
+		this.sideFactions = sideFactions;
 		pointsAwardedToVictor = 0;
 		int armyNumbers = 0;
 		int armyCmders = 0;

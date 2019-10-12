@@ -127,7 +127,9 @@ public class AiPlayer {
 
 			//recruit chance might be more than 100%, but it's ok as it will do something else
 			//if it can't recruit
-			recruitChance = commandableCmders[i].GetPercentOfNewTroopsIfRecruited() * RECRUIT_CHANCE_ENCOURAGEMENT;
+			recruitChance = Mathf.Max(commandableCmders[i].GetPercentOfNewTroopsIfRecruited(),
+				Mathf.Min(commandableCmders[i].GetPercentOfNewTroopsIfRecruitedComparedToCurrent(), 1.0f)) * 
+				RECRUIT_CHANCE_ENCOURAGEMENT;
 
 			trainChance = commandableCmders[i].GetPercentOfTroopsUpgradedIfTrained();
 

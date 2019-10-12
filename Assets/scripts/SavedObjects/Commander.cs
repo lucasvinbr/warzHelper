@@ -315,6 +315,15 @@ public class Commander : TroopContainer {
 	}
 
 	/// <summary>
+	/// returns the percentage compared to the cmder's CURRENT amount of troops that would be added if
+	/// the cmder recruited instead of moving or training
+	/// </summary>
+	/// <returns></returns>
+	public float GetPercentOfNewTroopsIfRecruitedComparedToCurrent() {
+		return GetPercentOfNewTroopsIfRecruited() / ((float)TotalTroopsContained / MaxTroopsCommanded);
+	}
+
+	/// <summary>
 	/// returns either our faction's base troop type 
 	/// or the local merc caravan's type...
 	/// or null, if there is no caravan and our faction has no troop types at all
