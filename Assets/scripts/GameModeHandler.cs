@@ -39,6 +39,11 @@ public class GameModeHandler : ModeUI {
 	/// </summary>
 	public bool currentTurnIsFast = false;
 
+	/// <summary>
+	/// true if a turn is going to be started once all panels are closed
+	/// </summary>
+	private bool turnStartScheduled = false;
+
 	private void Awake() {
 		instance = this;
 	}
@@ -100,7 +105,8 @@ public class GameModeHandler : ModeUI {
 			data.factionRelations.AddAnyMissingFacEntries();
 		}
 
-		StartCoroutine(StartTurnAfterPanelsClose(data.curTurnPhase));
+		ScheduleTurnStartAfterPanelsClose(data.curTurnPhase);
+		
 
 	}
 
@@ -110,12 +116,28 @@ public class GameModeHandler : ModeUI {
 	/// </summary>
 	/// <param name="startingPhase"></param>
 	/// <returns></returns>
-	IEnumerator StartTurnAfterPanelsClose(TurnPhase startingPhase) {
+	private IEnumerator StartTurnAfterPanelsClose(TurnPhase startingPhase, bool noFactionKillingThisTurn = false) {
 		while (GameInterface.openedPanelsOverlayLevel > 0) {
 			yield return null;
 		}
 
-		StartNewTurn(startingPhase);
+		StartNewTurn(startingPhase, noFactionKillingThisTurn);
+		turnStartScheduled = false;
+	}
+
+	/// <summary>
+	/// starts a turn once all panels are closed
+	/// (if it's not when the game mode is initializing, make sure to StopAllPhaseMans before starting a new turn!)
+	/// </summary>
+	/// <param name="startingPhase"></param>
+	/// <param name="noFactionKillingThisTurn"></param>
+	public void ScheduleTurnStartAfterPanelsClose(TurnPhase startingPhase, bool noFactionKillingThisTurn = false)
+	{
+		if (!turnStartScheduled)
+		{
+			StartCoroutine(StartTurnAfterPanelsClose(startingPhase, noFactionKillingThisTurn));
+			turnStartScheduled = true;
+		}
 	}
 
 
@@ -130,7 +152,7 @@ public class GameModeHandler : ModeUI {
 		}
 	}
 
-	public void StartNewTurn(TurnPhase startingPhase = TurnPhase.newCmder) {
+	private void StartNewTurn(TurnPhase startingPhase = TurnPhase.newCmder, bool noFactionKillingThisTurn = false) {
 		//find out which faction turn it is now
 		GameInfo data = GameController.CurGameData;
 		curPlayingFaction = GameController.GetNextFactionInTurnOrder(data.lastTurnPriority);
@@ -149,9 +171,13 @@ public class GameModeHandler : ModeUI {
 		}
 		else {
 			data.lastTurnPriority = curPlayingFaction.turnPriority;
-			//kill this faction then!
-			KillFaction(curPlayingFaction);
-			StartNewTurn();
+			if (!noFactionKillingThisTurn)
+			{
+				//kill this faction then!
+				KillFaction(curPlayingFaction);
+			}
+			
+			StartNewTurn(TurnPhase.newCmder, noFactionKillingThisTurn);
 			//TODO "game should end" checks
 		}
 
@@ -221,6 +247,6 @@ public class GameModeHandler : ModeUI {
 	public void KillFaction(Faction killedFac) {
 		ModalPanel.Instance().MessageBox(null, "Faction Eliminated", killedFac.name + " is no more!", null,
 			null, null, null, false, ModalPanel.ModalMessageType.Ok); //TODO show the faction's logo if set
-		GameController.RemoveFaction(killedFac);
+		GameController.DefeatFaction(killedFac);
 	}
 }

@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// decision-making for the AI players.
+/// They should try to preserve their commanders whenever possible,
+/// but also attack when odds are good enough
+/// </summary>
 public class AiPlayer {
 
 	/// <summary>
@@ -14,7 +19,7 @@ public class AiPlayer {
 	/// <summary>
 	/// how big should the "move to zone" score be before we actually decide to move?
 	/// </summary>
-	public const float MIN_MOVE_SCORE_THRESHOLD = 0.3f, MAX_MOVE_SCORE_THRESHOLD = 0.37f;
+	public const float MIN_MOVE_SCORE_THRESHOLD = 0.5f, MAX_MOVE_SCORE_THRESHOLD = 0.57f;
 
 	/// <summary>
 	/// multiplies the base recruitment chance to make recruiting more important than training
@@ -30,7 +35,7 @@ public class AiPlayer {
 	/// <summary>
 	/// if the enemies have the allies' power times this value in a zone, the AI should be disencouraged to move or stay there
 	/// </summary>
-	public const float MIN_FRIENDLY_ZONE_TOO_DANGEROUS_THRESHOLD = 2.5f, MAX_FRIENDLY_ZONE_TOO_DANGEROUS_THRESHOLD = 3.5f;
+	public const float MIN_FRIENDLY_ZONE_TOO_DANGEROUS_THRESHOLD = 2.4f, MAX_FRIENDLY_ZONE_TOO_DANGEROUS_THRESHOLD = 2.75f;
 
 	/// <summary>
 	/// divisor applied to move scores to keep training and recruiting relevant
@@ -56,7 +61,7 @@ public class AiPlayer {
 	/// how much should the presence of a friendly commander in a potential move target zone
 	/// make it more likely for more cmders to go to that zone as well?
 	/// </summary>
-	public const float FRIENDLY_CMDER_PRESENCE_MULT = 1.08f;
+	public const float FRIENDLY_CMDER_PRESENCE_MULT = 1.06f;
 
 	/// <summary>
 	/// if the ratio of spawned cmders / max cmders is below this value,
@@ -84,15 +89,12 @@ public class AiPlayer {
 
 		Zone topZone = null;
 		float topScore = 0;
-		float candidateScore = 0;
+		float candidateScore;
 
 
-		//zones with higher recruit factors are better for new cmders
-		//also give more score to zones which might be in danger
+		//zones with higher recruit factors and safety are better for new cmders
 		foreach (Zone z in availableZones) {
-			candidateScore = GetZoneDangerScore(z, curFac);
-			//too much danger is bad!
-			if (candidateScore >= GetRandomFriendlyTooDangerousThreshold()) candidateScore = GetRandomMoveScoreThreshold();
+			candidateScore = GetZoneDangerScore(z, curFac, true);
 			candidateScore = z.multRecruitmentPoints + candidateScore * NEW_CMDER_ZONE_DANGER_INFLUENCE;
 			if (candidateScore >= topScore) {
 				topScore = candidateScore;
@@ -108,7 +110,7 @@ public class AiPlayer {
 
 	public static void AiCommandPhase(Faction ourFac, List<Commander> commandableCmders,
 		CommandPhaseMan phaseScript) {
-		Zone zoneCmderIsIn = null, moveDestZone = null, scoreCheckZone = null,
+		Zone zoneCmderIsIn, moveDestZone, scoreCheckZone,
 			fallbackMoveDestZone = null;
 
 		List<Commander> ourCmders = ourFac.OwnedCommanders;
@@ -119,8 +121,7 @@ public class AiPlayer {
 		float factionCmderAmountRatio = ourCmders.Count / (float)ourFac.MaxCmders;
 
 		float recruitChance, topMoveScore, scoreCheckScore, trainChance;
-		bool hasActed = false;
-		bool plansOnStayingInCurZone = false;
+        bool isInDangerousZone = false;
 
 		for (int i = commandableCmders.Count - 1; i >= 0; i--) {
 			zoneCmderIsIn = GameController.GetZoneByID(commandableCmders[i].zoneIAmIn);
@@ -137,12 +138,19 @@ public class AiPlayer {
 			//if no zone beats this score, we stay
 			topMoveScore = GetZoneDangerScore(zoneCmderIsIn, ourFac);
 
-			//but too much danger is bad and should reduce our chances of staying
-			if (topMoveScore >= GetRandomFriendlyTooDangerousThreshold()) topMoveScore = GetRandomMoveScoreThreshold();
+            //but too much danger is bad and should reduce our chances of staying!
+            //(reduce all scores so that the cmder may flee to safety)
+            if (topMoveScore >= GetRandomFriendlyTooDangerousThreshold())
+            {
+                recruitChance /= topMoveScore;
+                trainChance /= topMoveScore;
+                topMoveScore = GetRandomMoveScoreThreshold();
+                isInDangerousZone = true;
+            }
 
-			if (factionCmderAmountRatio < SHOULD_GET_MORE_CMDERS_THRESHOLD &&
+            //if our territories are full of cmders, also make it more likely to move around
+            if (factionCmderAmountRatio < SHOULD_GET_MORE_CMDERS_THRESHOLD &&
 				emptyNewCmderZones.Count == 0) {
-				//if our territories are full of cmders, make it more likely to move around
 				topMoveScore *= factionCmderAmountRatio;
 				recruitChance *= factionCmderAmountRatio;
 				trainChance *= factionCmderAmountRatio;
@@ -151,13 +159,14 @@ public class AiPlayer {
 			foreach (int nearbyZoneID in zoneCmderIsIn.linkedZones) {
 				scoreCheckZone = GameController.GetZoneByID(nearbyZoneID);
 
-				scoreCheckScore = GetZoneMoveScore(scoreCheckZone, ourFac);
+				scoreCheckScore = GetZoneMoveScore(scoreCheckZone, ourFac, isInDangerousZone);
 
 				//if we're low on commanders,
 				//we should try to be more selective in our attacks...
 				//make room for new cmders by stacking existing cmders in a friendly zone and stuff
 				if (factionCmderAmountRatio < SHOULD_GET_MORE_CMDERS_THRESHOLD) {
-					if (scoreCheckZone.ownerFaction != ourFac.ID) {
+					if (scoreCheckZone.ownerFaction != ourFac.ID
+                        && ourFac.GetStandingWith(scoreCheckZone.ownerFaction) != GameFactionRelations.FactionStanding.ally) {
 						scoreCheckScore *= factionCmderAmountRatio;
 					}
 					else {
@@ -181,7 +190,7 @@ public class AiPlayer {
 
 			if (topMoveScore <= SHOULD_GO_DEFENSIVE_THRESHOLD) {
 				//Debug.Log("safe-landlocked! move score is " + topMoveScore);
-				//we're "safe-landlocked"!
+				//we're "safe-landlocked"! none of the zones around are too interesting.
 				//we should find a path to danger then
 				if (fallbackMoveDestZone == null) {
 					//get a good destination zone for the faction
@@ -197,9 +206,9 @@ public class AiPlayer {
 
 			}
 
-			hasActed = false;
-			plansOnStayingInCurZone = moveDestZone.ID == zoneCmderIsIn.ID;
-
+            //action time!
+			bool hasActed = false;
+			bool plansOnStayingInCurZone = moveDestZone.ID == zoneCmderIsIn.ID;
 
 			if (trainChance > recruitChance &&
 				(plansOnStayingInCurZone || trainChance > topMoveScore)) {
@@ -226,7 +235,7 @@ public class AiPlayer {
 
 				//try recruiting again if we can't train!
 				if (!hasActed) {
-					hasActed = commandableCmders[i].OrderRecruitTroops();
+					commandableCmders[i].OrderRecruitTroops();
 				}
 
 				//do nothing then
@@ -251,8 +260,8 @@ public class AiPlayer {
 	/// <param name="ourFac"></param>
 	/// <returns></returns>
 	public static float GetZoneDangerScore(Zone targetZone, Faction ourFac, bool getSafetyScoreInstead = false) {
-		Zone nearbyZone = null;
-		float potentialAlliedPower = 0, potentialEnemyPower = 0;
+		Zone nearbyZone;
+		float potentialAlliedPower, potentialEnemyPower;
 
 		potentialAlliedPower = GameController.GetTotalAutocalcPowerFromTroopList
 		(GameController.GetCombinedTroopsInZoneFromFactionAndAllies(targetZone, ourFac, useProjectedAllyPositions: true));
@@ -280,17 +289,21 @@ public class AiPlayer {
 		}
 		//Debug.Log("pot enemy: " + potentialEnemyPower + " pot ally: " + potentialAlliedPower);
 
-		return getSafetyScoreInstead ? potentialAlliedPower / Mathf.Max(1, potentialEnemyPower) : potentialEnemyPower / Mathf.Max(1, potentialAlliedPower);
+		return getSafetyScoreInstead ? 
+            potentialAlliedPower / Mathf.Max(1, potentialEnemyPower) :
+            potentialEnemyPower / Mathf.Max(1, potentialAlliedPower);
 	}
 
-	/// <summary>
-	/// uses the danger score and some extra info to get a "should I move there" score.
-	/// This favors zones with friendly cmders to help the AI make big armies
-	/// </summary>
-	/// <param name="targetZone"></param>
-	/// <param name="ourFac"></param>
-	/// <returns></returns>
-	public static float GetZoneMoveScore(Zone targetZone, Faction ourFac) {
+    /// <summary>
+    /// uses the danger score and some extra info to get a "should I move there" score.
+    /// This favors zones with friendly cmders to help the AI make big armies.
+    /// Friendly zones will get different scores depending on "currentlyInDanger"
+    /// (if true, more safety is good; if false, more danger is good)
+    /// </summary>
+    /// <param name="targetZone"></param>
+    /// <param name="ourFac"></param>
+    /// <returns></returns>
+    public static float GetZoneMoveScore(Zone targetZone, Faction ourFac, bool currentlyInDanger = false) {
 		float finalScore;
 
 		//if the zone is hostile, the less danger the better
@@ -303,10 +316,10 @@ public class AiPlayer {
 				finalScore *= GetRandomAtkOnNeutralFactionDiscouragement();
 			}
 		}else {
-			finalScore = GetZoneDangerScore(targetZone, ourFac);
+			finalScore = GetZoneDangerScore(targetZone, ourFac, currentlyInDanger);
 
 			//if an allied zone is TOO dangerous, maybe we shouldn't go there
-			if(finalScore >= GetRandomFriendlyTooDangerousThreshold()) {
+			if(!currentlyInDanger && finalScore >= GetRandomFriendlyTooDangerousThreshold()) {
 				finalScore = GetRandomMoveScoreThreshold();
 			}
 		}
@@ -335,10 +348,9 @@ public class AiPlayer {
 	/// <returns></returns>
 	public static Zone FindInterestingZone(Faction ourFac) {
 		List<Zone> browsedList = ourFac.OwnedZones;
-		float foundScore = 0.0f;
-		Zone foundZone = GetMostInterestingZoneInList(browsedList, ourFac, out foundScore);
+        Zone foundZone = GetMostInterestingZoneInList(browsedList, ourFac, out float foundScore);
 
-		if (foundScore > 0.0f) {
+        if (foundScore > 0.0f) {
 			return foundZone;
 		}
 
@@ -367,7 +379,7 @@ public class AiPlayer {
 
 	public static Zone GetMostInterestingZoneInList(List<Zone> zList, Faction ourFac,
 		out float bestScore) {
-		float topScore = 0.0f, candidateScore = 0.0f;
+		float topScore = 0.0f, candidateScore;
 		Zone topZone = null;
 		foreach (Zone z in zList) {
 			candidateScore = GetZoneMoveScore(z, ourFac);
@@ -389,7 +401,7 @@ public class AiPlayer {
 	/// <param name="bestScore"></param>
 	/// <returns></returns>
 	public static Zone GetMostEndangeredZoneInList(List<Zone> zList, out float bestScore) {
-		float topScore = 0.0f, candidateScore = 0.0f;
+		float topScore = 0.0f, candidateScore;
 		Zone topZone = null;
 		foreach (Zone z in zList) {
 			candidateScore = GetZoneDangerScore(z, GameController.GetFactionByID(z.ownerFaction));
@@ -412,15 +424,15 @@ public class AiPlayer {
 
 		List<int> foundPath = new List<int>();
 
-		Zone curScannedZone = startZone;
-		Zone costCalcZone = null;
+		Zone curScannedZone;
+		Zone costCalcZone;
 
 		frontier.Add(new KeyValuePair<int, float>(startZone.ID, 0));
 
 		KeyValuePair<int, float> newEntry;
-		int frontierInsertIndex = 0;
+		int frontierInsertIndex;
 
-		while (frontier[0].Key != targetZone.ID && frontier.Count > 0) {
+		while (frontier.Count > 0 && frontier[0].Key != targetZone.ID) {
 			curScannedZone = GameController.GetZoneByID(frontier[0].Key);
 			frontier.RemoveAt(0);
 			foreach (int zID in curScannedZone.linkedZones) {
@@ -455,7 +467,7 @@ public class AiPlayer {
 		}else {
 			//we failed to find a path?!
 			//just stand still then
-			Debug.LogWarning("[AIPlayer] Couldn't find a path to zone " + targetZone.name);
+			Debug.LogWarning("[AIPlayer] Couldn't find a path to zone " + targetZone.name + " from " + startZone.name);
 			return startZone;
 		}
 

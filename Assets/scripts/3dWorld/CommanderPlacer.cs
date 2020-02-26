@@ -34,6 +34,14 @@ public class CommanderPlacer : MonoBehaviour {
 		actionOnSpotSelect += actionOnConfirmPlace;
 	}
 
+	public void UpdateAllowedSpots(List<ZoneSpot> newAllowedSpots)
+	{
+		if (enabled)
+		{
+			allowedSpots = newAllowedSpots;
+		}
+	}
+
     void Update()
     {
 		if (GameInterface.openedPanelsOverlayLevel != 0) {

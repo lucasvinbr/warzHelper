@@ -14,11 +14,11 @@ public class GameFactionRelations
 	[System.Serializable]
 	public class FactionRelation {
 		public int[] relatedFacs = new int[2];
-		public float relationValue = 0.0f;
+		public float relationValue = INITIAL_REL;
 
 		public FactionRelation() { }
 
-		public FactionRelation(Faction fac1, Faction fac2, float relationValue = 0.0f) {
+		public FactionRelation(Faction fac1, Faction fac2, float relationValue = INITIAL_REL) {
 			relatedFacs[0] = fac1.ID;
 			relatedFacs[1] = fac2.ID;
 			this.relationValue = relationValue;
@@ -62,6 +62,11 @@ public class GameFactionRelations
 	/// factions will be enemies if their relation value goes below this
 	/// </summary>
 	public const float CONSIDER_ENEMY_THRESHOLD = 0.0f;
+
+	/// <summary>
+	/// the relation between all facs when the game starts
+	/// </summary>
+	public const float INITIAL_REL = 0.35f;
 
 	/// <summary>
 	/// factions will be allies if their relation value goes above this
@@ -127,7 +132,7 @@ public class GameFactionRelations
 		}
 
 		relationEntryExists = false;
-		return 0;
+		return INITIAL_REL;
 	}
 
 	public float GetRelationBetweenFactions(int facID1, int facID2) {
@@ -143,7 +148,7 @@ public class GameFactionRelations
 			}
 		}
 
-		return 0;
+		return INITIAL_REL;
 	}
 
 	public FactionStanding GetStandingBetweenFactions(int facID1, int facID2) {
@@ -152,6 +157,14 @@ public class GameFactionRelations
 		return RelationValueToStanding(GetRelationBetweenFactions(facID1, facID2));
 	}
 
+	/// <summary>
+	/// returns the new relation value between the two facs
+	/// </summary>
+	/// <param name="facID1"></param>
+	/// <param name="facID2"></param>
+	/// <param name="addition"></param>
+	/// <param name="preventBecomingAllies"></param>
+	/// <returns></returns>
 	public float AddRelationBetweenFactions(int facID1, int facID2, float addition,
 		bool preventBecomingAllies = false) {
 		foreach (FactionRelation rel in relations) {
@@ -166,12 +179,18 @@ public class GameFactionRelations
 						reportedRelationChanges.Add(rel, relationsBeforeChange);
 					}
 
+					//if a new alliance was made here, everyone should react!
+					if(RelationValueToStanding(rel.relationValue) == FactionStanding.ally &&
+						RelationValueToStanding(relationsBeforeChange) != FactionStanding.ally) {
+						DiplomacyManager.GlobalReactToAlliance(rel.relatedFacs[0], rel.relatedFacs[1]);
+					}
+
 					return rel.relationValue;
 				}
 			}
 		}
 
-		return 0;
+		return INITIAL_REL;
 	}
 
 	/// <summary>
@@ -193,7 +212,14 @@ public class GameFactionRelations
 
 	}
 
-
+	/// <summary>
+	/// returns the new relation value between the facs, or INITIAL_REL if something's wrong.
+	/// this does not trigger Faction Reactions to alliances caused by this change
+	/// </summary>
+	/// <param name="facID1"></param>
+	/// <param name="facID2"></param>
+	/// <param name="newValue"></param>
+	/// <returns></returns>
 	public float SetRelationBetweenFactions(int facID1, int facID2, float newValue) {
 		foreach (FactionRelation rel in relations) {
 			if (rel.relatedFacs[0] == facID1 || rel.relatedFacs[1] == facID1) {
@@ -204,7 +230,7 @@ public class GameFactionRelations
 			}
 		}
 
-		return 0;
+		return INITIAL_REL;
 	}
 
 	public void RemoveAllRelationEntriesWithFaction(int facID) {

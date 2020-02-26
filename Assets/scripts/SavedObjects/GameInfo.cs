@@ -14,6 +14,17 @@ public class GameInfo : TemplateInfo {
 	public bool fastAiTurns = true, alwaysAutocalcAiBattles = false, showBattleResolutionPanelForAutocalcAiBattles = false;
 
 	/// <summary>
+	/// factions that have been removed from the game by the player, via the "Add/remove factions" ingame menu.
+	/// They can still be added back!
+	/// </summary>
+	public List<Faction> disabledFactions = new List<Faction>();
+
+	/// <summary>
+	/// defeated factions can still come back if a zone is given to them
+	/// </summary>
+	public List<Faction> defeatedFactions = new List<Faction>();
+
+	/// <summary>
 	/// this makes the battle phase only happen after all factions took turns,
 	/// making it possible for allied factions to attack at the same time
 	/// </summary>

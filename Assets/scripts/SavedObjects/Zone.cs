@@ -321,4 +321,14 @@ public class Zone : TroopContainer {
 			GameController.GetFactionByID(ownerFaction).GetStandingWith(targetFacID) !=
 				GameFactionRelations.FactionStanding.ally));
 	}
+
+	/// <summary>
+	/// sets ownerFaction and refreshes display
+	/// </summary>
+	/// <param name="targetFacID"></param>
+	public void SetOwnerFaction(int targetFacID)
+	{
+		ownerFaction = targetFacID;
+		MyZoneSpot.RefreshDataDisplay();
+	}
 }

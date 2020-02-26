@@ -255,7 +255,7 @@ GameObject:
   - component: {fileID: 224820326140559712}
   - component: {fileID: 114329295056008914}
   m_Layer: 5
-  m_Name: factionIsAIToggle
+  m_Name: factionEnabledToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -344,9 +344,9 @@ GameObject:
   - component: {fileID: 114067283910903966}
   - component: {fileID: 114592283521380286}
   - component: {fileID: 114050316480808734}
-  - component: {fileID: 114555827549381484}
+  - component: {fileID: 6580991048207394332}
   m_Layer: 5
-  m_Name: factionAIPanelEntry
+  m_Name: factionEnableDisablePanelEntry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -511,7 +511,7 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
---- !u!114 &114555827549381484
+--- !u!114 &6580991048207394332
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -520,7 +520,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1697852386354164}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88a27e71385a3b14e83f6e18f8fd5369, type: 3}
+  m_Script: {fileID: 11500000, guid: 93462c02bf1557245b87cbe65e75ef05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   myContent:
@@ -540,5 +540,5 @@ MonoBehaviour:
     maxGarrisonedTroopTier: 0
     troopLine: 
   nameTxt: {fileID: 114789684760052104}
-  isAIToggle: {fileID: 114329295056008914}
+  isEnabledToggle: {fileID: 114329295056008914}
   backgroundImg: {fileID: 114160401955151468}

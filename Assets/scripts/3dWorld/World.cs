@@ -116,6 +116,11 @@ public class World : MonoBehaviour {
 		instance.cmderPlacerScript.StartNewPlacement(actionOnPlaced, allowedSpots);
 	}
 
+	public static void NewCmderPlacementUpdateAllowedZones(List<ZoneSpot> allowedSpots)
+	{
+		instance.cmderPlacerScript.UpdateAllowedSpots(allowedSpots);
+	}
+
     public static void CreateNewZoneAtPoint(Vector3 point, bool autoOpenEditMenu = true)
     {
         Zone newZone = new Zone("New Zone", point);		

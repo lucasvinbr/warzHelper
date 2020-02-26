@@ -66,7 +66,7 @@ public class GameInterface : MonoBehaviour {
 	public static bool troopDDownsAreStale = true;
 
 	/// <summary>
-	/// a variable that should always be set to true whenever faction is edited.
+	/// a variable that should always be set to true whenever a faction is edited.
 	/// this makes sure that "pick a faction" dropdowns' options are refreshed
 	/// </summary>
 	public static bool factionDDownsAreStale = true;

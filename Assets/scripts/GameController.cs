@@ -189,15 +189,6 @@ public class GameController : MonoBehaviour {
 
 
 
-	public void GoToTemplate(TemplateInfo templateData) {
-		GameInterface.instance.SwitchInterface(GameInterface.InterfaceMode.template);
-	}
-
-	void OnGameStart() {
-
-	}
-
-
 	#region game data removal
 	/// <summary>
 	/// removes the faction from the game data and sets all of the faction's owned zones to neutral
@@ -205,14 +196,111 @@ public class GameController : MonoBehaviour {
 	/// <param name="targetFaction"></param>
 	public static void RemoveFaction(Faction targetFaction) {
 		foreach (Zone z in targetFaction.OwnedZones) {
-			z.ownerFaction = -1;
-			z.MyZoneSpot.RefreshDataDisplay();
+			z.SetOwnerFaction(-1);
 		}
 		instance.curData.factions.Remove(targetFaction);
 		GameInterface.factionDDownsAreStale = true;
 		GameInfo gData = CurGameData;
 		if (gData != null) {
 			gData.factionRelations.RemoveAllRelationEntriesWithFaction(targetFaction.ID);
+		}
+	}
+
+	/// <summary>
+	/// (game mode only) almost like RemoveFaction, but stores them in disabledFactions
+	/// in case the player wants them to come back later.
+	/// This method does not handle most consequences of active factions disappearing while the game is running!
+	/// </summary>
+	/// <param name="targetFaction"></param>
+	public static void DisableFaction(Faction targetFaction)
+	{
+		foreach (Zone z in targetFaction.OwnedZones)
+		{
+			z.SetOwnerFaction(-1);
+		}
+		foreach (Commander cmder in targetFaction.OwnedCommanders)
+		{
+			RemoveCommander(cmder);
+		}
+
+		instance.curData.factions.Remove(targetFaction);
+		GameInterface.factionDDownsAreStale = true;
+		GameInfo gData = CurGameData;
+		if (gData != null)
+		{
+			//since cmders may have been removed, we must update the order feedback visuals
+			gData.unifiedOrdersRegistry.RefreshOrderFeedbacksVisibility();
+
+			gData.factionRelations.RemoveAllRelationEntriesWithFaction(targetFaction.ID);
+			gData.disabledFactions.Add(targetFaction);
+		}
+	}
+
+	/// <summary>
+	/// (game mode only) almost like RemoveFaction, but stores them in defeatedFactions
+	/// so that they can be brought back later
+	/// </summary>
+	/// <param name="targetFaction"></param>
+	public static void DefeatFaction(Faction targetFaction)
+	{
+		foreach (Zone z in targetFaction.OwnedZones)
+		{
+			z.SetOwnerFaction(-1);
+		}
+		foreach (Commander cmder in targetFaction.OwnedCommanders)
+		{
+			RemoveCommander(cmder);
+		}
+		instance.curData.factions.Remove(targetFaction);
+		GameInterface.factionDDownsAreStale = true;
+		GameInfo gData = CurGameData;
+		if (gData != null)
+		{
+			gData.factionRelations.RemoveAllRelationEntriesWithFaction(targetFaction.ID);
+			gData.defeatedFactions.Add(targetFaction);
+		}
+	}
+
+	/// <summary>
+	/// attempts to bring factions back from the disabled ones by taking neutral zones.
+	/// if there are no neutral zones or not enough for all facs, they'll be defeated when the turn ends
+	/// </summary>
+	/// <param name="targetFaction"></param>
+	public static void EnableFactions(List<Faction> targetFactions)
+	{
+		if (targetFactions == null || targetFactions.Count == 0) return;
+
+		List<Zone> availableZones = GetNeutralZones();
+		int zonesPerFaction = Mathf.Max(availableZones.Count / targetFactions.Count, 1);
+		foreach (Faction fac in targetFactions)
+		{
+			instance.curData.factions.Add(fac);
+		}
+		
+		GameInterface.factionDDownsAreStale = true;
+		instance.facMatsHandler.ReBakeFactionColorsDict();
+		MakeFactionTurnPrioritiesUnique();
+
+		foreach (Faction fac in targetFactions)
+		{
+			for(int i = zonesPerFaction; i > 0; i--)
+			{
+				if (availableZones.Count == 0) break;
+
+				availableZones[0].SetOwnerFaction(fac.ID);
+				availableZones.RemoveAt(0);
+			}
+		}
+
+		GameInfo gData = CurGameData;
+		if (gData != null)
+		{
+			gData.factionRelations.AddAnyMissingFacEntries();
+
+			foreach(Faction fac in targetFactions)
+			{
+				gData.disabledFactions.Remove(fac);
+			}
 		}
 	}
 
@@ -237,6 +325,13 @@ public class GameController : MonoBehaviour {
 	public static void RemoveCommander(Commander targetCmder) {
 		World.RemoveCmder3d(targetCmder.MeIn3d);
 		instance.curData.deployedCommanders.Remove(targetCmder);
+
+		GameInfo gData = CurGameData;
+
+		if (gData != null)
+		{
+			gData.unifiedOrdersRegistry.RemoveAnyOrderGivenToCmder(targetCmder.ID);
+		}
 	}
 
 	public static void RemoveTroopType(TroopType targetTroop) {
@@ -1287,6 +1382,20 @@ public class GameController : MonoBehaviour {
 				//aaaand refresh all zones' displays
 				foreach (Zone z in curData.zones) {
 					z.MyZoneSpot.RefreshDataDisplay();
+				}
+
+				GameInfo gData = CurGameData;
+				if(gData != null)
+				{
+					if(gData.curTurnPhase == GameModeHandler.TurnPhase.newCmder)
+					{
+						//we must recalculate possible zones for cmders if it's the player's newCmder phase
+						if (GameModeHandler.instance.curPlayingFaction.isPlayer)
+						{
+							World.NewCmderPlacementUpdateAllowedZones
+								(ZonesToZoneSpots(GetZonesForNewCmdersOfFaction(GameModeHandler.instance.curPlayingFaction)));
+						}
+					}
 				}
 
 			}, null);

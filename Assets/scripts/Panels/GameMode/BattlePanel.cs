@@ -113,7 +113,13 @@ public class BattlePanel : GrowingOverlayPanel {
 	public void FullInterrupt() {
 		attackerSide.StopAllCoroutines();
 		defenderSide.StopAllCoroutines();
+		if(battlePhase.battleData != null)
+		{
+			battlePhase.battleData.onBattleEnded -= UpdateArmyDisplays;
+		}
 		ResetTransitionState();
+		ResetUI();
+		gameObject.SetActive(false);
 	}
 
 	public void ResetUI() {

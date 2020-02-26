@@ -8,21 +8,22 @@ using UnityEngine.UI;
 /// </summary>
 public class DiplomacyManager {
 
+	#region consts
 	/// <summary>
 	/// our relation worsens with the faction that attacked us
 	/// </summary>
-	public const float MIN_REL_DMG_ATTACKED = -0.35F, MAX_REL_DMG_ATTACKED = -0.55F;
+	public const float MIN_REL_DMG_ATTACKED = -0.58F, MAX_REL_DMG_ATTACKED = -0.95F;
 
 	/// <summary>
 	/// our relation worsens with the faction that attacked our ally
 	/// </summary>
-	public const float MIN_REL_DMG_ALLY_ATTACKED = -0.1F, MAX_REL_DMG_ALLY_ATTACKED = -0.25F;
+	public const float MIN_REL_DMG_ALLY_ATTACKED = -0.33F, MAX_REL_DMG_ALLY_ATTACKED = -0.55F;
 
 	/// <summary>
 	/// slowly corrode all relations as the war progresses, to make alliances end and
 	/// factions that keep taking too many zones become targets
 	/// </summary>
-	public const float MIN_REL_DMG_AGGRESSIVE = -0.025F, MAX_REL_DMG_AGGRESSIVE = -0.06F;
+	public const float MIN_REL_DMG_AGGRESSIVE = -0.15F, MAX_REL_DMG_AGGRESSIVE = -0.25F;
 
 	/// <summary>
 	/// our relation worsens with the faction that became allies with an enemy of ours
@@ -32,23 +33,41 @@ public class DiplomacyManager {
 	/// <summary>
 	/// our relation gets better with the faction that attacked our enemy
 	/// </summary>
-	public const float MIN_REL_GAIN_ENEMY_ATTACKED = 0.1F, MAX_REL_GAIN_ENEMY_ATTACKED = 0.2F;
+	public const float MIN_REL_GAIN_ENEMY_ATTACKED = 0.22F, MAX_REL_GAIN_ENEMY_ATTACKED = 0.37F;
 
 	/// <summary>
 	/// our relation gets much better with the faction that joins our attack on a common enemy 
 	/// </summary>
-	public const float MIN_REL_GAIN_ATK_ENEMY_TOGETHER = 0.2F, MAX_REL_GAIN_ATK_ENEMY_TOGETHER = 0.3F;
+	public const float MIN_REL_GAIN_ATK_ENEMY_TOGETHER = 0.42F, MAX_REL_GAIN_ATK_ENEMY_TOGETHER = 0.69F;
 
 	/// <summary>
 	/// our relation gets better with the faction that became allies with an ally of ours
 	/// </summary>
-	public const float MIN_REL_GAIN_ALLIED_TO_ALLY = 0.15F, MAX_REL_GAIN_ALLIED_TO_ALLY = 0.25F;
+	public const float MIN_REL_GAIN_ALLIED_TO_ALLY = 0.25F, MAX_REL_GAIN_ALLIED_TO_ALLY = 0.35F;
 
 	/// <summary>
-	/// how good must our relations be before we consider an alliance?
+	/// how good must our relations be before we consider an alliance? (unused for now)
 	/// </summary>
 	public const float MIN_RELPERCENT_REQUIRED_ALLIANCE = 0.75f;
 
+	/// <summary>
+	/// our relation gets much better with a faction that gave us a zone
+	/// </summary>
+	public const float MIN_REL_GAIN_RECEIVED_ZONE_GIFT = 0.35f, MAX_REL_GAIN_RECEIVED_ZONE_GIFT = 0.45f;
+
+	/// <summary>
+	/// our relation gets worse with a faction that received a zone from an enemy of ours
+	/// </summary>
+	public const float MIN_REL_DMG_RECEIVED_ZONE_GIFT_FROM_ENEMY = -0.25f, MAX_REL_DMG_RECEIVED_ZONE_GIFT_FROM_ENEMY = -0.35f;
+
+	/// <summary>
+	/// our relation gets much worse with a faction that gave a zone to an enemy of ours
+	/// </summary>
+	public const float MIN_REL_DMG_GAVE_ZONE_TO_ENEMY = -0.55f, MAX_REL_DMG_GAVE_ZONE_TO_ENEMY = -0.75f;
+
+	#endregion
+
+	#region reactions to attacks
 	/// <summary>
 	/// gets attackers and defenders according to the zone owner's diplomacy.
 	/// the attacked should get angry with the attacker;
@@ -138,10 +157,117 @@ public class DiplomacyManager {
 		}
 	}
 
+	#endregion
+
+	#region reactions to zone gifts
+	
+	/// <summary>
+	/// enemies of the gifting faction get angry with both the gifting and the gifted
+	/// </summary>
+	/// <param name="IDGiftingFac"></param>
+	/// <param name="IDGiftedFac"></param>
+	public static void GlobalReactToZoneGift(int IDGiftingFac, int IDGiftedFac)
+	{
+		GameInfo gData = GameController.CurGameData;
+		if (!gData.factionRelations.lockRelations)
+		{
+			foreach (Faction fac in gData.factions)
+			{
+				FacReactToZoneGift(fac.ID, IDGiftingFac, IDGiftedFac);
+			}
+		}
+
+	}
+
+	/// <summary>
+	/// this makes our faction change its relation levels after a zone gift
+	/// if the gift somehow affected it
+	/// </summary>
+	/// <param name="ourFacID"></param>
+	/// <param name="attackerFacs"></param>
+	/// <param name="attackedFacID"></param>
+	public static void FacReactToZoneGift(int ourFacID, int IDGiftingFac, int IDGiftedFac)
+	{
+		GameInfo gData = GameController.CurGameData;
+
+		Faction ourFac = GameController.GetFactionByID(ourFacID);
+
+		if (ourFacID == IDGiftingFac)
+		{
+			return; //the gifted fac will handle increasing relations
+		}
+		else if (IDGiftedFac >= 0 && IDGiftingFac >= 0)
+		{
+			if(ourFacID == IDGiftedFac)
+			{
+				ourFac.AddRelationWith(IDGiftingFac, GetRelGainReceivedZoneGift());
+			}
+			else
+			{
+				//we're not giving nor receiving in this event; 
+				//there's no positive effect in our relations then.
+				//we should still frown at the event if one of them is an enemy,
+				//in order to prevent zone giving from being too OP
+				if(ourFac.GetStandingWith(IDGiftingFac) == GameFactionRelations.FactionStanding.enemy)
+				{
+					ourFac.AddRelationWith(IDGiftedFac, GetRelDmgReceivedZoneFromEnemy());
+				}
+
+				if(ourFac.GetStandingWith(IDGiftedFac) == GameFactionRelations.FactionStanding.enemy)
+				{
+					ourFac.AddRelationWith(IDGiftingFac, GetRelDmgGaveZoneToEnemy());
+				}
+			}
+		}
+	}
+	#endregion
+
+
+	#region reactions to alliances
+
+	public static void GlobalReactToAlliance(int factionX, int factionY) {
+		GameInfo gData = GameController.CurGameData;
+		if (!gData.factionRelations.lockRelations) {
+			foreach(Faction fac in gData.factions) {
+				if(fac.ID != factionX && fac.ID != factionY) {
+					//look at both factions
+					FactionReactToAlliance(fac, factionX, factionY);
+					FactionReactToAlliance(fac, factionY, factionX);
+				}
+			}
+		}
+
+	}
+
+	/// <summary>
+	/// reactingFaction enhances or degrades relations with factionReactedAgainst, according to
+	/// reactingFaction's relation with theirNewAlly
+	/// </summary>
+	/// <param name="reactingFaction"></param>
+	/// <param name="IDfactionReactedAgainst"></param>
+	/// <param name="IDtheirNewAlly"></param>
+	public static void FactionReactToAlliance(Faction reactingFaction, int IDfactionReactedAgainst, int IDtheirNewAlly) {
+		switch (reactingFaction.GetStandingWith(IDtheirNewAlly)) {
+			case GameFactionRelations.FactionStanding.enemy:
+				//frown at factionReactedAgainst!
+				reactingFaction.AddRelationWith(IDfactionReactedAgainst, GetRelDmgAlliedToEnemy());
+				break;
+			case GameFactionRelations.FactionStanding.ally:
+				//get closer to factionReactedAgainst!
+				reactingFaction.AddRelationWith(IDfactionReactedAgainst, GetRelGainAlliedToAlly());
+				break;
+			default:
+				//if we're neutral to theirNewAlly, don't care much about this alliance
+				break;
+		}
+	}
+
+	#endregion
 
 	/// <summary>
 	/// considers a random value between the MIN_REL_REQUIRED and the max 
 	/// and how close our relation is to the max
+	/// (unused for now)
 	/// </summary>
 	/// <returns></returns>
 	public static bool ShouldConsiderAlliance(float curRelation) {
@@ -162,12 +288,35 @@ public class DiplomacyManager {
 		return Random.Range(MIN_REL_DMG_AGGRESSIVE, MAX_REL_DMG_AGGRESSIVE);
 	}
 
+	public static float GetRelDmgAlliedToEnemy() {
+		return Random.Range(MIN_REL_DMG_ALLIED_TO_ENEMY, MAX_REL_DMG_ALLIED_TO_ENEMY);
+	}
+
 	public static float GetRelGainEnemyAttacked() {
 		return Random.Range(MIN_REL_GAIN_ENEMY_ATTACKED, MAX_REL_GAIN_ENEMY_ATTACKED);
 	}
 
 	public static float GetRelGainJoinAttack() {
 		return Random.Range(MIN_REL_GAIN_ATK_ENEMY_TOGETHER, MAX_REL_GAIN_ATK_ENEMY_TOGETHER);
+	}
+
+	public static float GetRelGainAlliedToAlly() {
+		return Random.Range(MIN_REL_GAIN_ALLIED_TO_ALLY, MAX_REL_GAIN_ALLIED_TO_ALLY);
+	}
+
+	public static float GetRelDmgGaveZoneToEnemy()
+	{
+		return Random.Range(MIN_REL_DMG_GAVE_ZONE_TO_ENEMY, MAX_REL_DMG_GAVE_ZONE_TO_ENEMY);
+	}
+
+	public static float GetRelDmgReceivedZoneFromEnemy()
+	{
+		return Random.Range(MIN_REL_DMG_RECEIVED_ZONE_GIFT_FROM_ENEMY, MAX_REL_DMG_RECEIVED_ZONE_GIFT_FROM_ENEMY);
+	}
+
+	public static float GetRelGainReceivedZoneGift()
+	{
+		return Random.Range(MIN_REL_GAIN_ALLIED_TO_ALLY, MAX_REL_GAIN_ALLIED_TO_ALLY);
 	}
 	#endregion
 

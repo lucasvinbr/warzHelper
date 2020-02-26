@@ -50,14 +50,41 @@ public class UnifiedOrdersRegistry {
 	/// <param name="orderedCmderID"></param>
 	/// <returns></returns>
 	public RegisteredCmderOrder GetOrderGivenToCmder(int orderedCmderID) {
-		foreach(RegisteredCmderOrder order in registeredOrders) {
-			if(order.orderType != RegisteredCmderOrder.OrderType.createCmder &&
+		foreach (RegisteredCmderOrder order in registeredOrders) {
+			if (order.orderType != RegisteredCmderOrder.OrderType.createCmder &&
 				order.orderedActorID == orderedCmderID) {
 				return order;
 			}
 		}
 
 		return null;
+	}
+
+	/// <summary>
+	/// if an order was given to the target cmder, removes it and returns true; if no order is found, returns false.
+	/// does not affect order visual feedbacks; they should be refreshed manually afterwards!
+	/// </summary>
+	/// <param name="orderedCmderID"></param>
+	/// <returns></returns>
+	public bool RemoveAnyOrderGivenToCmder(int orderedCmderID)
+	{
+		RegisteredCmderOrder cmderOrder = null;
+		foreach (RegisteredCmderOrder order in registeredOrders)
+		{
+			if (order.orderType != RegisteredCmderOrder.OrderType.createCmder &&
+				order.orderedActorID == orderedCmderID)
+			{
+
+				cmderOrder = order;
+			}
+		}
+
+		if(cmderOrder != null)
+		{
+			registeredOrders.Remove(cmderOrder);
+		}
+
+		return cmderOrder != null;
 	}
 
 	/// <summary>
@@ -125,7 +152,9 @@ public class UnifiedOrdersRegistry {
 
 		Faction curPlayingFac = GameModeHandler.instance.curPlayingFaction;
 
-		if (!curPlayingFac.isPlayer) return; //no need to work on feedbacks for the bots
+		if (curPlayingFac == null) return; //no need to work on feedbacks for a null player
+
+		if (!curPlayingFac.isPlayer) return; //no need to work on feedbacks for the bots either
 
 		Faction orderGivingFac = null;
 		Commander orderedCmder = null;
