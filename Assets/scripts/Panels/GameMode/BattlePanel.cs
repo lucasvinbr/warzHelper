@@ -250,17 +250,17 @@ public class BattlePanel : GrowingOverlayPanel {
 					return;
 				}
 
-				List<TroopNumberPair> attackersRemaining = new List<TroopNumberPair>(),
-					defendersRemaining = new List<TroopNumberPair>();
+				TroopList attackersRemaining = new TroopList(),
+					defendersRemaining = new TroopList();
 
 				foreach(SerializedTroop tnp in readTroops) {
 					//Debug.Log("got this kvp: " + tnp.name + " : " + tnp.amount);
 
 					TroopNumberPair convertedTNP = JsonHandlingUtils.SerializedTroopToTroopNumberPair(tnp);
 					if(convertedTNP.troopAmount > 0) {
-						if(GameController.IndexOfTroopInTroopList(battlePhase.battleData.defenderSideInfo.sideArmy, convertedTNP.troopTypeID) != -1) {
+						if(battlePhase.battleData.defenderSideInfo.sideArmy.IndexOfTroopInThisList(convertedTNP.troopTypeID) != -1) {
 							defendersRemaining.Add(convertedTNP);
-						}else if (GameController.IndexOfTroopInTroopList(battlePhase.battleData.attackerSideInfo.sideArmy, convertedTNP.troopTypeID) != -1) {
+						}else if (battlePhase.battleData.attackerSideInfo.sideArmy.IndexOfTroopInThisList(convertedTNP.troopTypeID) != -1) {
 							attackersRemaining.Add(convertedTNP);
 						}
 					}

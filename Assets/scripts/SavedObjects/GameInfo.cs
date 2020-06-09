@@ -24,6 +24,15 @@ public class GameInfo : TemplateInfo {
 	/// </summary>
 	public List<Faction> defeatedFactions = new List<Faction>();
 
+
+	/// <summary>
+	/// stores zones on which battles have already been fought this turn.
+	/// Storing this prevents the game from, after loading a game,
+	/// resolving a battle that had already been resolved once in the turn
+	/// (can happen with battles involving troop amounts higher than the limit involved per turn)
+	/// </summary>
+	public List<int> zonesWithResolvedBattlesThisTurn = new List<int>();
+
 	/// <summary>
 	/// this makes the battle phase only happen after all factions took turns,
 	/// making it possible for allied factions to attack at the same time

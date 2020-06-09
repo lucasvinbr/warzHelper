@@ -18,11 +18,9 @@ public class Rules {
 	public int autoResolveBattleSampleSize = 10;
 
 	/// <summary>
-	/// if one of the sides involved in an autocalc battle has an army size above this,
-	/// it won't make a difference when calculating army sample size proportions.
-	/// Useful for preventing huge steamrollers that don't take any losses
+	/// the max amount of troops one side can use in a battle in one turn
 	/// </summary>
-	public int autoResolveBattleMaxArmyForProportion = 400;
+	public int maxTroopsInvolvedInBattlePerTurn = 400;
 
 	/// <summary>
 	/// in an autocalc battle, the auto-resolve power of the involved troops is multiplied by a random

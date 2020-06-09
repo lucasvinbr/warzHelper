@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 public class BattleRemainingFactionTroopsPanel : ListContainerPanel<TroopNumberPair> {
 
-	public List<TroopNumberPair> representedTroops;
+	public TroopList representedTroops;
 
 	public TMP_Text boxHeaderTxt;
 
@@ -42,8 +42,8 @@ public class BattleRemainingFactionTroopsPanel : ListContainerPanel<TroopNumberP
 	/// returns a troopNumberPair list with entries using the provided amounts
 	/// </summary>
 	/// <returns></returns>
-	public List<TroopNumberPair> BakeIntoArmy() {
-		List<TroopNumberPair> returnedList = new List<TroopNumberPair>();
+	public TroopList BakeIntoArmy() {
+		TroopList returnedList = new TroopList();
 
 		for (int i = 0; i < listContainer.childCount; i++) {
 			Transform entry = listContainer.GetChild(i);

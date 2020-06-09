@@ -30,7 +30,11 @@ public class PointAwardPhaseMan : GamePhaseManager {
 		}
 
 		foreach (Zone z in awardedZones) {
-			z.GetPointAwardPoints();
+			if (!z.IsContested())
+			{
+				z.GetPointAwardPoints();
+			}
+			
 			z.SpendPoints(true); //zones that actually do something with their points will emit some effects
 		}
 

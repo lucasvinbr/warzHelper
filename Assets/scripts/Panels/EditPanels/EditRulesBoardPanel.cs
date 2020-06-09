@@ -8,7 +8,7 @@ public class EditRulesBoardPanel : EditDataPanel<Rules> {
 
     public InputField maxGarrUnitsInput, maxCmderUnitsInput, bonusCmdersPerZoneInput, 
 		pointAwardZonesInput, pointAwardCmdersInput, pointAwardBattlesInput, winnerBattleDmgInput,
-		maxRandomAutocalcPowerInput, maxCmdersPerFactionInput, boardWidthInput, boardHeightInput;
+		maxRandomAutocalcPowerInput, maxTroopsInvolvedInOneTurnBattleInput, maxCmdersPerFactionInput, boardWidthInput, boardHeightInput;
 
 	public Image boardTextureImg;
 
@@ -20,6 +20,7 @@ public class EditRulesBoardPanel : EditDataPanel<Rules> {
 		maxCmdersPerFactionInput.text = dataBeingEdited.baseMaxCommandersPerFaction.ToString();
 		pointAwardZonesInput.text = dataBeingEdited.baseZonePointAwardOnTurnStart.ToString();
 		pointAwardCmdersInput.text = dataBeingEdited.baseCommanderPointAwardOnTurnStart.ToString();
+		maxTroopsInvolvedInOneTurnBattleInput.text = dataBeingEdited.maxTroopsInvolvedInBattlePerTurn.ToString();
 		maxRandomAutocalcPowerInput.text = dataBeingEdited.autoResolveBattleDieSides.ToString(CultureInfo.InvariantCulture);
 		pointAwardBattlesInput.text = dataBeingEdited.battleWinnerPointAwardFactor.ToString(CultureInfo.InvariantCulture);
 		bonusCmdersPerZoneInput.text = dataBeingEdited.baseBonusCommandersPerZone.ToString(CultureInfo.InvariantCulture);
@@ -48,6 +49,7 @@ public class EditRulesBoardPanel : EditDataPanel<Rules> {
 		dataBeingEdited.baseMaxCommandersPerFaction = int.Parse(maxCmdersPerFactionInput.text);
 		dataBeingEdited.baseMaxUnitsInOneGarrison = int.Parse(maxGarrUnitsInput.text);
 		dataBeingEdited.baseMaxUnitsUnderOneCommander = int.Parse(maxCmderUnitsInput.text);
+		dataBeingEdited.maxTroopsInvolvedInBattlePerTurn = int.Parse(maxTroopsInvolvedInOneTurnBattleInput.text);
 		World.SetupBoardDetails();
 		gameObject.SetActive(false);
 		OnWindowIsClosing();
@@ -72,22 +74,5 @@ public class EditRulesBoardPanel : EditDataPanel<Rules> {
 			}
 		}
 	}
-
-	public override void OnDeleteBtnClicked() {
-		if (creatingNewEntry) {
-			OnConfirmDelete();
-		}
-		else {
-			ModalPanel.Instance().YesNoBox("Confirm Zone Deletion", "You are about to delete this zone. This cannot be undone unless this game is reloaded without saving. Are you sure?", OnConfirmDelete, null);
-		}
-	}
-
-	public override void OnConfirmDelete() {
-		//no deleting should happen here, but...
-		gameObject.SetActive(false);
-		dataBeingEdited = null;
-		OnWindowIsClosing();
-	}
-
 
 }

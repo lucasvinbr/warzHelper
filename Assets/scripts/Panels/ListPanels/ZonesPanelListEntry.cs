@@ -14,7 +14,7 @@ public class ZonesPanelListEntry : ListPanelEntry<Zone> {
         base.SetContent(theContent);
         nameTxt.text = myContent.name;
         ownerTxt.text = GameController.GetFactionNameByID(myContent.ownerFaction);
-        garrisonTxt.text = myContent.TotalTroopsContained.ToString();
+        garrisonTxt.text = myContent.troopsContained.TotalTroopAmount.ToString();
     }
 
 	public void EntryClicked() {

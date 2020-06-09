@@ -76,6 +76,15 @@ public class Zone : TroopContainer {
 		}
 	}
 
+	public bool IsNeutral
+	{
+		get
+		{
+			return ownerFaction < 0;
+		}
+		
+	}
+
 	/// <summary>
 	/// calculated taking in account the zone's faction and factors
 	/// </summary>
@@ -114,7 +123,7 @@ public class Zone : TroopContainer {
 		this.ownerFaction = -1;
 		this.coords = new Vector2(zonePos.x,
 			zonePos.z);
-		troopsContained = new List<TroopNumberPair>();
+		troopsContained = new TroopList();
 		linkedZones = new List<int>();
 		while (GameController.GetZoneByName(this.name) != null) {
 			this.name = name + " copy";
@@ -156,28 +165,25 @@ public class Zone : TroopContainer {
 				bool hasTrained = false;
 				Faction ownerFac = GameController.GetFactionByID(ownerFaction);
 				int trainableTroops = 0;
-				int troopTrainingCostHere = 0;
+				int pointsForTraining;
 				int troopIndexInGarrison = -1;
 				int tierLimit = ignoreGarrisonTierLimit ? ownerFac.troopLine.Count - 1 : ownerFac.maxGarrisonedTroopTier - 1;
 				TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
 				for (int i = 0; i < tierLimit; i++) {
 
-					troopIndexInGarrison = IndexOfTroopInContainer(ownerFac.troopLine[i]);
+					pointsForTraining = Mathf.RoundToInt(pointsToSpend * multTrainingPoints);
+
+					troopIndexInGarrison = troopsContained.IndexOfTroopInThisList(ownerFac.troopLine[i]);
 					if (troopIndexInGarrison >= 0) {
 						curTTBeingTrained = GameController.GetTroopTypeByID(ownerFac.troopLine[i]);
 						curTTUpgradeTo = GameController.GetTroopTypeByID(ownerFac.troopLine[i + 1]);
-						troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / multRecruitmentPoints);
-						if (troopTrainingCostHere == 0) {
-							trainableTroops = troopsContained[troopIndexInGarrison].troopAmount;
-						}
-						else {
-							trainableTroops = Mathf.Min(pointsToSpend / troopTrainingCostHere,
+						trainableTroops = Mathf.Min(pointsForTraining / curTTBeingTrained.pointCost,
 								troopsContained[troopIndexInGarrison].troopAmount);
-						}
 						if (trainableTroops > 0) {
-							RemoveTroop(curTTBeingTrained.ID, trainableTroops);
-							AddTroop(curTTUpgradeTo.ID, trainableTroops);
-							pointsToSpend -= trainableTroops * troopTrainingCostHere;
+							troopsContained.RemoveTroop(curTTBeingTrained.ID, trainableTroops);
+							troopsContained.AddTroop(curTTUpgradeTo.ID, trainableTroops);
+							pointsToSpend -= 
+								Mathf.RoundToInt(trainableTroops * curTTBeingTrained.pointCost / multTrainingPoints);
 							hasTrained = true;
 						}
 					}
@@ -205,7 +211,7 @@ public class Zone : TroopContainer {
 	/// <returns></returns>
 	public override bool RecruitTroops() {
 		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
-		if (TotalTroopsContained < MaxTroopsInGarrison && multRecruitmentPoints > 0) {
+		if (troopsContained.TotalTroopAmount < MaxTroopsInGarrison && multRecruitmentPoints > 0) {
 			//recruitment!
 
 			TroopType recruitableTroopType = null;
@@ -221,19 +227,15 @@ public class Zone : TroopContainer {
 				recruitableTroopType = GameController.GetTroopTypeByID(ownerFac.troopLine[0]);
 			}
 
-			int troopRecruitmentCostHere =
-				Mathf.RoundToInt(recruitableTroopType.pointCost / multRecruitmentPoints);
+			int pointsForRecruitment =
+				Mathf.RoundToInt(pointsToSpend * multRecruitmentPoints);
 			int recruitableTroopsAmount = 0;
-			//this troop can be so cheap and the zone so good that the troop ends up with cost 0 after rounding
-			if (troopRecruitmentCostHere == 0) {
-				recruitableTroopsAmount = MaxTroopsInGarrison - TotalTroopsContained;
-			}
-			else {
-				recruitableTroopsAmount = Mathf.Min(pointsToSpend / troopRecruitmentCostHere,
-					MaxTroopsInGarrison - TotalTroopsContained);
-			}
-			AddTroop(recruitableTroopType.ID, recruitableTroopsAmount);
-			pointsToSpend -= troopRecruitmentCostHere * recruitableTroopsAmount;
+
+			recruitableTroopsAmount = Mathf.Min(pointsForRecruitment / recruitableTroopType.pointCost,
+					MaxTroopsInGarrison - troopsContained.TotalTroopAmount);
+
+			troopsContained.AddTroop(recruitableTroopType.ID, recruitableTroopsAmount);
+			pointsToSpend -= Mathf.RoundToInt(recruitableTroopsAmount * recruitableTroopType.pointCost / multRecruitmentPoints);
 			WorldFXManager.instance.EmitParticle(WorldFXManager.instance.recruitParticle, MyZoneSpot.transform.position,
 				GameController.GetFactionByID(ownerFaction).color);
 			troopsContained.Sort(TroopNumberPair.CompareTroopNumberPairsByAutocalcPower);
@@ -261,7 +263,7 @@ public class Zone : TroopContainer {
 			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
 			for (int i = 0; i < ownerFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
 
-				troopIndexInGarrison = IndexOfTroopInContainer(ownerFac.troopLine[i]);
+				troopIndexInGarrison = troopsContained.IndexOfTroopInThisList(ownerFac.troopLine[i]);
 				if (troopIndexInGarrison >= 0) {
 					curTTBeingTrained = GameController.GetTroopTypeByID(ownerFac.troopLine[i]);
 					curTTUpgradeTo = GameController.GetTroopTypeByID(ownerFac.troopLine[i + 1]);
@@ -274,8 +276,8 @@ public class Zone : TroopContainer {
 							troopsContained[troopIndexInGarrison].troopAmount);
 					}
 					if (trainableTroops > 0) {
-						RemoveTroop(curTTBeingTrained.ID, trainableTroops);
-						AddTroop(curTTUpgradeTo.ID, trainableTroops);
+						troopsContained.RemoveTroop(curTTBeingTrained.ID, trainableTroops);
+						troopsContained.AddTroop(curTTUpgradeTo.ID, trainableTroops);
 						pointsToSpend -= trainableTroops * troopTrainingCostHere;
 						hasTrained = true;
 					}
@@ -320,6 +322,15 @@ public class Zone : TroopContainer {
 		return ((ownerFaction != targetFacID) && (ownerFaction < 0 ||
 			GameController.GetFactionByID(ownerFaction).GetStandingWith(targetFacID) !=
 				GameFactionRelations.FactionStanding.ally));
+	}
+
+	/// <summary>
+	/// a zone is contested if there are enemy commanders in it
+	/// </summary>
+	/// <returns></returns>
+	public bool IsContested()
+	{
+		return GameController.GetCommandersInvadingZone(this).Count > 0;
 	}
 
 	/// <summary>

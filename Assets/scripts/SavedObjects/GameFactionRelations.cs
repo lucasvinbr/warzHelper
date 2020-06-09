@@ -157,6 +157,31 @@ public class GameFactionRelations
 		return RelationValueToStanding(GetRelationBetweenFactions(facID1, facID2));
 	}
 
+	public List<int> GetFactionsWithStandingToFaction(int facID, FactionStanding targetStanding)
+	{
+		List<int> returnedList = new List<int>();
+
+		foreach(FactionRelation rel in relations)
+		{
+			if(rel.relatedFacs[0] == facID)
+			{
+				if(RelationValueToStanding(rel.relationValue) == targetStanding)
+				{
+					returnedList.Add(rel.relatedFacs[1]);
+				}
+			}
+			else if (rel.relatedFacs[1] == facID)
+			{
+				if (RelationValueToStanding(rel.relationValue) == targetStanding)
+				{
+					returnedList.Add(rel.relatedFacs[0]);
+				}
+			}
+		}
+
+		return returnedList;
+	}
+
 	/// <summary>
 	/// returns the new relation value between the two facs
 	/// </summary>

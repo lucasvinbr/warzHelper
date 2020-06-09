@@ -39,13 +39,15 @@ public class BattlePhaseMan : GamePhaseManager {
 		List<Commander> potentialFighterCmders = curGameData.unifyBattlePhase ?
 			curGameData.deployedCommanders : GameModeHandler.instance.curPlayingFaction.OwnedCommanders;
 
-		Zone zoneCmderIsIn = null;
-		Faction ownerFac = null;
+		Zone zoneCmderIsIn;
+		Faction ownerFac;
 		foreach(Commander cmder in potentialFighterCmders) {
-			if (cmder.TotalAutocalcPower <= 0) continue;
+			if (cmder.troopsContained.TotalAutocalcPower <= 0) continue;
 
 			zoneCmderIsIn = GameController.GetZoneByID(cmder.zoneIAmIn);
-			if(!battleZones.Contains(zoneCmderIsIn) &&
+
+			if(!curGameData.zonesWithResolvedBattlesThisTurn.Contains(zoneCmderIsIn.ID) &&
+				!battleZones.Contains(zoneCmderIsIn) &&
 				zoneCmderIsIn.ownerFaction != cmder.ownerFaction) {
 				ownerFac = GameController.GetFactionByID(zoneCmderIsIn.ownerFaction);
 				if (ownerFac != null && 
@@ -128,6 +130,7 @@ public class BattlePhaseMan : GamePhaseManager {
 	}
 
 	public void OnBattleResolved() {
+		GameController.CurGameData.zonesWithResolvedBattlesThisTurn.Add(battleZones[0].ID);
 		battleZones.RemoveAt(0);
 		if (battleZones.Count == 0) {
 			infoTxt.text = "No more battles to resolve!";
@@ -150,11 +153,13 @@ public class BattlePhaseMan : GamePhaseManager {
 
 	public override void InterruptPhase() {
 		base.InterruptPhase();
+		GameController.CurGameData.zonesWithResolvedBattlesThisTurn.Clear();
 		battlePanel.FullInterrupt();
 	}
 
 	public override void OnPhaseEnded() {
 		base.OnPhaseEnded();
+		GameController.CurGameData.zonesWithResolvedBattlesThisTurn.Clear();
 		infoTxt.text = string.Empty;
 	}
 

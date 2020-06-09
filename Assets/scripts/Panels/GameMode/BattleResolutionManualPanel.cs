@@ -11,7 +11,7 @@ public class BattleResolutionManualPanel : GenericOverlayPanel {
 
 	public BattlePanel bPanel;
 
-	public void SetupAndOpen(List<TroopNumberPair> attackerForces, List<TroopNumberPair> defenderForces) {
+	public void SetupAndOpen(TroopList attackerForces, TroopList defenderForces) {
 		attackerPanel.representedTroops = attackerForces;
 		defenderPanel.representedTroops = defenderForces;
 

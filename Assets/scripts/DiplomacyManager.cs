@@ -12,12 +12,12 @@ public class DiplomacyManager {
 	/// <summary>
 	/// our relation worsens with the faction that attacked us
 	/// </summary>
-	public const float MIN_REL_DMG_ATTACKED = -0.58F, MAX_REL_DMG_ATTACKED = -0.95F;
+	public const float MIN_REL_DMG_ATTACKED = -0.78F, MAX_REL_DMG_ATTACKED = -0.95F;
 
 	/// <summary>
 	/// our relation worsens with the faction that attacked our ally
 	/// </summary>
-	public const float MIN_REL_DMG_ALLY_ATTACKED = -0.33F, MAX_REL_DMG_ALLY_ATTACKED = -0.55F;
+	public const float MIN_REL_DMG_ALLY_ATTACKED = -0.43F, MAX_REL_DMG_ALLY_ATTACKED = -0.75F;
 
 	/// <summary>
 	/// slowly corrode all relations as the war progresses, to make alliances end and
@@ -28,22 +28,27 @@ public class DiplomacyManager {
 	/// <summary>
 	/// our relation worsens with the faction that became allies with an enemy of ours
 	/// </summary>
-	public const float MIN_REL_DMG_ALLIED_TO_ENEMY = -0.35F, MAX_REL_DMG_ALLIED_TO_ENEMY = -0.55F;
+	public const float MIN_REL_DMG_ALLIED_TO_ENEMY = -0.25F, MAX_REL_DMG_ALLIED_TO_ENEMY = -0.35F;
 
 	/// <summary>
 	/// our relation gets better with the faction that attacked our enemy
 	/// </summary>
-	public const float MIN_REL_GAIN_ENEMY_ATTACKED = 0.22F, MAX_REL_GAIN_ENEMY_ATTACKED = 0.37F;
+	public const float MIN_REL_GAIN_ENEMY_ATTACKED = 0.27F, MAX_REL_GAIN_ENEMY_ATTACKED = 0.42F;
+
+	/// <summary>
+	/// our relation gets better with the faction that was attacked by our enemy
+	/// </summary>
+	public const float MIN_REL_GAIN_ATTACKED_BY_ENEMY = 0.05F, MAX_REL_GAIN_ATTACKED_BY_ENEMY = 0.11F;
 
 	/// <summary>
 	/// our relation gets much better with the faction that joins our attack on a common enemy 
 	/// </summary>
-	public const float MIN_REL_GAIN_ATK_ENEMY_TOGETHER = 0.42F, MAX_REL_GAIN_ATK_ENEMY_TOGETHER = 0.69F;
+	public const float MIN_REL_GAIN_ATK_ENEMY_TOGETHER = 0.52F, MAX_REL_GAIN_ATK_ENEMY_TOGETHER = 0.79F;
 
 	/// <summary>
 	/// our relation gets better with the faction that became allies with an ally of ours
 	/// </summary>
-	public const float MIN_REL_GAIN_ALLIED_TO_ALLY = 0.25F, MAX_REL_GAIN_ALLIED_TO_ALLY = 0.35F;
+	public const float MIN_REL_GAIN_ALLIED_TO_ALLY = 0.10F, MAX_REL_GAIN_ALLIED_TO_ALLY = 0.18F;
 
 	/// <summary>
 	/// how good must our relations be before we consider an alliance? (unused for now)
@@ -98,30 +103,6 @@ public class DiplomacyManager {
 	/// this makes our faction change its relation levels after an attack
 	/// if the attack somehow affected it (attacked faction was an ally, for example)
 	/// </summary>
-	/// <param name="ourFac"></param>
-	/// <param name="attackerFac"></param>
-	/// <param name="attackedFac"></param>
-	public static void FacReactToAttack(Faction ourFac, Faction attackerFac, Faction attackedFac) {
-		if(ourFac == attackedFac) {
-			ourFac.AddRelationWith(attackerFac, GetRelDmgAttacked());
-		}else if (attackedFac != null && ourFac != attackerFac) {
-			
-			GameFactionRelations.FactionStanding standingWithAttacked = 
-				attackedFac.GetStandingWith(ourFac);
-			if (standingWithAttacked == GameFactionRelations.FactionStanding.enemy) {
-				ourFac.AddRelationWith(attackerFac, GetRelGainEnemyAttacked());
-			}else if(standingWithAttacked == GameFactionRelations.FactionStanding.ally) {
-				ourFac.AddRelationWith(attackerFac, GetRelDmgAllyAttacked());
-			}
-			//and worsen relations
-			ourFac.AddRelationWith(attackerFac, GetRelDmgAggressiveBehaviour());
-		}
-	}
-
-	/// <summary>
-	/// this makes our faction change its relation levels after an attack
-	/// if the attack somehow affected it (attacked faction was an ally, for example)
-	/// </summary>
 	/// <param name="ourFacID"></param>
 	/// <param name="attackerFacs"></param>
 	/// <param name="attackedFacID"></param>
@@ -142,8 +123,26 @@ public class DiplomacyManager {
 				if (standingWithAttacked == GameFactionRelations.FactionStanding.enemy) {
 					ourFac.AddRelationWith(attackerFacs, GetRelGainEnemyAttacked());
 				}
-				else if (standingWithAttacked == GameFactionRelations.FactionStanding.ally) {
-					ourFac.AddRelationWith(attackerFacs, GetRelDmgAllyAttacked());
+				else{
+					if (standingWithAttacked == GameFactionRelations.FactionStanding.ally)
+					{
+						ourFac.AddRelationWith(attackerFacs, GetRelDmgAllyAttacked());
+					}
+
+					//add some relation to the attacked if at least one of the attackers is an enemy of ours
+					bool attackersContainEnemy = false;
+					foreach(int facID in attackerFacs)
+					{
+						if(ourFac.GetStandingWith(facID) == GameFactionRelations.FactionStanding.enemy)
+						{
+							attackersContainEnemy = true;
+							break;
+						}
+					}
+					if (attackersContainEnemy)
+					{
+						ourFac.AddRelationWith(attackedFac, GetRelGainAttackedByEnemy());
+					}
 				}
 				//and worsen relations
 				ourFac.AddRelationWith(attackerFacs, GetRelDmgAggressiveBehaviour());
@@ -230,9 +229,7 @@ public class DiplomacyManager {
 		if (!gData.factionRelations.lockRelations) {
 			foreach(Faction fac in gData.factions) {
 				if(fac.ID != factionX && fac.ID != factionY) {
-					//look at both factions
 					FactionReactToAlliance(fac, factionX, factionY);
-					FactionReactToAlliance(fac, factionY, factionX);
 				}
 			}
 		}
@@ -294,6 +291,11 @@ public class DiplomacyManager {
 
 	public static float GetRelGainEnemyAttacked() {
 		return Random.Range(MIN_REL_GAIN_ENEMY_ATTACKED, MAX_REL_GAIN_ENEMY_ATTACKED);
+	}
+
+	public static float GetRelGainAttackedByEnemy()
+	{
+		return Random.Range(MIN_REL_GAIN_ATTACKED_BY_ENEMY, MAX_REL_GAIN_ATTACKED_BY_ENEMY);
 	}
 
 	public static float GetRelGainJoinAttack() {

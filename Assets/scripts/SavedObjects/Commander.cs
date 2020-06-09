@@ -42,7 +42,7 @@ public class Commander : TroopContainer {
 		this.ID = GameController.GetUnusedCmderID();
 		this.ownerFaction = ownerFactionID;
 		this.zoneIAmIn = zoneStartingLocation;
-		troopsContained = new List<TroopNumberPair>();
+		troopsContained = new TroopList();
 		GameController.instance.curData.deployedCommanders.Add(this);
 	}
 
@@ -89,27 +89,24 @@ public class Commander : TroopContainer {
 			Faction ownerFac = GameController.GetFactionByID(ownerFaction);
 			bool hasTrained = false;
 			int trainableTroops = 0;
-			int troopTrainingCostHere = 0;
 			int troopIndexInGarrison = -1;
+			int pointsForTraining;
 			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
 			for (int i = 0; i < ownerFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
 
-				troopIndexInGarrison = IndexOfTroopInContainer(ownerFac.troopLine[i]);
+				pointsForTraining = Mathf.RoundToInt(pointsToSpend * curZone.multTrainingPoints);
+				troopIndexInGarrison = troopsContained.IndexOfTroopInThisList(ownerFac.troopLine[i]);
 				if (troopIndexInGarrison >= 0) {
 					curTTBeingTrained = GameController.GetTroopTypeByID(ownerFac.troopLine[i]);
 					curTTUpgradeTo = GameController.GetTroopTypeByID(ownerFac.troopLine[i + 1]);
-					troopTrainingCostHere = Mathf.RoundToInt(curTTUpgradeTo.pointCost / curZone.multTrainingPoints);
-					if (troopTrainingCostHere == 0) {
-						trainableTroops = troopsContained[troopIndexInGarrison].troopAmount;
-					}
-					else {
-						trainableTroops = Mathf.Min(pointsToSpend / troopTrainingCostHere,
+
+					trainableTroops = Mathf.Min(pointsForTraining / curTTUpgradeTo.pointCost,
 							troopsContained[troopIndexInGarrison].troopAmount);
-					}
+
 					if (trainableTroops > 0) {
-						RemoveTroop(curTTBeingTrained.ID, trainableTroops);
-						AddTroop(curTTUpgradeTo.ID, trainableTroops);
-						pointsToSpend -= trainableTroops * troopTrainingCostHere;
+						troopsContained.RemoveTroop(curTTBeingTrained.ID, trainableTroops);
+						troopsContained.AddTroop(curTTUpgradeTo.ID, trainableTroops);
+						pointsToSpend -= Mathf.RoundToInt(trainableTroops * curTTUpgradeTo.pointCost / curZone.multTrainingPoints);
 						hasTrained = true;
 					}
 				}
@@ -156,25 +153,21 @@ public class Commander : TroopContainer {
 	public override bool RecruitTroops() {
 		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
 		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
-		if (TotalTroopsContained < MaxTroopsCommanded && curZone.multRecruitmentPoints > 0) {
+		if (troopsContained.TotalTroopAmount < MaxTroopsCommanded && curZone.multRecruitmentPoints > 0) {
 			//recruitment!
 
 			TroopType recruitableTroopType = GetTroopTypeRecruitedWhereIAm(ownerFac);
 			if (recruitableTroopType == null) return false;
 
-			int troopRecruitmentCostHere =
-				Mathf.RoundToInt(recruitableTroopType.pointCost / curZone.multRecruitmentPoints);
 			int recruitableTroopsAmount = 0;
-			//this troop can be so cheap and the zone so good that the troop ends up with cost 0 after rounding
-			if (troopRecruitmentCostHere == 0) {
-				recruitableTroopsAmount = MaxTroopsCommanded - TotalTroopsContained;
-			}
-			else {
-				recruitableTroopsAmount = Mathf.Min(pointsToSpend / troopRecruitmentCostHere,
-					MaxTroopsCommanded - TotalTroopsContained);
-			}
-			AddTroop(recruitableTroopType.ID, recruitableTroopsAmount);
-			pointsToSpend -= troopRecruitmentCostHere * recruitableTroopsAmount;
+
+			recruitableTroopsAmount = 
+				Mathf.Min(Mathf.RoundToInt(pointsToSpend * curZone.multRecruitmentPoints) / recruitableTroopType.pointCost,
+					MaxTroopsCommanded - troopsContained.TotalTroopAmount);
+
+			troopsContained.AddTroop(recruitableTroopType.ID, recruitableTroopsAmount);
+			pointsToSpend -= 
+				Mathf.RoundToInt(recruitableTroopType.pointCost * recruitableTroopsAmount / curZone.multRecruitmentPoints);
 			WorldFXManager.instance.EmitParticle(WorldFXManager.instance.recruitParticle, MeIn3d.transform.position,
 				GameController.GetFactionByID(ownerFaction).color);
 			troopsContained.Sort(TroopNumberPair.CompareTroopNumberPairsByAutocalcPower);
@@ -252,7 +245,7 @@ public class Commander : TroopContainer {
 			int fakePointsToSpend = pointsToSpend;
 			TroopType curTTBeingTrained = null, curTTUpgradeTo = null;
 			for (int i = 0; i < cmderFac.troopLine.Count - 1; i++) { //the last one can't upgrade, so...
-				troopIndexInGarrison = IndexOfTroopInContainer(cmderFac.troopLine[i]);
+				troopIndexInGarrison = troopsContained.IndexOfTroopInThisList(cmderFac.troopLine[i]);
 				if (troopIndexInGarrison >= 0) {
 					curTTBeingTrained = GameController.GetTroopTypeByID(cmderFac.troopLine[i]);
 					curTTUpgradeTo = GameController.GetTroopTypeByID(cmderFac.troopLine[i + 1]);
@@ -289,6 +282,9 @@ public class Commander : TroopContainer {
 		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
 
 		if (curZone.multRecruitmentPoints > 0) {
+
+			if (curZone.IsContested()) return 0.0f;
+
 			Faction cmderFac = GameController.GetFactionByID(ownerFaction);
 			int fakePointsToSpend = pointsToSpend;
 
@@ -300,11 +296,11 @@ public class Commander : TroopContainer {
 			int recruitableTroopsAmount = 0;
 			//this troop can be so cheap and the zone so good that the troop ends up with cost 0 after rounding
 			if (troopRecruitmentCostHere == 0) {
-				recruitableTroopsAmount = MaxTroopsCommanded - TotalTroopsContained;
+				recruitableTroopsAmount = MaxTroopsCommanded - troopsContained.TotalTroopAmount;
 			}
 			else {
 				recruitableTroopsAmount = Mathf.Min(pointsToSpend / troopRecruitmentCostHere,
-					MaxTroopsCommanded - TotalTroopsContained);
+					MaxTroopsCommanded - troopsContained.TotalTroopAmount);
 			}
 
 			//Debug.Log("GetPercentOfNewTroopsIfRecruited = " + ((float)recruitableTroopsAmount / MaxTroopsCommanded));
@@ -320,7 +316,7 @@ public class Commander : TroopContainer {
 	/// </summary>
 	/// <returns></returns>
 	public float GetPercentOfNewTroopsIfRecruitedComparedToCurrent() {
-		return GetPercentOfNewTroopsIfRecruited() / ((float)TotalTroopsContained / MaxTroopsCommanded);
+		return GetPercentOfNewTroopsIfRecruited() / ((float)troopsContained.TotalTroopAmount / MaxTroopsCommanded);
 	}
 
 	/// <summary>

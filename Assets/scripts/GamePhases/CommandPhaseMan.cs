@@ -104,8 +104,7 @@ public class CommandPhaseMan : GamePhaseManager {
 		if (isMultiOrdering) {
 			Zone curZone = GameController.GetZoneByID(cmder.zoneIAmIn);
 			Faction curFac = GameModeHandler.instance.curPlayingFaction;
-			List<TroopNumberPair> cmderArmies = null;
-			List<Commander> cmdersInZone = GameController.GetCommandersOfFactionInZone(curZone, curFac, out cmderArmies);
+			List<Commander> cmdersInZone = GameController.GetCommandersOfFactionInZone(curZone, curFac, out TroopList cmderArmies);
 			curCmderInfoBox.SetContent(cmderArmies, cmdersInZone.Count, cmder);
 		}else {
 			curCmderInfoBox.SetContent(cmder);
@@ -207,12 +206,21 @@ public class CommandPhaseMan : GamePhaseManager {
 
 
 	public void RecruitBtnPressed() {
+
+		Zone curZone = GameController.GetZoneByID(worldCommandScript.curSelectedCmder.zoneIAmIn);
+
+		if (curZone.IsContested())
+		{
+			SmallTextAnnouncer.instance.DoAnnouncement("Can't recruit in a contested zone!", Color.white);
+			return;
+		}
+
 		if (isMultiOrdering) {
-			List<Commander> actedCmders = new List<Commander>();
+
+			List <Commander> actedCmders = new List<Commander>();
 
 			foreach (Commander cmd in GameController.GetCommandersOfFactionInZone
-				(GameController.GetZoneByID(worldCommandScript.curSelectedCmder.zoneIAmIn),
-				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
+				(curZone, GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
 				if (cmd.OrderRecruitTroops()) {
 					actedCmders.Add(cmd);
 				}
@@ -238,12 +246,20 @@ public class CommandPhaseMan : GamePhaseManager {
 	}
 
 	public void TrainingBtnPressed() {
+
+		Zone curZone = GameController.GetZoneByID(worldCommandScript.curSelectedCmder.zoneIAmIn);
+
+		if (curZone.IsContested())
+		{
+			SmallTextAnnouncer.instance.DoAnnouncement("Can't train in a contested zone!", Color.white);
+			return;
+		}
+
 		if (isMultiOrdering) {
 			List<Commander> actedCmders = new List<Commander>();
 
 			foreach (Commander cmd in GameController.GetCommandersOfFactionInZone
-				(GameController.GetZoneByID(worldCommandScript.curSelectedCmder.zoneIAmIn),
-				GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
+				(curZone, GameModeHandler.instance.curPlayingFaction, commandableCommanders)) {
 				if (cmd.OrderTrainTroops()) {
 					actedCmders.Add(cmd);
 				}

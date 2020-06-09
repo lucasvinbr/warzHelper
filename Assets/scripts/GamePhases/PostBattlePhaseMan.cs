@@ -69,13 +69,12 @@ public class PostBattlePhaseMan : GamePhaseManager {
 		Faction cmderFac = null, ownerFac = GameController.GetFactionByID(confZone.ownerFaction);
 
 		bool zoneWasTaken = false, 
-			zoneStillHasDefenders = GameController.GetTotalTroopAmountFromTroopList(
-				GameController.GetCombinedTroopsInZoneFromFactionAndAllies
-				(confZone, ownerFac)) > 0;
+			zoneStillHasDefenders = 
+			GameController.GetCombinedTroopsInZoneFromFactionAndAllies(confZone, ownerFac).TotalTroopAmount > 0;
 
 		//"kill" all commanders with no troops
 		foreach (Commander c in cmdersInZone) {
-			if(c.TotalTroopsContained == 0) {
+			if(c.troopsContained.TotalTroopAmount == 0) {
 				StartCoroutine(KillCommanderRoutine(c));
 				//mark for tidying after all "dead" cmders have been removed
 				if (!zonesToCleanUp.Contains(confZone)) {
@@ -98,9 +97,8 @@ public class PostBattlePhaseMan : GamePhaseManager {
 					}else {
 						//the check made for zoneStillHasDefenders is not enough in the
 						//"ally is also ally of my enemy" case
-						if (GameController.GetTotalTroopAmountFromTroopList(
-							GameController.GetCombinedTroopsInZoneFromFactionAndAllies
-							(confZone, ownerFac.ID, cmderFac.ID)) == 0) {
+						if (GameController.GetCombinedTroopsInZoneFromFactionAndAllies
+							(confZone, ownerFac.ID, cmderFac.ID).TotalTroopAmount == 0) {
 
 							confZone.ownerFaction = c.ownerFaction;
 							confZone.pointsToSpend = 0;

@@ -32,7 +32,7 @@ public class CmdPhaseCurCmderInfoBox : MonoBehaviour
 		//clear troop entries first
 		ClearTroopEntries();
 
-		numTroopsTxt.text = "Troops: " + cmder.TotalTroopsContained + "/" + cmder.MaxTroopsCommanded;
+		numTroopsTxt.text = "Troops: " + cmder.troopsContained.TotalTroopAmount + "/" + cmder.MaxTroopsCommanded;
 
 		foreach(TroopNumberPair tnp in cmder.troopsContained) {
 			AddTroopEntry(tnp);
@@ -51,11 +51,11 @@ public class CmdPhaseCurCmderInfoBox : MonoBehaviour
 	/// <param name="cmdersArmy"></param>
 	/// <param name="cmdersCount"></param>
 	/// <param name="sampleCmder"></param>
-	public void SetContent(List<TroopNumberPair> cmdersArmy, int cmdersCount, Commander sampleCmder) {
+	public void SetContent(TroopList cmdersArmy, int cmdersCount, Commander sampleCmder) {
 		//clear troop entries first
 		ClearTroopEntries();
 
-		numTroopsTxt.text = "Troops: " + GameController.GetTotalTroopAmountFromTroopList(cmdersArmy) + "/" + sampleCmder.MaxTroopsCommanded * cmdersCount;
+		numTroopsTxt.text = "Troops: " + cmdersArmy.TotalTroopAmount + "/" + sampleCmder.MaxTroopsCommanded * cmdersCount;
 
 		foreach (TroopNumberPair tnp in cmdersArmy) {
 			AddTroopEntry(tnp);
