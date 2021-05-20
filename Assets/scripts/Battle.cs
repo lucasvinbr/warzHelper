@@ -156,6 +156,7 @@ public class Battle {
 
 
 			onBattleEnded?.Invoke();
+			onBattleEnded = null;
 		}
 
 		return battleHasEnded;
