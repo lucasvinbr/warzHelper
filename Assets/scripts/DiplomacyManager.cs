@@ -19,16 +19,16 @@ public class DiplomacyManager {
 	/// </summary>
 	public const float MIN_REL_DMG_ALLY_ATTACKED = -0.43F, MAX_REL_DMG_ALLY_ATTACKED = -0.75F;
 
-	/// <summary>
-	/// slowly corrode all relations as the war progresses, to make alliances end and
-	/// factions that keep taking too many zones become targets
-	/// </summary>
-	public const float MIN_REL_DMG_AGGRESSIVE = -0.15F, MAX_REL_DMG_AGGRESSIVE = -0.25F;
+    /// <summary>
+    /// slowly corrode all relations as the war progresses, to make alliances end and
+    /// factions that keep taking too many zones become targets
+    /// </summary>
+    public const float MIN_REL_DMG_AGGRESSIVE = -0.001F, MAX_REL_DMG_AGGRESSIVE = -0.005F;
 
-	/// <summary>
-	/// our relation worsens with the faction that became allies with an enemy of ours
-	/// </summary>
-	public const float MIN_REL_DMG_ALLIED_TO_ENEMY = -0.25F, MAX_REL_DMG_ALLIED_TO_ENEMY = -0.35F;
+    /// <summary>
+    /// our relation worsens with the faction that became allies with an enemy of ours
+    /// </summary>
+    public const float MIN_REL_DMG_ALLIED_TO_ENEMY = -0.25F, MAX_REL_DMG_ALLIED_TO_ENEMY = -0.35F;
 
 	/// <summary>
 	/// our relation gets better with the faction that attacked our enemy
@@ -48,7 +48,7 @@ public class DiplomacyManager {
 	/// <summary>
 	/// our relation gets better with the faction that became allies with an ally of ours
 	/// </summary>
-	public const float MIN_REL_GAIN_ALLIED_TO_ALLY = 0.10F, MAX_REL_GAIN_ALLIED_TO_ALLY = 0.18F;
+	public const float MIN_REL_GAIN_ALLIED_TO_ALLY = 0.02F, MAX_REL_GAIN_ALLIED_TO_ALLY = 0.04F;
 
 	/// <summary>
 	/// how good must our relations be before we consider an alliance? (unused for now)
@@ -69,6 +69,11 @@ public class DiplomacyManager {
 	/// our relation gets much worse with a faction that gave a zone to an enemy of ours
 	/// </summary>
 	public const float MIN_REL_DMG_GAVE_ZONE_TO_ENEMY = -0.55f, MAX_REL_DMG_GAVE_ZONE_TO_ENEMY = -0.75f;
+
+	/// <summary>
+	/// factions that have more enemies than allies should try to get more allies faster
+	/// </summary>
+	public const float FACTION_IN_DISADVANTAGE_FRIENDLINESS_MULTIPLIER = 1.15f;
 
 	#endregion
 
@@ -92,8 +97,13 @@ public class DiplomacyManager {
 					attackers.Add(cmder.ownerFaction);
 				}
 			}
+
+			List<Faction> factionsInDisadvantage = GetAllFactionsInDisadvantage();
+
 			foreach (Faction fac in gData.factions) {
-				FacReactToAttack(fac.ID, attackers, attackedZone.ownerFaction);
+				FacReactToAttack(fac.ID, attackers, attackedZone.ownerFaction, factionsInDisadvantage.Contains(fac) ? 
+																					FACTION_IN_DISADVANTAGE_FRIENDLINESS_MULTIPLIER :
+																					1.0f);
 			}
 		}
 
@@ -106,7 +116,7 @@ public class DiplomacyManager {
 	/// <param name="ourFacID"></param>
 	/// <param name="attackerFacs"></param>
 	/// <param name="attackedFacID"></param>
-	public static void FacReactToAttack(int ourFacID, List<int> attackerFacs, int attackedFacID) {
+	public static void FacReactToAttack(int ourFacID, List<int> attackerFacs, int attackedFacID, float relationGainMultiplier = 1.0f) {
 		GameInfo gData = GameController.CurGameData;
 
 		Faction ourFac = GameController.GetFactionByID(ourFacID);
@@ -121,7 +131,7 @@ public class DiplomacyManager {
 				GameFactionRelations.FactionStanding standingWithAttacked =
 					attackedFac.GetStandingWith(ourFacID);
 				if (standingWithAttacked == GameFactionRelations.FactionStanding.enemy) {
-					ourFac.AddRelationWith(attackerFacs, GetRelGainEnemyAttacked());
+					ourFac.AddRelationWith(attackerFacs, GetRelGainEnemyAttacked() * relationGainMultiplier);
 				}
 				else{
 					if (standingWithAttacked == GameFactionRelations.FactionStanding.ally)
@@ -141,7 +151,7 @@ public class DiplomacyManager {
 					}
 					if (attackersContainEnemy)
 					{
-						ourFac.AddRelationWith(attackedFac, GetRelGainAttackedByEnemy());
+						ourFac.AddRelationWith(attackedFac, GetRelGainAttackedByEnemy() * relationGainMultiplier);
 					}
 				}
 				//and worsen relations
@@ -149,7 +159,7 @@ public class DiplomacyManager {
 			}else {
 				foreach(int atkerFacID in attackerFacs) {
 					if(atkerFacID != ourFacID) {
-						ourFac.AddRelationWith(atkerFacID, GetRelGainJoinAttack());
+						ourFac.AddRelationWith(atkerFacID, GetRelGainJoinAttack() * relationGainMultiplier);
 					}
 				}
 			}
@@ -227,9 +237,14 @@ public class DiplomacyManager {
 	public static void GlobalReactToAlliance(int factionX, int factionY) {
 		GameInfo gData = GameController.CurGameData;
 		if (!gData.factionRelations.lockRelations) {
-			foreach(Faction fac in gData.factions) {
+
+			List<Faction> factionsInDisadvantage = GetAllFactionsInDisadvantage();
+
+			foreach (Faction fac in gData.factions) {
 				if(fac.ID != factionX && fac.ID != factionY) {
-					FactionReactToAlliance(fac, factionX, factionY);
+					FactionReactToAlliance(fac, factionX, factionY, factionsInDisadvantage.Contains(fac) ?
+																		FACTION_IN_DISADVANTAGE_FRIENDLINESS_MULTIPLIER :
+																		1.0f);
 				}
 			}
 		}
@@ -243,7 +258,7 @@ public class DiplomacyManager {
 	/// <param name="reactingFaction"></param>
 	/// <param name="IDfactionReactedAgainst"></param>
 	/// <param name="IDtheirNewAlly"></param>
-	public static void FactionReactToAlliance(Faction reactingFaction, int IDfactionReactedAgainst, int IDtheirNewAlly) {
+	public static void FactionReactToAlliance(Faction reactingFaction, int IDfactionReactedAgainst, int IDtheirNewAlly, float relationGainMultiplier = 1.0f) {
 		switch (reactingFaction.GetStandingWith(IDtheirNewAlly)) {
 			case GameFactionRelations.FactionStanding.enemy:
 				//frown at factionReactedAgainst!
@@ -251,7 +266,7 @@ public class DiplomacyManager {
 				break;
 			case GameFactionRelations.FactionStanding.ally:
 				//get closer to factionReactedAgainst!
-				reactingFaction.AddRelationWith(IDfactionReactedAgainst, GetRelGainAlliedToAlly());
+				reactingFaction.AddRelationWith(IDfactionReactedAgainst, GetRelGainAlliedToAlly() * relationGainMultiplier);
 				break;
 			default:
 				//if we're neutral to theirNewAlly, don't care much about this alliance
@@ -270,6 +285,26 @@ public class DiplomacyManager {
 	public static bool ShouldConsiderAlliance(float curRelation) {
 		return Random.Range(MIN_RELPERCENT_REQUIRED_ALLIANCE * GameFactionRelations.CONSIDER_ALLY_THRESHOLD,
 			GameFactionRelations.CONSIDER_ALLY_THRESHOLD) < curRelation;
+	}
+
+	/// <summary>
+	/// returns a list with all factions that have more enemies than allies
+	/// </summary>
+	/// <returns></returns>
+	public static List<Faction> GetAllFactionsInDisadvantage()
+    {
+		List<Faction> returnedList = new List<Faction>();
+		GameInfo gData = GameController.CurGameData;
+
+		foreach(Faction f in gData.factions)
+        {
+			if(f.GetDiplomaticEnemies().Count > f.GetDiplomaticAllies().Count)
+            {
+				returnedList.Add(f);
+            }
+        }
+
+		return returnedList;
 	}
 
 	#region randomized value getters

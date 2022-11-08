@@ -1341,6 +1341,7 @@ public class GameController : MonoBehaviour {
 				}
 
 				List<Zone> availableZones = new List<Zone>(curData.zones);
+
 				List<Zone> zonesGivenToCurFac = new List<Zone>();
 				Zone candidateZone;
 				foreach (Faction fac in curData.factions) {
@@ -1351,7 +1352,7 @@ public class GameController : MonoBehaviour {
 							candidateZone = availableZones[Random.Range(0, availableZones.Count)];
 						}
 						else {
-							//try to get zones close to each other
+							//try to get zones linked to each other
 							foreach (Zone z in availableZones) {
 								if (IsZoneLinkedToAnyZoneOfList(z, zonesGivenToCurFac)) {
 									candidateZone = z;
@@ -1359,6 +1360,7 @@ public class GameController : MonoBehaviour {
 								}
 							}
 							//or just a random one if we fail
+							
 							if (candidateZone == null) candidateZone = availableZones[Random.Range(0, availableZones.Count)];
 						}
 

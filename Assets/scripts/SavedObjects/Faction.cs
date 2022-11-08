@@ -228,6 +228,16 @@ public class Faction
 			(ID, GameFactionRelations.FactionStanding.enemy);
 	}
 
+	/// <summary>
+	/// returns the IDs of factions with which this one has a standing of "ally"
+	/// </summary>
+	/// <returns></returns>
+	public List<int> GetDiplomaticAllies()
+	{
+		return GameController.CurGameData.factionRelations.GetFactionsWithStandingToFaction
+			(ID, GameFactionRelations.FactionStanding.ally);
+	}
+
 	public static int SortByTurnPriority(Faction x, Faction y) {
 		int comparison = x.turnPriority.CompareTo(y.turnPriority);
 		//if it's equal, randomize it
