@@ -153,7 +153,7 @@ public class Commander : TroopContainer {
 	public override bool RecruitTroops() {
 		Zone curZone = GameController.GetZoneByID(zoneIAmIn);
 		Faction ownerFac = GameController.GetFactionByID(ownerFaction);
-		if (troopsContained.TotalTroopAmount < MaxTroopsCommanded && curZone.multRecruitmentPoints > 0) {
+		if (!curZone.IsContested() && troopsContained.TotalTroopAmount < MaxTroopsCommanded && curZone.multRecruitmentPoints > 0) {
 			//recruitment!
 
 			TroopType recruitableTroopType = GetTroopTypeRecruitedWhereIAm(ownerFac);
