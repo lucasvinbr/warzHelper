@@ -223,6 +223,11 @@ public class GameController : MonoBehaviour {
 			RemoveCommander(cmder);
 		}
 
+		if(GameModeHandler.instance.curPlayingFaction == targetFaction)
+		{
+			GameModeHandler.instance.TurnFinished();
+		}
+
 		instance.curData.factions.Remove(targetFaction);
 		GameInterface.factionDDownsAreStale = true;
 		GameInfo gData = CurGameData;
@@ -1343,13 +1348,31 @@ public class GameController : MonoBehaviour {
 				List<Zone> availableZones = new List<Zone>(curData.zones);
 
 				List<Zone> zonesGivenToCurFac = new List<Zone>();
+				List<Zone> zonesGivenToLastFac = new List<Zone>();
 				Zone candidateZone;
 				foreach (Faction fac in curData.factions) {
+					if(zonesGivenToCurFac.Count > 0)
+					{
+						zonesGivenToLastFac.Clear();
+						zonesGivenToLastFac.AddRange(zonesGivenToCurFac);
+					}
+
 					zonesGivenToCurFac.Clear();
 					while (zonesGivenToCurFac.Count < zonesPerFaction && availableZones.Count > 0) {
 						candidateZone = null;
 						if (zonesGivenToCurFac.Count == 0) {
-							candidateZone = availableZones[Random.Range(0, availableZones.Count)];
+                            // start from one of the last picked zones, if any
+							if(zonesGivenToLastFac.Count > 0)
+							{
+                                foreach (Zone z in availableZones)
+                                {
+                                    if (IsZoneLinkedToAnyZoneOfList(z, zonesGivenToLastFac))
+                                    {
+                                        candidateZone = z;
+                                        break;
+                                    }
+                                }
+                            }
 						}
 						else {
 							//try to get zones linked to each other
@@ -1359,12 +1382,27 @@ public class GameController : MonoBehaviour {
 									break;
 								}
 							}
-							//or just a random one if we fail
-							
-							if (candidateZone == null) candidateZone = availableZones[Random.Range(0, availableZones.Count)];
-						}
 
-						candidateZone.ownerFaction = fac.ID;
+							if(candidateZone == null)
+							{
+                                // fall back to probably close zones if we can't find any directly linked
+                                foreach (Zone z in availableZones)
+                                {
+                                    if (IsZoneLinkedToAnyZoneOfList(z, zonesGivenToLastFac))
+                                    {
+                                        candidateZone = z;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                        }
+
+
+                        //or just a random one if all fails or we just started distributing
+                        if (candidateZone == null) candidateZone = availableZones[Random.Range(0, availableZones.Count)];
+
+                        candidateZone.ownerFaction = fac.ID;
 						zonesGivenToCurFac.Add(candidateZone);
 						availableZones.Remove(candidateZone);
 					}
