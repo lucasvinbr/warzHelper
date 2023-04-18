@@ -35,6 +35,13 @@ public class CommandPhaseMan : GamePhaseManager {
 		commandableCommanders.Clear();
 		worldCommandScript.Cleanup();
 		Faction playerFac = GameModeHandler.instance.curPlayingFaction;
+
+		if (playerFac == null)
+		{
+            OnPhaseEnding();
+			return;
+        }
+
 		List<Commander> factionCmders = playerFac.OwnedCommanders;
 		GameInfo gData = GameController.CurGameData;
 
