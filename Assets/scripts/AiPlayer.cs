@@ -69,11 +69,16 @@ public class AiPlayer {
 	/// </summary>
 	public const float FRIENDLY_CMDER_PRESENCE_MULT = 1.06f;
 
-	/// <summary>
-	/// if the ratio of spawned cmders / max cmders is below this value,
-	/// the AI should try to make room for new cmders
-	/// </summary>
-	public const float SHOULD_GET_MORE_CMDERS_THRESHOLD = 0.75f;
+    /// <summary>
+    /// neutral zones can be very valuable! Factions should be encouraged to take them before someone else does
+    /// </summary>
+    public const float NEUTRAL_ZONE_SCORE_BONUS = 1.6f;
+
+    /// <summary>
+    /// if the ratio of spawned cmders / max cmders is below this value,
+    /// the AI should try to make room for new cmders
+    /// </summary>
+    public const float SHOULD_GET_MORE_CMDERS_THRESHOLD = 0.75f;
 
 	/// <summary>
 	/// the AI will avoid traveling to further locations if at least one of the nearby zones reaches this score
@@ -190,7 +195,11 @@ public class AiPlayer {
 				if (factionCmderAmountRatio < SHOULD_GET_MORE_CMDERS_THRESHOLD) {
 					if (scoreCheckZone.ownerFaction != ourFac.ID
                         && ourFac.GetStandingWith(scoreCheckZone.ownerFaction) != GameFactionRelations.FactionStanding.ally) {
-						scoreCheckScore *= factionCmderAmountRatio * factionCmderAmountRatio;
+						// don't disencourage moving to neutral zones though!
+						if(scoreCheckZone.ownerFaction >= 0)
+						{
+                            scoreCheckScore *= factionCmderAmountRatio * factionCmderAmountRatio;
+                        }
 					}
 					else {
 						if (emptyNewCmderZones.Count == 1 &&
@@ -372,6 +381,11 @@ public class AiPlayer {
 		if(targetZone.ownerFaction >= 0)
 		{
 			finalScore /= MOVE_SCORE_DIVISOR;
+		}
+		else
+		{
+			// this zone is neutral! encourage moving to it
+			finalScore += NEUTRAL_ZONE_SCORE_BONUS;
 		}
 
 		return finalScore;
