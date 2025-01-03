@@ -65,7 +65,8 @@ public class GameModeHandler : ModeUI {
 	}
 
 	public override void Initialize() {
-		GameController.instance.facMatsHandler.ReBakeFactionColorsDict();
+
+        GameController.instance.facMatsHandler.ReBakeFactionColorsDict();
 		World.CleanZonesContainer();
 		World.CleanZoneLinks();
 		World.CleanCmders();
@@ -107,7 +108,6 @@ public class GameModeHandler : ModeUI {
 
 		ScheduleTurnStartAfterPanelsClose(data.curTurnPhase);
 		
-
 	}
 
 	/// <summary>
@@ -135,8 +135,8 @@ public class GameModeHandler : ModeUI {
 	{
 		if (!turnStartScheduled)
 		{
-			StartCoroutine(StartTurnAfterPanelsClose(startingPhase, noFactionKillingThisTurn));
-			turnStartScheduled = true;
+            turnStartScheduled = true;
+            StartCoroutine(StartTurnAfterPanelsClose(startingPhase, noFactionKillingThisTurn));
 		}
 	}
 
@@ -157,7 +157,7 @@ public class GameModeHandler : ModeUI {
 		GameInfo data = GameController.CurGameData;
 		curPlayingFaction = GameController.GetNextFactionInTurnOrder(data.lastTurnPriority);
 
-		if (GameController.ShouldFactionGetATurn(curPlayingFaction)) {
+        if (GameController.ShouldFactionGetATurn(curPlayingFaction)) {
 			currentTurnIsFast = (!curPlayingFaction.isPlayer && data.fastAiTurns);
 			if (!currentTurnIsFast)
 				bigAnnouncer.DoAnnouncement(curPlayingFaction.name + "\nTurn", curPlayingFaction.color);
@@ -218,6 +218,9 @@ public class GameModeHandler : ModeUI {
 
 		data.lastTurnPriority = curPlayingFaction.turnPriority;
 		data.elapsedTurns++;
+
+		DiplomacyManager.GlobalDecayRelationsWithFac(curPlayingFaction.ID);
+
 		//TODO victory check
 		//check for a special case:
 		//in "unified mode" last faction in turn order isn't killed right away

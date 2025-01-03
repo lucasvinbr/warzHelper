@@ -75,17 +75,27 @@ public class DiplomacyManager {
 	/// </summary>
 	public const float FACTION_IN_DISADVANTAGE_FRIENDLINESS_MULTIPLIER = 1.15f;
 
-	#endregion
-
-	#region reactions to attacks
 	/// <summary>
-	/// gets attackers and defenders according to the zone owner's diplomacy.
-	/// the attacked should get angry with the attacker;
-	/// everyone gets a little relation decrease with the attacker as well...
-	/// unless we're enemies with the attacked
+	/// relations should return to neutral with time, unless something favorable keeps happening
 	/// </summary>
-	/// <param name="attackedZone"></param>
-	public static void GlobalReactToAttack(Zone attackedZone) {
+	public const float MIN_REL_DMG_ALLIANCE_DECAY = -0.005f, MAX_REL_DMG_ALLIANCE_DECAY = -0.025f;
+
+    /// <summary>
+    /// relations should return to neutral with time, unless something bad keeps happening
+    /// </summary>
+    public const float MIN_REL_GAIN_ENEMY_DECAY = 0.005f, MAX_REL_GAIN_ENEMY_DECAY = 0.025f;
+
+    #endregion
+
+    #region reactions to attacks
+    /// <summary>
+    /// gets attackers and defenders according to the zone owner's diplomacy.
+    /// the attacked should get angry with the attacker;
+    /// everyone gets a little relation decrease with the attacker as well...
+    /// unless we're enemies with the attacked
+    /// </summary>
+    /// <param name="attackedZone"></param>
+    public static void GlobalReactToAttack(Zone attackedZone) {
 		GameInfo gData = GameController.CurGameData;
 		if (!gData.factionRelations.lockRelations) {
 			List<int> attackers = new List<int>();
@@ -274,15 +284,64 @@ public class DiplomacyManager {
 		}
 	}
 
-	#endregion
+    #endregion
 
-	/// <summary>
-	/// considers a random value between the MIN_REL_REQUIRED and the max 
-	/// and how close our relation is to the max
-	/// (unused for now)
-	/// </summary>
-	/// <returns></returns>
-	public static bool ShouldConsiderAlliance(float curRelation) {
+    #region relation decay
+
+    public static void GlobalDecayRelationsWithFac(int factionX)
+    {
+        GameInfo gData = GameController.CurGameData;
+        if (!gData.factionRelations.lockRelations)
+        {
+
+            List<Faction> factionsInDisadvantage = GetAllFactionsInDisadvantage();
+
+            foreach (Faction fac in gData.factions)
+            {
+                if (fac.ID != factionX)
+                {
+                    FactionRelationsDecayWithFac(fac, factionX, factionsInDisadvantage.Contains(fac) ?
+                                                                        FACTION_IN_DISADVANTAGE_FRIENDLINESS_MULTIPLIER :
+                                                                        1.0f);
+                }
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// reactingFaction enhances or degrades relations with factionReactedAgainst, according to
+    /// reactingFaction's current relation: worsens if it's good, gets better if it's bad
+    /// </summary>
+    /// <param name="reactingFaction"></param>
+    /// <param name="IDfactionDecayedAgainst"></param>
+    public static void FactionRelationsDecayWithFac(Faction reactingFaction, int IDfactionDecayedAgainst, float relationGainMultiplier = 1.0f)
+    {
+        switch (reactingFaction.GetStandingWith(IDfactionDecayedAgainst))
+        {
+            case GameFactionRelations.FactionStanding.enemy:
+                //forget grievances a little!
+                reactingFaction.AddRelationWith(IDfactionDecayedAgainst, GetRelGainEnemyDecay() * relationGainMultiplier);
+                break;
+            case GameFactionRelations.FactionStanding.ally:
+                //forget a little why we allied in the first place!
+                reactingFaction.AddRelationWith(IDfactionDecayedAgainst, GetRelDmgAllianceDecay());
+                break;
+            default:
+                //if we're neutral, don't care
+                break;
+        }
+    }
+
+    #endregion
+
+    /// <summary>
+    /// considers a random value between the MIN_REL_REQUIRED and the max 
+    /// and how close our relation is to the max
+    /// (unused for now)
+    /// </summary>
+    /// <returns></returns>
+    public static bool ShouldConsiderAlliance(float curRelation) {
 		return Random.Range(MIN_RELPERCENT_REQUIRED_ALLIANCE * GameFactionRelations.CONSIDER_ALLY_THRESHOLD,
 			GameFactionRelations.CONSIDER_ALLY_THRESHOLD) < curRelation;
 	}
@@ -355,7 +414,17 @@ public class DiplomacyManager {
 	{
 		return Random.Range(MIN_REL_GAIN_ALLIED_TO_ALLY, MAX_REL_GAIN_ALLIED_TO_ALLY);
 	}
-	#endregion
+
+    public static float GetRelDmgAllianceDecay()
+    {
+        return Random.Range(MIN_REL_DMG_ALLIANCE_DECAY, MAX_REL_DMG_ALLIANCE_DECAY);
+    }
+
+    public static float GetRelGainEnemyDecay()
+    {
+        return Random.Range(MIN_REL_GAIN_ENEMY_DECAY, MAX_REL_GAIN_ENEMY_DECAY);
+    }
+    #endregion
 
 
 }
