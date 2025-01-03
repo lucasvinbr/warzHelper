@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class CommandPhaseMan : GamePhaseManager {
 
+	public Button showCurCmderBtn;
 	public Button getIdleCmderBtn;
 
 	public CanvasGroup selectedCmderBtnsGroup;
@@ -112,7 +113,9 @@ public class CommandPhaseMan : GamePhaseManager {
 			Zone curZone = GameController.GetZoneByID(cmder.zoneIAmIn);
 			Faction curFac = GameModeHandler.instance.curPlayingFaction;
 			List<Commander> cmdersInZone = GameController.GetCommandersOfFactionInZone(curZone, curFac, out TroopList cmderArmies);
-			curCmderInfoBox.SetContent(cmderArmies, cmdersInZone.Count, cmder);
+            List<Commander> commandableCmdersInZone = 
+				GameController.GetCommandersOfFactionInZone(curZone, curFac, commandableCommanders, out TroopList commandableCmderArmies);
+            curCmderInfoBox.SetContent(cmderArmies, cmdersInZone.Count, commandableCmderArmies, commandableCmdersInZone.Count, cmder);
 		}else {
 			curCmderInfoBox.SetContent(cmder);
 		}
@@ -170,6 +173,17 @@ public class CommandPhaseMan : GamePhaseManager {
 			GoToNextIdleCmder(worldCommandScript.curSelectedCmder, true);
 		}
 	}
+
+	/// <summary>
+	/// used by the UI btn
+	/// </summary>
+	public void FocusOnCurrentcmder()
+	{
+        if (worldCommandScript.curSelectedCmder != null)
+        {
+            CameraPanner.instance.TweenToSpot(worldCommandScript.curSelectedCmder.MeIn3d.transform.position);
+        }
+    }
 
 	/// <summary>
 	/// selects the next idle cmder and removes the provided cmder from the list

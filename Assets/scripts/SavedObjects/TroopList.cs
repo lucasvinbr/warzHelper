@@ -94,6 +94,8 @@ public class TroopList : List<TroopNumberPair> {
 
 	}
 
+	
+
 	public bool HasTroop(int TTID)
 	{
 		for (int i = 0; i < Count; i++)
@@ -106,6 +108,20 @@ public class TroopList : List<TroopNumberPair> {
 
 		return false;
 	}
+
+
+	public TroopNumberPair GetTroopsOfType(int TTID)
+	{
+        for (int i = 0; i < Count; i++)
+        {
+            if (this[i].troopTypeID == TTID)
+            {
+                return this[i];
+            }
+        }
+
+        return default;
+    }
 
 	/// <summary>
 	/// returns -1 if it can't find a troop with the provided ID

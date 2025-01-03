@@ -604,7 +604,37 @@ public class GameController : MonoBehaviour {
 		return friendlyCommandersInTheZone;
 	}
 
-	public static List<Commander> GetCommandersOfFactionInZone(Zone targetZone, Faction targetFac, out TroopList cmdersArmy) {
+    /// <summary>
+    /// can only get cmders that are also in the provided whitelist. Also outs the retrieved cmders' combined army
+    /// </summary>
+    /// <param name="targetZone"></param>
+    /// <param name="targetFac"></param>
+    /// <param name="whitelist"></param>
+    /// <returns></returns>
+    public static List<Commander> GetCommandersOfFactionInZone(Zone targetZone, Faction targetFac, List<Commander> whitelist, out TroopList cmdersArmy)
+    {
+        List<Commander> friendlyCommandersInTheZone = new List<Commander>();
+        cmdersArmy = new TroopList();
+        foreach (Commander cmder in targetFac.OwnedCommanders)
+        {
+            if (cmder.zoneIAmIn == targetZone.ID && whitelist.Contains(cmder))
+            {
+                friendlyCommandersInTheZone.Add(cmder);
+                cmdersArmy = GetCombinedTroopsFromTwoLists(cmdersArmy, cmder.troopsContained);
+            }
+        }
+
+        return friendlyCommandersInTheZone;
+    }
+
+    /// <summary>
+    /// also outs the commanders' army
+    /// </summary>
+    /// <param name="targetZone"></param>
+    /// <param name="targetFac"></param>
+    /// <param name="cmdersArmy"></param>
+    /// <returns></returns>
+    public static List<Commander> GetCommandersOfFactionInZone(Zone targetZone, Faction targetFac, out TroopList cmdersArmy) {
 		List<Commander> friendlyCommandersInTheZone = new List<Commander>();
 		cmdersArmy = new TroopList();
 		foreach (Commander cmder in targetFac.OwnedCommanders) {

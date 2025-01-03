@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 
 /// <summary>
-/// expandable box, displayed only during the command phase, that shows info about the currently selected commander
+/// expandable box, displayed only during the command phase, that shows info about the currently selected commander(s)
 /// </summary>
 public class CmdPhaseCurCmderInfoBox : MonoBehaviour
 {
@@ -51,14 +51,27 @@ public class CmdPhaseCurCmderInfoBox : MonoBehaviour
 	/// <param name="cmdersArmy"></param>
 	/// <param name="cmdersCount"></param>
 	/// <param name="sampleCmder"></param>
-	public void SetContent(TroopList cmdersArmy, int cmdersCount, Commander sampleCmder) {
+	public void SetContent(TroopList cmdersArmy, int cmdersCount, TroopList commandableCmdersArmy, int commandableCmdersCount, Commander sampleCmder) {
 		//clear troop entries first
 		ClearTroopEntries();
 
 		numTroopsTxt.text = "Troops: " + cmdersArmy.TotalTroopAmount + "/" + sampleCmder.MaxTroopsCommanded * cmdersCount;
 
+		if(commandableCmdersCount != cmdersCount)
+		{
+			numTroopsTxt.text += string.Concat("\n(", commandableCmdersArmy.TotalTroopAmount, "/", sampleCmder.MaxTroopsCommanded * commandableCmdersCount);
+		}
+
 		foreach (TroopNumberPair tnp in cmdersArmy) {
-			AddTroopEntry(tnp);
+            if (commandableCmdersCount != cmdersCount)
+            {
+				AddTroopEntry(tnp, commandableCmdersArmy.GetTroopsOfType(tnp.troopTypeID).troopAmount);
+			}
+			else
+			{
+                AddTroopEntry(tnp);
+            }
+            
 		}
 
 
@@ -74,12 +87,20 @@ public class CmdPhaseCurCmderInfoBox : MonoBehaviour
 		}
 	}
 
-	public void AddTroopEntry(TroopNumberPair tnp) {
+	public void AddTroopEntry(TroopNumberPair tnp, int troopAmountInParenthesis = -1) {
 		GameObject newEntry = Instantiate(troopEntryPrefab, troopEntriesContainer);
 		LayoutTooltipTwoTextEntry entryScript = newEntry.GetComponent<LayoutTooltipTwoTextEntry>();
 
 		entryScript.leftTxt.text = GameController.GetTroopTypeByID(tnp.troopTypeID).name;
-		entryScript.rightTxt.text = tnp.troopAmount.ToString();
-	}
+
+        if (troopAmountInParenthesis != -1)
+        {
+            entryScript.rightTxt.text = string.Concat(tnp.troopAmount.ToString(), " (", troopAmountInParenthesis.ToString(), ")");
+        }
+        else
+        {
+            entryScript.rightTxt.text = tnp.troopAmount.ToString();
+        }
+    }
 
 }
